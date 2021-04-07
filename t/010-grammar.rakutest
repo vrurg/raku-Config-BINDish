@@ -1,0 +1,175 @@
+use v6.d;
+use Test;
+use Config::BINDish;
+use Config::BINDish::Grammar;
+use Config::BINDish::Actions;
+use Config::BINDish::AST;
+
+my $res;
+
+role R1 is BINDish-grammar { }
+role R2 is BINDish-grammar {
+    method panic(|) {
+        note "!!! R2 !!!";
+        nextsame;
+    }
+}
+role R3 is BINDish-grammar {
+    method panic(|) {
+        note "!!! PANIC !!!";
+        nextsame
+    }
+}
+
+#my \eg = Config::BINDish.new.extend-grammar(role MR1 {
+#    method panic(|) {
+#        note "!!! MANUAL !!!";
+#        nextsame;
+#    }
+#}).grammar;
+#
+#note "--- 1. ", eg.^name, " of ", eg.HOW.^name;
+#
+#note "--- 2. ", Config::BINDish.new.grammar.^name;
+
+#$res = Config::BINDish::Grammar.parse("");
+#note "EMPTY: ", $res;
+#
+#$res = Config::BINDish::Grammar.parse(q:to/CFG/);
+#// CPP comment
+#CFG
+#note $res;
+
+#$res = Config::BINDish::Grammar.parse(q:to/CFG/);
+#/* Comment line 1
+#line 2
+#line 3 */
+#
+#/* C comment single line */
+#
+#// CPP 1
+#
+## UNIX
+#
+#// CPP 2
+#CFG
+#note "------ COMMENTS ------\n", $res;
+#^^^^
+
+role GE1 is BINDish-grammar {
+    submethod setup-BINDish {
+#        note ::?ROLE.^name, " setup";
+        self.declare-blocks:
+            fubar => { :named, in => <block subblock> };
+    }
+}
+
+role GE2 is BINDish-grammar {
+    submethod setup-BINDish {
+#        note ::?ROLE.^name, " setup";
+        self.declare-blocks:
+            trial => { :named };
+        self.declare-options:
+            name => { type => Str };
+    }
+}
+
+my $c = Config::BINDish.new(:strict(:!syntax, :!options, :!blocks),
+#    extend-grammar => role {
+#        method panic(|) {
+#            note "!!! MANUAL !!!";
+#            nextsame
+#        }
+#        multi token statement:sym<include> {
+#            :my $*CFG-VALUE;
+#            'include' <.ws> <value> <.ws> ';' { note "Will try to include from ", $<value>.Str }
+#        }
+#    },
+#    extend-actions => role {
+#        method statement:sym<include>($/) {
+#            make Config::BINDish::AST::NOP.new;
+#        }
+#    },
+    );
+
+#$res = $c.read(string => q:to/CFG/);
+#
+#block {
+#    val "1.0";
+#}
+#
+#block {
+#    val "2.0";
+#}
+#
+#unknown "AAA" {
+#    val "3.0";
+#}
+#
+#foo "as" CL {
+#}
+#
+#CFG
+#
+#say $res;
+#$res.ast.dump;
+#exit;
+
+$res = $c.read(string => q:to/CFG/);
+val "in global context";
+block {
+    val "a string with \' \\\\ \\escapes"; # comment
+    count 12;
+    val2 "one more string";
+    subblock {
+        subval 13;
+    }
+    allow-something
+}
+
+#include "aaa";
+block {
+    val 'Another string with \' \\\\ \\escapes';
+    subblock {
+        subval 42;
+        fubar "Level2" {
+            val "Level 2.1";
+        }
+    };
+}
+foo "Bar" Class1 { }
+foo "Baz" Class2 { }
+foo "Bar" Class2 {
+    val 666;
+    val2 "*Sinister laugh*";
+}
+#fubar {
+#    and "may be";
+#}
+trial "aaa" {
+    name 'bbb';
+}
+sup-trial {
+    validate 111;
+}
+    #subblock {
+    #    subval 13;
+    #}
+CFG
+#say "------ PARSE RESULT ------\n", $res;
+say "------ DUMP ", $res.ast.WHICH, " ------";
+my $ast = $res.ast;
+$ast.dump;
+say "------ BLOCKS ------";
+for $ast.blocks('foo', :class<Class2>) -> $blk {
+    say "FOUND BLOCK: ", $blk;
+}
+
+say "foo(Bar, Class2).val: ", $ast.block('foo', :name<Bar>, :class<Class2>).value('val');
+say "foo(Bar, Class2).val2: ", $ast.block('foo', :name<Bar>, :class<Class2>).value('val2');
+say "--- FLAT ---";
+my $flat = $ast.flatten;
+$flat.dump;
+say $flat.block('block').value('val2');
+say $ast.block('block').value('val2');
+#say "foo(Bar).val2: ", $ast.block('foo', :name<Bar>).value('val2');

@@ -1,0 +1,35 @@
+{
+  "api": 0.1,
+  "auth": "zef:vrurg",
+  "authors": [
+    "Vadim Belman <vrurg@lflat.org>"
+  ],
+  "build-depends": [
+  ],
+  "depends": [
+  ],
+  "description": "Flexible BIND-like Configuration Files Support",
+  "license": "Artistic-2.0",
+  "meta-version": "0",
+  "name": "Config::BINDish",
+  "perl": null,
+  "production": false,
+  "provides": {
+    "Config::BINDish": "lib/Config/BINDish.rakumod",
+    "Config::BINDish::Grammar": "lib/Config/BINDish/Grammar.rakumod",
+    "Config::BINDish::META": "lib/Config/BINDish/META.rakumod"
+  },
+  "raku": "6.d",
+  "resources": [
+  ],
+  "source-url": "https://github.com/vrurg/raku-Config-BINDish.git",
+  "support": {
+    "source": "https://github.com/vrurg/raku-Config-BINDish.git"
+  },
+  "tags": [
+    "CONFIG"
+  ],
+  "test-depends": [
+  ],
+  "version": "0.0.1"
+}

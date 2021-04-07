@@ -1,0 +1,68 @@
+use v6.d;
+use Test;
+use Config::BINDish;
+#use Config::BINDish::INET;
+use Config::BINDish::Expandable;
+
+CONTROL {
+    when CX::Warn {
+        note .message, "\n" ~ .backtrace;
+        .resume
+    }
+    default { .rethrow }
+}
+
+my $cfg = q:to/CFG/;
+    atom "{/server("S1",addr).images}/{/server(S1,addr).atom-path}";
+server "S1" addr {
+    base "https://localhost";
+    images "{base}/img";
+    atom-path "atom";
+    resource "Img" {
+        path "img";
+        max-size 1024;
+    }
+}
+
+server "S1" path {
+    root "/usr/local/www";
+    img-pool "{root}/img";
+    misc "{/server("S1",addr).resource("Img").path}/misc";
+}
+
+client {
+    rss "{/server(S1,addr).base}/rss";
+    atom "{/server('S1',addr).base}/{/server(S1,addr).atom-path}";
+}
+CFG
+
+my $c = Config::BINDish.new(:!strict);
+
+my $res;
+
+#$res = $c.grammar.subparse('{base}', :rule<expandable-macro>);
+#say $res;
+#say "> /base";
+#say $c.grammar.subparse('{/base}', :rule<expandable-macro>);
+#say "> with block:";
+#say $c.grammar.subparse('{foo.base}', :rule<expandable-macro>);
+#say "> with named block:";
+#say $c.grammar.subparse('{foo( "AA" ).base}', :rule<expandable-macro>);
+#say "> with named block & keyword:";
+#say $c.grammar.subparse('{foo(AA).base}', :rule<expandable-macro>);
+#say "> with named and classified block:";
+#say $c.grammar.subparse('{foo( "AA", Class ).base}', :rule<expandable-macro>);
+#say "> with named and classified, block chain:";
+#say $c.grammar.subparse('{foo( "AA", Class ).bar.base}', :rule<expandable-macro>);
+#say "> with named and classified, block chain starting at the top:";
+#say $c.grammar.subparse('"Before {/foo("AA", Class).bar.base} after"', :rule<dq-string>);
+##say "> multi-macro:";
+##say $c.grammar.subparse('"Before {/foo("AA", Class).bar.base} after"', :rule<dq-string>);
+
+$res = $c.read(string => $cfg);
+#say $res;
+#say "--- EXPANDABLE AST ---";
+#$res.ast.dump;
+say "--- EXPAND AN OPTION ---";
+say "=== ", $res.ast.value('atom');
+#say "=== ", $res.ast.block('server', :name<S1>, :class<path>);

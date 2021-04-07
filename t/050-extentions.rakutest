@@ -1,0 +1,35 @@
+use v6.d;
+use Test;
+use Config::BINDish;
+use Config::BINDish::INET;
+
+my $c = Config::BINDish.new(:!strict);
+
+my $res = $c.read(string => q:to/CFG/);
+myaddr4 192.168.0.0/255.255.0.0;
+myaddr6 2001:db8:85a3::8a2e:370:7334/49;
+base https://localhost;
+
+server {
+    base https://test.com/subpath
+}
+CFG
+
+say "-------- PARSE";
+say $res;
+say "-------- AST";
+$res.ast.dump;
+
+my $addr = $res.ast.value('myaddr4');
+say $addr;
+
+$addr = $res.ast.value('myaddr6');
+say $addr;
+
+$addr = $res.ast.value('base');
+say $addr;
+say $res.ast.option('base');
+
+say "in-block base: ", $res.ast.block('server').value('base');
+
+done-testing;
