@@ -1,5 +1,5 @@
 use v6.d;
-unit module Config::BINDish::Inet;
+unit module Config::BINDish::INET;
 use Config::BINDish;
 use Config::BINDish::AST;
 use IP::Addr;
