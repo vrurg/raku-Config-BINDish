@@ -1,10 +1,7 @@
 use v6.d;
 use nqp;
-#no precompilation;
-#use Grammar::Tracer;
 unit grammar Config::BINDish::Grammar;
 use Config::BINDish::X;
-use AttrX::Mooish;
 
 class Context {...}
 
