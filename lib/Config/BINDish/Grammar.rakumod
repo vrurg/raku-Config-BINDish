@@ -17,6 +17,10 @@ class Value {
         my $quote = $!type-name eq 'dq-string' ?? '"' !! "'";
         $!type ~~ Stringy ?? $quote ~ $val ~ $quote !! $val
     }
+
+    method coerced(::?CLASS:D:) {
+        -> ::T { T($!payload) }($!type)
+    }
 }
 
 role StatementProps {
