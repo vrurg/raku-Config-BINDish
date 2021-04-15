@@ -1,0 +1,14 @@
+use v6.d;
+use Test::Async;
+use lib $?FILE.IO.parent(1).add('lib');
+use Test051;
+
+plan 2;
+my $obj = Test051.new;
+
+lives-ok { $obj.cfg.read: string => "ip 1.2.3.4;"; },
+         "extension loaded by a module works";
+
+is ~$obj.cfg.top.value("ip"), "1.2.3.4", "loaded extension works";
+
+done-testing;

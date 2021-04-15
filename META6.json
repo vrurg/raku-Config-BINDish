@@ -14,7 +14,6 @@
   "license": "Artistic-2.0",
   "meta-version": "0",
   "name": "Config::BINDish",
-  "perl": null,
   "production": false,
   "provides": {
     "Config::BINDish": "lib/Config/BINDish.rakumod",
@@ -37,6 +36,7 @@
     "CONFIG"
   ],
   "test-depends": [
+    "Test::Async"
   ],
   "version": "0.0.1"
 }

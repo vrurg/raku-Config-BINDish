@@ -1,0 +1,153 @@
+use v6.d;
+use Test::Async <Config::BINDish::Test Base>;
+use Config::BINDish;
+use Config::BINDish::Grammar;
+use Config::BINDish::AST;
+use Config::BINDish::X;
+
+plan 4;
+
+# The purpose of this test suite is to make sure that in strict mode only pre-declared constructs are allowed.
+my $custom-set-invoked = False;
+
+role CustomExt is BINDish-grammar {
+    submethod setup-BINDish {
+        $custom-set-invoked = True;
+        self.declare-blocks:
+            my-top => { :top-only },
+            my-top-named => { :top-only, :named },
+            my-sub => { :in<my-top> },
+        ;
+        self.declare-options:
+            op-top => { :top-only, :type(Str) },
+            op-sub => { :in<my-top-named>, :type-name<bool> },
+            op-any => {},
+    }
+}
+
+my $cfg = Config::BINDish.new:
+        :strict{:blocks, :options},
+        blocks => %(
+            general => { :top-only },
+            subsystem => { :top-only, :named },
+            paths => { :in<general subsystem>, :named, :type(Str), :value-only },
+        ),
+        options => %(
+            base => { :in<paths>, type => Str },
+            max => { :in<general>, type => Int }
+        );
+
+does-ok $cfg.grammar, CustomExt, "grammar does our custom extension";
+
+$cfg.read: string => '';
+ok $custom-set-invoked, "custom extension setup method has been invoked";
+
+subtest "Structure" => {
+    plan 4;
+
+    throws-like { $cfg.read: string => q:to/CFG/;
+                                        my-top {
+                                            paths "public" {
+                                                "pub/";
+                                                "user/pub";
+                                            }
+                                        }
+                                        CFG
+                },
+                Config::BINDish::X::Parse::Context,
+                "block used in a wrong context",
+                :message(/"Block 'paths' cannot be used in block 'my-top'"/);
+
+    lives-ok { $cfg.read: string => q:to/CFG/;
+                                        subsystem "storage" {
+                                            paths "public" {
+                                                "pub/";
+                                                "user/pub";
+                                            }
+                                        }
+                                        CFG
+             },
+             "block used within correct context";
+
+    throws-like { $cfg.read: string => q:to/CFG/;
+                                        subsystem "storage" {
+                                            paths "public" {
+                                                "pub/";
+                                                "user/pub";
+                                                base "/";
+                                            }
+                                        }
+                                        CFG
+                },
+                Config::BINDish::X::Parse::Context,
+                "option used in a vlue-only block is an error",
+                :message(/"Option 'base' cannot be used in block 'paths \"public\"'"/);
+
+    throws-like { $cfg.read: string => q:to/CFG/;
+                                        subsystem "storage" {
+                                            paths "public" {
+                                                13;
+                                            }
+                                        }
+                                        CFG
+                },
+                Config::BINDish::X::Parse::ValueType,
+                "bad value type within a vlue-only block",
+                :message(/"Block 'paths' expects (Str) value but got (Int)"/);
+}
+
+subtest "Value validation" => {
+    plan 6;
+
+    throws-like { $cfg.read: string => q<op-top 1;>; },
+                Config::BINDish::X::Parse::ValueType,
+                "bad option value type",
+                :message(/"Option 'op-top' expects (Str) value but got (Int)"/);
+
+    lives-ok { $cfg.read: string => q<op-top "ok";>; }, "valid option type";
+
+    throws-like { $cfg.read: string => q:to/CFG/;
+                                general {
+                                    max 4.2;
+                                }
+                                CFG
+                },
+                Config::BINDish::X::Parse::ValueType,
+                "option in a block, bad value",
+                :message(/"Option 'max' expects (Int) value but got (Rat)"/);
+
+    lives-ok { $cfg.read: string => q:to/CFG/;
+                                general {
+                                    max 4;
+                                }
+                                CFG
+            },
+             "option in a block with good value type";
+
+    throws-like { $cfg.read: string => q:to/CFG/;
+                                        general {
+                                            paths "public" {
+                                                "pub/";
+                                                "user/pub";
+                                                3.1415926;
+                                            }
+                                        }
+                                        CFG
+                },
+                Config::BINDish::X::Parse::ValueType,
+                "bad value type in a block",
+                :message(/"Block 'paths' expects (Str) value but got (Rat)"/);
+
+    lives-ok { $cfg.read: string => q:to/CFG/;
+                                        general {
+                                            paths "public" {
+                                                "pub/";
+                                                "user/pub";
+                                            }
+                                        }
+                                        CFG
+             },
+             "all block values are good";
+}
+
+done-testing;

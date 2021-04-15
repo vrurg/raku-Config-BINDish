@@ -1,0 +1,117 @@
+use v6.d;
+use Test::Async <Config::BINDish::Test Base>;
+use Config::BINDish;
+use Config::BINDish::X;
+
+plan 11;
+
+class Foo { }
+class Bar { }
+
+my @setup-order;
+my @panic-order;
+
+my role Ext1 is BINDish-grammar {
+    submethod setup-BINDish {
+        push @setup-order, ::?ROLE.^name;
+    }
+    method panic(|) {
+        push @panic-order, ::?ROLE.^name;
+        nextsame
+    }
+
+    multi token value:sym<foo> {
+        $<foo-type>='foo' { self.set-value: Foo, :foo($/) }
+    }
+}
+
+my role Ext2 is BINDish-grammar {
+    submethod setup-BINDish {
+        push @setup-order, ::?ROLE.^name;
+    }
+    method panic(|) {
+        push @panic-order, ::?ROLE.^name;
+        nextsame
+    }
+}
+
+my $cfg = Config::BINDish.new;
+my $grammar = $cfg.grammar.new;
+
+# What's declared later gets invoked first. I.e. as if a class inherits from a child of another class.
+is-deeply @setup-order, ['Ext2', 'Ext1'], "setup-BINDish submethod invoked in reverse order of declaration";
+
+@panic-order = [];
+try $cfg.grammar.parse: '{}';
+is-deeply @panic-order, ['Ext2', 'Ext1'], "overridden methods are invoked in the same order";
+
+# Note that the same test in 010-grammar.rakutest causes the standard grammar to throw.
+my $match = $cfg.grammar.parse: q<block { option foo }>, :!strict;
+is-cfg-stmt-list $match,
+                 %( statements => 0 => %(
+                     block-head => block-type => 'block',
+                     block-body => token-statements(
+                         message => "option with extension-supported value",
+                         statements => %(
+                             0 => %(
+                                 option-name => "option",
+                                 option-value => foo-type => 'foo' ))))),
+                 "grammar is extended with a new value type";
+
+throws-like { $cfg.grammar.parse: q<block { option bar }>, :!strict },
+            Config::BINDish::X::Parse,
+            "control test to ensure we haven't accidentally added another custom value type",
+            message => /"Unrecognized statement" .* "⏏option bar }"/;
+
+@setup-order = [];
+$grammar = $cfg.extend-grammar(role Ext3 {
+    submethod setup-BINDish {
+        push @setup-order, ::?ROLE.^name;
+    }
+    method panic(|) {
+        push @panic-order, ::?ROLE.^name;
+        nextsame
+    }
+    token value:sym<bar> {
+        $<bar-type>='bar' { self.set-value: Bar, :bar($/) }
+    }
+}).grammar.new;
+
+is-deeply @setup-order, ['Ext3', 'Ext2', 'Ext1'], "added extension with extend-grammar method";
+
+@panic-order = [];
+try $cfg.grammar.parse: '{}';
+is-deeply @panic-order, ['Ext3', 'Ext2', 'Ext1'], "extension added with a method can override methods too";
+
+$match = $cfg.grammar.parse: q<block { option bar }>, :!strict;
+is-cfg-stmt-list $match,
+                 %( statements => 0 => %(
+                     block-head => block-type => 'block',
+                     block-body => token-statements(
+                         message => "option with extension-supported value",
+                         statements => %(
+                             0 => %(
+                                 option-name => "option",
+                                 option-value => bar-type => 'bar' ))))),
+                 "manually added extension also can extend the grammar";
+
+throws-like { $cfg.grammar.parse: q<block { option baz }>, :!strict },
+            Config::BINDish::X::Parse,
+            "no other custom value types so far",
+            message => /"Unrecognized statement" .* "⏏option baz }"/;
+
+@setup-order = [];
+$cfg = Config::BINDish.new;
+$grammar = $cfg.grammar.new;
+is-deeply @setup-order, ['Ext2', 'Ext1'], "extensions added with the method are per-instance property";
+
+@panic-order = [];
+try $cfg.grammar.parse: '{}';
+is-deeply @panic-order, ['Ext2', 'Ext1'], "method overriding doesn't include manually added role too";
+
+throws-like { $cfg.grammar.parse: q<block { option bar }>, :!strict },
+            Config::BINDish::X::Parse,
+            "no custom value type defined by manually added extension",
+            message => /"Unrecognized statement" .* "⏏option bar }"/;
+
+done-testing;

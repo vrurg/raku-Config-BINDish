@@ -1,68 +1,78 @@
 use v6.d;
-use Test;
-use Config::BINDish;
-#use Config::BINDish::INET;
+use Test::Async;
 use Config::BINDish::Expandable;
+use Config::BINDish::INET;
+use Config::BINDish;
 
-CONTROL {
-    when CX::Warn {
-        note .message, "\n" ~ .backtrace;
-        .resume
-    }
-    default { .rethrow }
-}
+plan 9;
 
 my $cfg = q:to/CFG/;
-    atom "{/server("S1",addr).images}/{/server(S1,addr).atom-path}";
+
+name "test config";
+description "Meaningless {name}...";
+test1 "block {server(S1, addr).name} is visible";
+test2 "path from a subblock: {server(S1, addr).resource(Img).path}";
+test3 "integer: {server(S1, addr).resource(Img).max-size}";
+test4 "subblock name with spaces: {server(S1, addr).meta('spaced name').id}";
+
 server "S1" addr {
-    base "https://localhost";
-    images "{base}/img";
-    atom-path "atom";
+    name "server addresses";
+    description "Block about {name}.";
+    test1 "block-related: {meta("space name").id}";
+    base https://localhost/;
     resource "Img" {
         path "img";
         max-size 1024;
+    }
+    meta "spaced name" {
+        id 42;
+    }
+    general {
+        scripts "v3.14";
     }
 }
 
 server "S1" path {
     root "/usr/local/www";
-    img-pool "{root}/img";
-    misc "{/server("S1",addr).resource("Img").path}/misc";
+    img-pool "{root}/{/server("S1", addr).resource(Img).path}";
+    scripts "{root}/scripts/{/server(S1, addr).general.scripts}";
 }
 
-client {
-    rss "{/server(S1,addr).base}/rss";
-    atom "{/server('S1',addr).base}/{/server(S1,addr).atom-path}";
-}
 CFG
 
 my $c = Config::BINDish.new(:!strict);
+$c.read(string => $cfg);
 
-my $res;
+my $top = $c.top;
 
-#$res = $c.grammar.subparse('{base}', :rule<expandable-macro>);
-#say $res;
-#say "> /base";
-#say $c.grammar.subparse('{/base}', :rule<expandable-macro>);
-#say "> with block:";
-#say $c.grammar.subparse('{foo.base}', :rule<expandable-macro>);
-#say "> with named block:";
-#say $c.grammar.subparse('{foo( "AA" ).base}', :rule<expandable-macro>);
-#say "> with named block & keyword:";
-#say $c.grammar.subparse('{foo(AA).base}', :rule<expandable-macro>);
-#say "> with named and classified block:";
-#say $c.grammar.subparse('{foo( "AA", Class ).base}', :rule<expandable-macro>);
-#say "> with named and classified, block chain:";
-#say $c.grammar.subparse('{foo( "AA", Class ).bar.base}', :rule<expandable-macro>);
-#say "> with named and classified, block chain starting at the top:";
-#say $c.grammar.subparse('"Before {/foo("AA", Class).bar.base} after"', :rule<dq-string>);
-##say "> multi-macro:";
-##say $c.grammar.subparse('"Before {/foo("AA", Class).bar.base} after"', :rule<dq-string>);
+is $top.value('description'), "Meaningless test config...", "the most basic expansion case at top-level";
+is $top.get(:server('S1', 'addr') => 'description'),
+   "Block about server addresses.",
+   "the most basic expansion case in a block";
 
-$res = $c.read(string => $cfg);
-#say $res;
-#say "--- EXPANDABLE AST ---";
-#$res.ast.dump;
-say "--- EXPAND AN OPTION ---";
-say "=== ", $res.ast.value('atom');
-#say "=== ", $res.ast.block('server', :name<S1>, :class<path>);
+is $top.value('test1'),
+   "block server addresses is visible",
+   "top-level option see a later declared block";
+
+is $top.value('test2'),
+   "path from a subblock: img",
+   "top-level option see a second-level block";
+
+is $top.value("test3"),
+   "integer: 1024",
+   "can expand with a non-string value";
+
+is $top.value("test4"),
+   "subblock name with spaces: 42",
+   "subblock is seen when its name contains whitespaces";
+
+my $blk1 = $top.block("server", name => "S1", class => 'addr');
+
+is $blk1.value("test1"), "block-related: 42", "relative expansion within a block";
+
+my $blk2 = $top.block("server", :name<S1>, :class<path>);
+
+is $blk2.value("img-pool"), "/usr/local/www/img", "expanded from both local and another block options";
+is $blk2.value("scripts"), "/usr/local/www/scripts/v3.14", "reference to a nameless block";
+
+done-testing;

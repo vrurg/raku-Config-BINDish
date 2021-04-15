@@ -1,175 +1,509 @@
 use v6.d;
-use Test;
-use Config::BINDish;
+use Test::Async <Config::BINDish::Test Base>;
 use Config::BINDish::Grammar;
-use Config::BINDish::Actions;
-use Config::BINDish::AST;
+use Config::BINDish::X;
 
-my $res;
+plan 3, :!parallel;
 
-role R1 is BINDish-grammar { }
-role R2 is BINDish-grammar {
-    method panic(|) {
-        note "!!! R2 !!!";
-        nextsame;
+subtest "Grammar Basics", {
+    my @tests =
+        "empty config" => %(
+            source => ";;",
+            top => %(),
+        ),
+
+        "bare option" => %(
+            source => "opt",
+#            plans => 0 => 5,
+            top => %(
+                statements => 0 => %(
+                    option-name => "opt",
+                    statement-terminate => statement-terminator => ""))),
+
+        "terminated bare option" => %(
+            source => "opt;",
+            plans => 0 => 5,
+            top => statements => 0 => %(
+                option-name => "opt",
+                statement-terminate => statement-terminator => ";")),
+
+        "multi-option" => %(
+            source => q:to/CFG/,
+                        option1;
+                        option2
+                        CFG
+            top => %(
+                stmt-count => 2,
+                statements => %(
+                    0 => %(
+                        option-name => 'option1',
+                        statement-terminate => statement-terminator => ';'),
+                    1 => %(
+                        option-name => 'option2',
+                        statement-terminate => statement-terminator => '')))),
+
+        "string value option" => %(
+            source => "opt \"foo\"",
+            top => %(
+                plans => 0 => 9,
+                statements => 0 => %(
+                    option-name => "opt",
+                    option-value => dq-string => string => "foo",
+                    statement-terminate => statement-terminator => ""))),
+
+        "terminated string value option" => %(
+            source => "opt \"foo\";",
+            top => %(
+                plans => 0 => 9,
+                statements => 0 => %(
+                    option-name => "opt",
+                    option-value => dq-string => string => "foo",
+                    statement-terminate => statement-terminator => ";"))),
+
+        "int value option" => %(
+            source => "opt 42",
+            top => statements => 0 => %(
+                    option-name => "opt",
+                    option-value => 42,
+                    statement-terminate => statement-terminator => "")),
+
+        "terminated int value option" => %(
+            source => "opt -13;",
+            top => statements => 0 => %(
+                    option-name => "opt",
+                    option-value => -13,
+                    statement-terminate => statement-terminator => ";")),
+
+        "rat value option" => %(
+            source => "opt 4.2",
+            top => structs => 0 => %(
+                    option-name => "opt",
+                    option-value => 4.2,
+                    statement-terminate => statement-terminator => "")),
+
+        "terminated rat value option" => %(
+            source => q:to/CFG/,
+                      opt1 -1.3;
+                      opt2 42.;
+                      opt3 .42;
+                      opt4 -42.;
+                      opt5 -.42;
+                      CFG
+            top => %(
+                stmt-count => 5,
+                statements => %(
+                    0 => %(
+                        option-name => "opt1",
+                        option-value => -1.3,
+                        statement-terminate => statement-terminator => ";"),
+                    1 => %(
+                        option-name => "opt2",
+                        option-value => "42.",
+                        statement-terminate => statement-terminator => ";"),
+                    2 => %(
+                        option-name => "opt3",
+                        option-value => ".42",
+                        statement-terminate => statement-terminator => ";"),
+                    3 => %(
+                        option-name => "opt4",
+                        option-value => "-42.",
+                        statement-terminate => statement-terminator => ";"),
+                    4 => %(
+                        option-name => "opt5",
+                        option-value => "-.42",
+                        statement-terminate => statement-terminator => ";")))),
+
+        "num value option" => %(
+            source => "opt 4.2e1",
+            top => statements => 0 => %(
+                    option-name => "opt",
+                    option-value => "4.2e1",
+                    statement-terminate => statement-terminator => "")),
+
+        "terminated num value option" => %(
+            source => q:to/CFG/,
+                      opt1 -1.3e0;
+                      opt2 42e-1;
+                      opt3 .42e1;
+                      opt4 -42e-2;
+                      opt5 -.42e2;
+                      CFG
+            top => %(
+                stmt-count => 5,
+                statements => %(
+                    0 => %(
+                        option-name => "opt1",
+                        option-value => "-1.3e0",
+                        statement-terminate => statement-terminator => ";"),
+                    1 => %(
+                        option-name => "opt2",
+                        option-value => "42e-1",
+                        statement-terminate => statement-terminator => ";"),
+                    2 => %(
+                        option-name => "opt3",
+                        option-value => ".42e1",
+                        statement-terminate => statement-terminator => ";"),
+                    3 => %(
+                        option-name => "opt4",
+                        option-value => "-42e-2",
+                        statement-terminate => statement-terminator => ";"),
+                    4 => %(
+                        option-name => "opt5",
+                        option-value => "-.42e2",
+                        statement-terminate => statement-terminator => ";")))),
+
+        "num in a block" => %(
+            source => q:to/CFG/,
+                        multi "special" class {
+                            num 3.14e0;
+                        }
+                        CFG
+            top => statements => 0 => %(
+                block-head => block-type => 'multi',
+                block-body => token-statements(
+                        statements => %(
+                            0 => %(
+                                option-name => "num",
+                                option-value => "3.14e0"))))),
+
+        "comments" => %(
+            source => q:to/CFG/,
+                        # Unix style
+                        opt 1;
+                        // C++ style
+                        opt 2;
+                        /*
+                         * C style
+                         */
+                        opt 3;
+                        CFG
+            top => statements => %(
+                0 => UNIX-comment => comment-body => ' Unix style',
+                2 => CPP-comment => comment-body => ' C++ style',
+                4 => C-comment => comment-body => "\n * C style\n ",
+            ),
+        ),
+
+        "empty block" => %(
+            source => 'block {}',
+            top => statements => 0 => %(
+                block-head => block-type => "block",
+                block-body => '{}' )),
+
+        "terminated empty block" => %(
+            source => 'block {};',
+            top => statements => 0 => %(
+                block-head => block-type => "block",
+                block-body => '{};')),
+
+        "empty named block" => %(
+            source => q:to/CFG/,
+                      blk "foo" { }
+                      CFG
+            # Keys of expect hash are indicies in <statements> list
+            # Values represent the structure
+            top => statements => 0 => %(
+                    block-head => block-type => 'blk',
+                    block-name => value => dq-string => string => "foo",
+                    block-body => "\{ \}\n" )),
+
+        "empty named and classified block" => %(
+            source => q:to/CFG/,
+                      blk "foo" BAR { }
+                      CFG
+            # Keys of expect hash are indicies in <statements> list
+            # Values represent the structure
+            top => statements => 0 => %(
+                    block-head => block-type => 'blk',
+                    block-name => value => dq-string => string => "foo",
+                    block-class => 'BAR',
+                    block-body => "\{ \}\n" )),
+
+        "nested blocks" => %(
+            source => q:to/CFG/,
+                        block {
+                            foo 42;
+                            subblock "nested" 1 {
+                                nested-foo 13;
+                                subsubblock "nested" 2 {
+                                    option "deep one";
+                                    nested-foo 0
+                                }
+                            }
+                        }
+                        CFG
+            top => statements => 0 => %(
+                block-head => block-type => "block",
+                block-body => token-statements(
+                    message => "top block",
+                    stmt-count => 2,
+                    statements => %(
+                        0 => %(
+                            option-name => "foo",
+                            option-value => "42",
+                            statement-terminate => statement-terminator => ";"),
+                        1 => %(
+                            block-head => block-type => "subblock",
+                            block-name => q<"nested">,
+                            block-class => "1",
+                            block-body => token-statements(
+                                message => "subblock, nesting 1",
+                                stmt-count => 2,
+                                statements => %(
+                                    0 => %(
+                                        option-name => "nested-foo",
+                                        option-value => "13",
+                                        statement-terminate => statement-terminator => ";"),
+                                    1 => %(
+                                        block-head => block-type => "subsubblock",
+                                        block-name => q<"nested">,
+                                        block-class => "2",
+                                        block-body => token-statements(
+                                            message => "subblock, nesting 2",
+                                            stmt-count => 2,
+                                            statements => %(
+                                                0 => %(
+                                                    option-name => "option",
+                                                    option-value => q<"deep one">,
+                                                    statement-terminate => statement-terminator => ";",
+                                                ),
+                                                1 => %(
+                                                    option-name => "nested-foo",
+                                                    option-value => "0",
+                                                    statement-terminate => statement-terminator => ""))))))))))),
+
+        "multi-block" => %(
+            source => q:to/CFG/,
+                        multi "1" {
+                            opt1 1;
+                        }
+                        multi "2" {
+                            opt2 "2";
+                        }
+                        multi "1" {
+                            opt1 3;
+                        }
+                        CFG
+            top => %(
+                stmt-count => 3,
+                statements => %(
+                    0 => %(
+                        block-head => block-type => 'multi',
+                        block-name => value => dq-string => string => "1",
+                        block-body => token-statements(
+                            message => 'first multi "1"',
+                            stmt-count => 1,
+                            statements => 0 => %(
+                                option-name => "opt1",
+                                option-value => "1" ))),
+                    1 => %(
+                        block-head => block-type => 'multi',
+                        block-name => value => dq-string => string => "2",
+                        block-body => token-statements(
+                            message => 'multi "2"',
+                            stmt-count => 1,
+                            statements => 0 => %(
+                                option-name => "opt2",
+                                option-value => q<"2"> ))),
+                    2 => %(
+                        block-head => block-type => 'multi',
+                        block-name => value => dq-string => string => "1",
+                        block-body => token-statements(
+                            message => 'second multi "1"',
+                            stmt-count => 1,
+                            statements => 0 => %(
+                                option-name => "opt1",
+                                option-value => "3" )))))),
+
+        "value list block" => %(
+            source => q:to/CFG/,
+                        blist "some data" {
+                            1.1; 2.2; 3.3;
+                        }
+                        CFG
+            top => statements => 0 => %(
+                block-head => block-type => 'blist',
+                block-body => token-statements(
+                        statements => %(
+                            0 => value => "1.1",
+                            1 => value => "2.2",
+                            2 => value => "3.3")))),
+        ;
+
+    plan +@tests, :parallel;
+
+    run-grammar-tests Config::BINDish::Grammar, @tests;
+}
+
+subtest "Errors" => {
+    plan 5;
+
+    throws-like { Config::BINDish::Grammar.parse: '{}'; },
+                Config::BINDish::X::Parse::General,
+                "config syntax error",
+                message => /:s Unrecognized statement/;
+
+    throws-like { Config::BINDish::Grammar.parse: 'block {}', :strict },
+                Config::BINDish::X::Parse::General,
+                "block needs a terminator in strict mode",
+                message => /:s Missing semicolon/;
+
+    throws-like { Config::BINDish::Grammar.parse: 'block { option };', :strict },
+                Config::BINDish::X::Parse::General,
+                "option needs a terminator in strict mode",
+                message => /:s Missing semicolon/;
+
+    throws-like { Config::BINDish::Grammar.parse: 'block { option foo; };', :!strict },
+                Config::BINDish::X::Parse::General,
+                "option value can't be parsed",
+                message => /:s Unrecognized statement/;
+
+    throws-like { Config::BINDish::Grammar.parse:
+                    q:to/CFG/
+                        block {
+                            val 1;
+                            opt "foo";
+                            option bar
+                        }
+                        CFG
+                },
+                Config::BINDish::X::Parse::General,
+                "error line is reported",
+                message => /"Unrecognized statement" .* "line 4"/;
+}
+
+subtest "Explicit Structure" => {
+    plan 12;
+
+    my %blocks = block => {:top-only, :named},
+                 subblock => {:in<block>, :named},
+                 parent-block => { :top-only, },
+                 ;
+    my %options = count => { :type(Int) },
+                  description => { :top-only, :type(Str) },
+                  subopt => { :in<subblock>, :type-name<int>  },
+                  ;
+    my $cfg = q:to/CFG/;
+                description "mixed pre-declared and undeclared elements";
+                free-form-option;
+                count 1;
+                block 'top one' {
+                    count 2;
+                    subblock "inner one" {
+                        subopt 42;
+                        other-option "is ok too";
+                    }
+                }
+                foo "undeclared" { }
+                CFG
+
+    my $match = Config::BINDish::Grammar.parse: $cfg, :%blocks, :%options, :!strict;
+    is-cfg-stmt-list $match,
+                     %(
+                        statements => %(
+                            0 => %(
+                                option-name => "description",
+                                option-value => dq-string => q<"mixed pre-declared and undeclared elements">,
+                            ),
+                            1 => option-name => "free-form-option",
+                            2 => %(
+                                option-name => "count",
+                                option-value => "1",
+                            ),
+                            3 => %(
+                                block-head => block-type => "block",
+                                block-name => value => sq-string => q<'top one'>,
+                                block-body => token-statements(
+                                        message => "structured block",
+                                        statements => %(
+                                            0 => %(
+                                                option-name => "count",
+                                                option-value => "2",
+                                            ),
+                                            1 => %(
+                                                block-head => block-type => "subblock",
+                                                block-name => value => dq-string => q<"inner one">,
+                                                block-body => token-statements(
+                                                        statements => %(
+                                                            0 => %(
+                                                                option-name => "subopt",
+                                                                option-value => "42",
+                                                            ),
+                                                            1 => %(
+                                                                option-name => "other-option",
+                                                                option-value => q<"is ok too">,
+                                                            ),
+                                                        ),
+                                                    ),
+                                            ),
+                                        ),
+                                    ),
+                            ),
+                            4 => %(
+                                block-head => block-type => "foo",
+                                block-name => value => dq-string => q<"undeclared">,
+                                block-body => token-statements(statements => %()),
+                            ),
+                        ),
+                     ),
+                     "predefined elements can be mixed with free-form ones in non-strict mode";
+
+    throws-like {
+                    $ = Config::BINDish::Grammar.parse: "bad-option 1;", :%options, :strict;
+                },
+                Config::BINDish::X::Parse::Unknown,
+                "undeclared option in strict mode throws",
+                message => /:s Unknown option/;
+    throws-like {
+                    $ = Config::BINDish::Grammar.parse: q<foo 'bar' { };>, :%blocks, :strict;
+                },
+                Config::BINDish::X::Parse::Unknown,
+                "undeclared block in strict mode throws",
+                message => /:s Unknown block type/;
+    throws-like {
+                    $ = Config::BINDish::Grammar.parse: q<subblock 'not here' { };>, :%blocks, :strict;
+                },
+                Config::BINDish::X::Parse::Context,
+                "a subblock at the top level in strict mode throws",
+                message => /:s Block .* cannot be used in global context/;
+
+    for True, False -> $strict {
+        my $mode = ($strict ?? 'strict' !! 'non-strict') ~ " mode";
+        throws-like {
+                        $ = Config::BINDish::Grammar.parse: q<parent-block { subblock 'not here' { }; };>,
+                                                            :%blocks,
+                                                            :$strict;
+                    },
+                    Config::BINDish::X::Parse::Context,
+                    "a subblock under wrong parent block in $mode throws",
+                    message => /:s Block .* cannot be used in block \'parent\-block\'/;
+        throws-like {
+                        $ = Config::BINDish::Grammar.parse: q<parent-block { block 'not here' { }; };>,
+                                                            :%blocks,
+                                                            :$strict;
+                    },
+                    Config::BINDish::X::Parse::Context,
+                    "a top-level block under a parent block in $mode throws",
+                    message => /Block .* "cannot be used in block"/;
+        throws-like {
+                        $ = Config::BINDish::Grammar.parse: q<parent-block { subopt 13; };>,
+                                                            :%blocks,
+                                                            :%options,
+                                                            :$strict;
+                    },
+                    Config::BINDish::X::Parse::Context,
+                    "a top-level block under a parent block in $mode throws",
+                    message => /:s Option .* cannot be used in block/;
+        throws-like {
+                        $ = Config::BINDish::Grammar.parse: q<parent-block { description 'any'; };>,
+                                                            :%blocks,
+                                                            :%options,
+                                                            :$strict;
+                    },
+                    Config::BINDish::X::Parse::Context,
+                    "a top-level option can't be used in a block in $mode",
+                    message => /:s Option .* cannot be used in block/;
     }
 }
-role R3 is BINDish-grammar {
-    method panic(|) {
-        note "!!! PANIC !!!";
-        nextsame
-    }
-}
 
-#my \eg = Config::BINDish.new.extend-grammar(role MR1 {
-#    method panic(|) {
-#        note "!!! MANUAL !!!";
-#        nextsame;
-#    }
-#}).grammar;
-#
-#note "--- 1. ", eg.^name, " of ", eg.HOW.^name;
-#
-#note "--- 2. ", Config::BINDish.new.grammar.^name;
-
-#$res = Config::BINDish::Grammar.parse("");
-#note "EMPTY: ", $res;
-#
-#$res = Config::BINDish::Grammar.parse(q:to/CFG/);
-#// CPP comment
-#CFG
-#note $res;
-
-#$res = Config::BINDish::Grammar.parse(q:to/CFG/);
-#/* Comment line 1
-#line 2
-#line 3 */
-#
-#/* C comment single line */
-#
-#// CPP 1
-#
-## UNIX
-#
-#// CPP 2
-#CFG
-#note "------ COMMENTS ------\n", $res;
-#^^^^
-
-role GE1 is BINDish-grammar {
-    submethod setup-BINDish {
-#        note ::?ROLE.^name, " setup";
-        self.declare-blocks:
-            fubar => { :named, in => <block subblock> };
-    }
-}
-
-role GE2 is BINDish-grammar {
-    submethod setup-BINDish {
-#        note ::?ROLE.^name, " setup";
-        self.declare-blocks:
-            trial => { :named };
-        self.declare-options:
-            name => { type => Str };
-    }
-}
-
-my $c = Config::BINDish.new(:strict(:!syntax, :!options, :!blocks),
-#    extend-grammar => role {
-#        method panic(|) {
-#            note "!!! MANUAL !!!";
-#            nextsame
-#        }
-#        multi token statement:sym<include> {
-#            :my $*CFG-VALUE;
-#            'include' <.ws> <value> <.ws> ';' { note "Will try to include from ", $<value>.Str }
-#        }
-#    },
-#    extend-actions => role {
-#        method statement:sym<include>($/) {
-#            make Config::BINDish::AST::NOP.new;
-#        }
-#    },
-    );
-
-#$res = $c.read(string => q:to/CFG/);
-#
-#block {
-#    val "1.0";
-#}
-#
-#block {
-#    val "2.0";
-#}
-#
-#unknown "AAA" {
-#    val "3.0";
-#}
-#
-#foo "as" CL {
-#}
-#
-#CFG
-#
-#say $res;
-#$res.ast.dump;
-#exit;
-
-$res = $c.read(string => q:to/CFG/);
-val "in global context";
-block {
-    val "a string with \' \\\\ \\escapes"; # comment
-    count 12;
-    val2 "one more string";
-    subblock {
-        subval 13;
-    }
-    allow-something
-}
-
-#include "aaa";
-block {
-    val 'Another string with \' \\\\ \\escapes';
-    subblock {
-        subval 42;
-        fubar "Level2" {
-            val "Level 2.1";
-        }
-    };
-}
-foo "Bar" Class1 { }
-foo "Baz" Class2 { }
-foo "Bar" Class2 {
-    val 666;
-    val2 "*Sinister laugh*";
-}
-#fubar {
-#    and "may be";
-#}
-trial "aaa" {
-    name 'bbb';
-}
-sup-trial {
-    validate 111;
-}
-    #subblock {
-    #    subval 13;
-    #}
-CFG
-#say "------ PARSE RESULT ------\n", $res;
-say "------ DUMP ", $res.ast.WHICH, " ------";
-my $ast = $res.ast;
-$ast.dump;
-say "------ BLOCKS ------";
-for $ast.blocks('foo', :class<Class2>) -> $blk {
-    say "FOUND BLOCK: ", $blk;
-}
-
-say "foo(Bar, Class2).val: ", $ast.block('foo', :name<Bar>, :class<Class2>).value('val');
-say "foo(Bar, Class2).val2: ", $ast.block('foo', :name<Bar>, :class<Class2>).value('val2');
-say "--- FLAT ---";
-my $flat = $ast.flatten;
-$flat.dump;
-say $flat.block('block').value('val2');
-say $ast.block('block').value('val2');
-#say "foo(Bar).val2: ", $ast.block('foo', :name<Bar>).value('val2');
+done-testing;

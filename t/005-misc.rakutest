@@ -1,0 +1,15 @@
+use v6.d;
+use Test::Async <Config::BINDish::Test Base>;
+use Config::BINDish::Grammar;
+
+plan 1;
+
+# Make sure we don't accidentally re-declare a method/token/rule of the standard Grammar class.
+my $std-methods = set(Grammar.^methods.map: *.name);
+my $bindish-methods = set Config::BINDish::Grammar.^methods(:local).map: *.name;
+# Methods overriden intentionally. I.e. here we know what we do.
+my $allowed-intersection = set <BUILDALL>;
+
+is-deeply (($std-methods ∩ $bindish-methods) (-) $allowed-intersection),
+          set(),
+          "BINDish grammar doesn't override any of the standard grammar methods";

@@ -2,23 +2,70 @@ use v6.d;
 class Config::BINDish::X is Exception is export {
 }
 
-class Config::BINDish::X::Parse is Config::BINDish::X {
+role Config::BINDish::X::Parse is Config::BINDish::X {
     has Match:D $.cursor is required;
-    has Str:D $.msg is required;
 
     method line {
-        ($!cursor.prematch ~ $!cursor).chomp.split(/\n/).elems;
+        $!cursor.prematch.chomp.split(/\n/).elems;
     }
 
-    method message {
-        my $pre = ($!cursor.prematch ~ $!cursor).chomp.split(/\n/).reverse.grep(*.chars).head;
-        my $post = $!cursor.postmatch.split(/\n/).head.chomp;
+    method wrap-message($msg) {
+        my $pre = $!cursor.prematch.chomp.split(/\n/).reverse.grep(*.chars).head // "";
+        my $post = ($!cursor.postmatch.split(/\n/).head // "").chomp;
         "===SORRY!=== Error while parsing configuration file\n" ~
-        $!msg ~ "\n"
+        $msg ~ "\n"
         ~ ("at line " ~ self.line).indent(2)
         ~ "\n" ~ $pre ~ "⏏" ~ $post ~ "\n"
     }
 }
+
+class Config::BINDish::X::Parse::General does Config::BINDish::X::Parse {
+    has Str:D $.msg is required;
+
+    method message {
+        self.wrap-message($!msg)
+    }
+}
+
+class Config::BINDish::X::Parse::Context does Config::BINDish::X::Parse {
+    has Str:D $.what is required; # Option or block
+    has $.keyword is required; # Block type or option name
+    has $.ctx is required;
+
+    method message {
+        self.wrap-message: $.what.tc ~ " " ~ $.keyword.gist ~ " cannot be used in " ~ $.ctx.description;
+    }
+}
+
+class Config::BINDish::X::Parse::Unknown does Config::BINDish::X::Parse {
+    has Str:D $.what is required;
+    has $.keyword is required;
+    method message {
+        self.wrap-message: "Unknown " ~ $.what ~ " " ~ $.keyword.gist
+    }
+}
+
+class Config::BINDish::X::Parse::MissingPart does Config::BINDish::X::Parse {
+    has Str:D $.what is required;
+    has Str:D $.block-spec is required;
+    method message {
+        self.wrap-message: $.what.tc ~ " is missing in a declaration of block '" ~ $.block-spec ~ "'"
+    }
+}
+
+class Config::BINDish::X::Parse::ValueType does Config::BINDish::X::Parse {
+    has Str:D $.what is required;
+    has $.keyword is required;
+    has $.props is required;
+    has $.value is required;
+    method message {
+        self.wrap-message: $.what.tc
+                           ~ " " ~ $.keyword.gist
+                           ~ " expects " ~ $.props.type-as-str
+                           ~ " value but got " ~ $.value.type.gist;
+    }
+}
+
 
 role Config::BINDish::X::Ambiguous[Str:D $ast-type] is Config::BINDish::X {
     has Int:D $.count is required;
@@ -30,7 +77,7 @@ role Config::BINDish::X::Ambiguous[Str:D $ast-type] is Config::BINDish::X {
     }
 }
 
-class Config::BINDish::X::Blocl::Ambiguous does Config::BINDish::X::Ambiguous["block"] {
+class Config::BINDish::X::Block::Ambiguous does Config::BINDish::X::Ambiguous["block"] {
     has $.type is required;
     has $.name;
     has $.class;
@@ -48,10 +95,14 @@ class Config::BINDish::X::Block::DoesntExists is Config::BINDish::X {
     has $.class;
 
     method message {
-        "Block '" ~ $!type.gist
-        ~ ($!name ?? " " ~ $!name.gist !! "")
+        note $!name.WHICH, " // ", $!name ~~ Stringy;
+        my $name = $!name
+            ?? " " ~ ($!name ~~ Stringy ?? '"' ~ $!name ~ '"' !! $!name.gist )
+            !! "";
+        "Block `" ~ $!type.gist
+        ~ $name
         ~ ($!class ?? ", " ~ $!class.gist !! "")
-        ~ "' doesn't exists"
+        ~ "` doesn't exists"
     }
 }
 
@@ -79,5 +130,12 @@ class Config::BINDish::X::AST::DoesntExists is Config::BINDish::X {
 class Config::BINDish::X::NoInnerParent is Config::BINDish::X {
     method message {
         "Method invoked outside of the config top context. No config parsing started yet?"
+    }
+}
+
+class Config::BINDish::X::AST::DuplicateType is Config::BINDish::X {
+    has Str:D $.type is required;
+    method message {
+        "Cannot register a duplicate of AST node type '$!type'"
     }
 }

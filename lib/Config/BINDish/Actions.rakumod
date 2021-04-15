@@ -86,6 +86,20 @@ method value:sym<string>($/) {
     }
 }
 
+method value:sym<rat>($/) {
+    make Config::BINDish::AST.new-ast('Value',
+                                      :type(Rat),
+                                      :type-name<rat>,
+                                      :payload(Rat(~$/)));
+}
+
+method value:sym<num>($/) {
+    make Config::BINDish::AST.new-ast('Value',
+                                      :type(Num),
+                                      :type-name<num>,
+                                      :payload(Num(~$/)));
+}
+
 method value:sym<int>($/) {
     make Config::BINDish::AST.new-ast('Value',
                                       :type(Int),

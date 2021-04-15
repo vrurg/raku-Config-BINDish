@@ -1,9 +1,23 @@
 use v6.d;
+#no precompilation;
+#use Grammar::Tracer;
 use nqp;
 unit grammar Config::BINDish::Grammar;
 use Config::BINDish::X;
 
 class Context {...}
+
+class Value {
+    has Str:D $.type-name is required;
+    has Mu $.type is required;
+    has Mu $.value is required;
+
+    method gist {
+        my $val = Str($!value);
+        my $quote = $!type-name eq 'dq-string' ?? '"' !! "'";
+        $!type ~~ Stringy ?? $quote ~ $val ~ $quote !! $val
+    }
+}
 
 role StatementProps {
     # If non-empty then this statement can only be contained by blocks listed here.
@@ -14,9 +28,7 @@ role StatementProps {
     multi method COERCE(%profile) {
         self.new: |%profile
     }
-    multi method COERCE(Any) {
-        self.new
-    }
+
     multi method ACCEPTS(Context:D $ctx) {
         my $cur-block = $ctx.cur-block-ctx;
         return $cur-block.type eq 'TOP' if $!top-only;
@@ -24,30 +36,31 @@ role StatementProps {
     }
 }
 
-class OptionProps does StatementProps {
+role ContainerProps {
     # These attributes are used as RHS of a smartmatch.
-    has Str $.type-name;
+    # NOTE: These are kept separate from StatementProps because extensions may add non-container type statements.
+    has $.type-name;
     has Mu $.type;
+
+    multi method ACCEPTS(Value:D $val) {
+        (!$!type-name.defined || $val.type-name ~~ $!type-name)
+        && ($!type =:= Mu || $val.type ~~ $!type)
+    }
+
+    method type-as-str {
+        ($!type-name ~ " of " with $!type-name) ~ $!type.gist
+    }
 }
 
-class BlockProps does StatementProps {
+class OptionProps does StatementProps does ContainerProps {}
+
+class BlockProps does StatementProps does ContainerProps {
     # Block must be named
     has Bool:D $.named = False;
     # Block must have a class
     has Bool:D $.classified = False;
     # Block can only contain values, no options or blocks allowed
     has Bool:D $.value-only = False;
-}
-
-class Value {
-    has Str:D $.type-name is required;
-    has Mu $.type is required;
-    has Mu $.value is required;
-
-    method Str {
-        my $val = Str($!value);
-        $!type ~~ Stringy ?? '"' ~ $val ~ '"' !! $val
-    }
 }
 
 class Context {
@@ -72,7 +85,7 @@ class Context {
     method description {
         given $!type {
             when 'TOP'    { 'global context' }
-            when 'BLOCK'  { "block '" ~ $!keyword.value ~ ($!name ?? " " ~ $!name !! "") ~ "'" }
+            when 'BLOCK'  { "block '" ~ $!keyword.value ~ ($!name ?? " " ~ $!name.gist !! "") ~ "'" }
             when 'OPTION' { "option '" ~ $!keyword.value ~ "'" }
             default {
                 die "Internal: looks like " ~ $_ ~ " context hasn't been given a description!"
@@ -85,7 +98,7 @@ class Strictness {
     has Bool:D $.syntax = False;
     has Bool:D $.options = False;
     has Bool:D $.blocks = False;
-    multi method COERCE(Hash:D %p) { self.new: |%p }
+    multi method COERCE(Hash:D $p) { self.new: |$p }
     multi method COERCE(Pair:D $p) { self.new: |$p }
     multi method COERCE(Positional:D $l where { ? all .map(* ~~ Pair) }) { self.new: |%$l }
     multi method COERCE(Bool:D $default) { self.new: :syntax($default), :options($default), :blocks($default) }
@@ -94,9 +107,14 @@ class Strictness {
 has Bool:D $.flat = False;
 has Strictness:D() $.strict = False;
 # All block types.
-has BlockProps() %.blocks;
+has BlockProps() %.blk-props;
 # Allowed top-level keywords.
-has OptionProps() %.options;
+has OptionProps() %.opt-props;
+# User-defined blocks and options, set-only.
+has %.blocks;
+has %.options;
+
+# Context stack. Normally a new context is created on per-parent basis.
 has @.contexts;
 
 method set-value(Mu $type is raw, *%tinfo where *.elems == 1 --> Value:D) {
@@ -105,47 +123,46 @@ method set-value(Mu $type is raw, *%tinfo where *.elems == 1 --> Value:D) {
 }
 
 submethod TWEAK(|) {
-    if 0 && $*RAKU.compiler.version >= v2021.03.20.g.776.f.1.a.626 {
-        self.WALK(:name<setup-BINDish>, :!methods, :submethods, :roles).invoke.sink;
-    }
-    else {
-        # Earlier versions of Rakudo had a bug in WALK which caused it to attempt submethod_table on NQP classes
-        my %invoked;
-        for self.^mro(:roles) -> \component {
-            my &setup-method = nqp::can(component.HOW, 'submethod_table')
-                ?? component.^submethod_table<setup-BINDish> // Nil
-                !! Nil;
-            my $method-which = &setup-method.WHICH;
-            if &setup-method && !%invoked{$method-which} {
-                %invoked{$method-which} = True;
-                self.&setup-method();
-            }
+    # Walk over grammar's MRO and invoke setup methods.
+    # To prevent duplicate iteration over submethods defined in v6.c/v6.d roles
+    # record submethod objects we've already invoked.
+    my %invoked;
+    for self.^mro(:roles) -> \component {
+        my &setup-method = nqp::can(component.HOW, 'submethod_table')
+            ?? component.^submethod_table<setup-BINDish> // Nil
+            !! Nil;
+        my $method-which = &setup-method.WHICH;
+        if &setup-method && !%invoked{$method-which} {
+            %invoked{$method-which} = True;
+            self.&setup-method();
         }
     }
 }
 
 submethod setup-BINDish {
-    self.declare-blocks:
-        block => { :top-only },
-        subblock => { in => <block> },
-        foo => { :named, :classified },
-#        fubar => { :named, in => <block subblock> },
-        ;
-    self.declare-options:
-        val => {},
-        val2 => { type => Str },
-        count => { in => <block>, type-name => 'int', },
-        subval => { in => <subblock> },
-        allow-something => { in => <block> },
-        ;
+    self.declare-blocks: %!blocks;
+    self.declare-options: %!options;
+#    self.declare-blocks:
+#        block => { :top-only },
+#        subblock => { in => <block> },
+#        foo => { :named, :classified },
+##        fubar => { :named, in => <block subblock> },
+#        ;
+#    self.declare-options:
+#        val => {},
+#        val2 => { type => Str },
+#        count => { in => <block>, type-name => 'int', },
+#        subval => { in => <subblock> },
+#        allow-something => { in => <block> },
+#        ;
 }
 
 proto method declare-blocks(|) {*}
 multi method declare-blocks(%blocks) {
     for %blocks.kv -> $name, %props {
         die "Re-declaration of block '$name'"
-            with %!blocks{$name};
-        %!blocks{$name} = BlockProps.new: |%props;
+            with %!blk-props{$name};
+        %!blk-props{$name} = BlockProps.new: |%props;
     }
 }
 multi method declare-blocks(*%blocks) {
@@ -156,8 +173,8 @@ proto method declare-options(|) {*}
 multi method declare-options(%options) {
     for %options.kv -> $name, %props {
         die "Re-declaration of option '" ~ $name ~ "'"
-            with %!options{$name};
-        %!options{$name} = OptionProps.new: |%props;
+            with %!opt-props{$name};
+        %!opt-props{$name} = OptionProps.new: |%props;
     }
 }
 multi method declare-options(*%options) {
@@ -186,7 +203,7 @@ method pop-ctx(--> Context:D) {
 }
 
 method block-ok(Str:D $type) {
-    my %blocks = $*CFG-GRAMMAR.blocks;
+    my %blocks = $*CFG-GRAMMAR.blk-props;
     return True unless %blocks;
     with %blocks{$type} {
         return self.cfg-ctx ~~ $_
@@ -195,7 +212,7 @@ method block-ok(Str:D $type) {
 }
 
 method option-ok(Str:D $keyword) {
-    my %options = $*CFG-GRAMMAR.options;
+    my %options = $*CFG-GRAMMAR.opt-props;
     return True unless %options;
     with %options{$keyword} {
         return self.cfg-ctx ~~ $_
@@ -205,7 +222,7 @@ method option-ok(Str:D $keyword) {
 
 method enter-option {
     self.push-ctx: :type<OPTION>,
-                   :props( %!options{$*CFG-KEYWORD.value} ),
+                   :props( %!opt-props{$*CFG-KEYWORD.value} ),
                    :keyword( $*CFG-KEYWORD )
 }
 
@@ -219,37 +236,21 @@ method backtrack-option {
 
 method validate-option {
     my ::?CLASS:D $grammar = $*CFG-GRAMMAR;
-    my %options = $grammar.options;
+    my %options = $grammar.opt-props;
     if %options {
         my $ctx = self.cfg-ctx.cur-block-ctx;
         my $keyword = $*CFG-KEYWORD.value;
         my $props = %options{$keyword};
         if $props {
-            self.panic: "Option '$keyword' cannot be used in " ~ $ctx.description
-                unless self.option-ok($keyword);
+            self.panic: X::Parse::Context, :what<option>, :keyword($*CFG-KEYWORD), :$ctx
+                unless self.option-ok($keyword) && !$ctx.props.value-only;
             my $value = $*CFG-VALUE // Value.new: :type(Bool), :type-name('bool'), :value;
-            my $type-matches = True;
-            my Mu $got-type;
-            my Mu $expected-type;
-            with $props.type-name {
-                $type-matches = $value.type-name ~~ $_;
-                $got-type = $value.type-name.raku;
-                $expected-type = $_.raku;
-            }
-            if $type-matches && $props.type !=:= Mu {
-                $type-matches = $value.type ~~ $props.type;
-                $got-type = $value.type.gist;
-                $expected-type = $props.type.gist;
-            }
-            unless $type-matches {
-                self.panic: "Option '$keyword' expects a value of type "
-                            ~ $expected-type
-                            ~ " but got "
-                            ~ $got-type
+            unless $value ~~ $props {
+                self.panic: X::Parse::ValueType, :what<option>, :keyword($*CFG-KEYWORD), :$props, :$value
             }
         }
         elsif $grammar.strict.options {
-            self.panic: "Unknown option '" ~ $keyword ~ "' in " ~ $ctx.description
+            self.panic: X::Parse::Unknown, :what<option>, :$keyword
         }
     }
     self.leave-option
@@ -260,28 +261,36 @@ method validate-block {
     my $grammar = $*CFG-GRAMMAR;
     my Str:D $block-type = $*CFG-BLOCK-TYPE.value;
     my StatementProps $props;
-    my %blocks = $*CFG-GRAMMAR.blocks;
+    my %blocks = $*CFG-GRAMMAR.blk-props;
     if %blocks {
         $props = $_ with %blocks{$block-type};
         if $props {
-            self.panic: "Block '"
-                        ~ $block-type
-                        ~ "' cannot be declared in "
-                        ~ $ctx.description
+            self.panic: X::Parse::Context, :what<block>, :keyword($*CFG-BLOCK-TYPE), :$ctx
                 unless self.block-ok($block-type);
-            self.panic: "Name is missing in declaraion of block '" ~ $block-type ~ "'"
+            self.panic: X::Parse::MissingPart, :what<name>, :block-spec($block-type)
                 unless !$props.named || $*CFG-BLOCK-NAME;
-            self.panic: "Class is missing in a declaraion of block '"
-                        ~ $block-type
-                        ~ ($*CFG-BLOCK-NAME ?? " " ~ $*CFG-BLOCK-NAME !! '')
-                        ~ "'"
+            self.panic: X::Parse::MissingPart,
+                        :what<class>,
+                        :block-spec($block-type ~
+                                    ~ ($*CFG-BLOCK-NAME ?? " " ~ $*CFG-BLOCK-NAME !! ''))
                 unless !$props.classified || $*CFG-BLOCK-CLASS;
         }
         elsif $grammar.strict.blocks {
-            self.panic: "Unknown block type '" ~ $block-type ~ "'"
+            self.panic: X::Parse::Unknown, :what('block type'), :keyword($block-type)
         }
     }
     self.push-ctx: :type<BLOCK>, :keyword( $*CFG-BLOCK-TYPE ), :name( $*CFG-BLOCK-NAME ), :$props;
+}
+
+method validate-value {
+    my $ctx = self.cfg-ctx;
+    my $props = $ctx.props;
+    if $props && $props ~~ ContainerProps {
+#        my $grammar = $*CFG-GRAMMAR;
+        unless (my $value = $*CFG-VALUE) ~~ $props {
+            self.panic: X::Parse::ValueType, :what($ctx.type.lc), :keyword($ctx.keyword), :$props, :$value
+        }
+    }
 }
 
 method leave-block { self.pop-ctx }
@@ -295,8 +304,12 @@ method block-description {
         !! "*global context*"
 }
 
-method panic(Str:D $msg) {
-    Config::BINDish::X::Parse.new(:cursor(self), :$msg).throw
+proto method panic(|) {*}
+multi method panic(Str:D $msg) {
+    Config::BINDish::X::Parse::General.new(:cursor(self), :$msg).throw
+}
+multi method panic(Config::BINDish::X::Parse:U \ex, Str $msg?, *%p) {
+    ex.new(:cursor(self), |(:$msg with $msg), |%p).throw
 }
 
 # ---------------- GRAMMAR RULES ----------------
@@ -306,7 +319,11 @@ rule TOP {
     :my $*CFG-INNER-PARENT;
     :my $*CFG-TOP;
     <.enter-TOP>
-    { self.push-ctx: :type<TOP>; }
+    {
+        self.push-ctx: :type<TOP>,
+                       :props(BlockProps.new),
+                       :keyword(Value.new: :value<TOP>, :type(Str), :type-name<keyword>);
+    }
     <statement-list>
 }
 
@@ -317,7 +334,7 @@ rule statement-list {
     [
     | $
     | <?before '}'>
-    | [ $<statements>=<statement> || <bad-statement> ]*? <?before '}' | $>
+    | [ $<statements>=<.statement> || <bad-statement> ]*? <?before '}' | $>
     ]
 }
 
@@ -331,7 +348,8 @@ multi token statement:sym<comment> {
 # A string, number, boolean, or any user-defined type.
 multi rule statement:sym<value> {
     :my Value $*CFG-VALUE;
-    <value> <statement-terminate>
+    $<err-pos>=<?> <value> <statement-terminate>
+    { $<err-pos>.validate-value }
 }
 
 multi rule statement:sym<option> {
@@ -340,18 +358,23 @@ multi rule statement:sym<option> {
     $<option-name>=<.keyword>
     { self.enter-option }
     [
-        [ $<option-value>=<.value> ]?
+    [$<option-value>=<.value> ]?
         <?before <.statement-terminator>>
         $<err-pos>=<?> <statement-terminate>
         { $<err-pos>.validate-option }
     ]
-    | <?{ self.backtrack-option with $*CFG-KEYWORD; False }>
+    | <?{
+        self.backtrack-option with $*CFG-KEYWORD;
+        False
+    }>
 }
 
 multi rule statement:sym<block> {
     :my Value $*CFG-BLOCK-TYPE;
     :my Value $*CFG-BLOCK-NAME;
     :my Value $*CFG-BLOCK-CLASS;
+    :my $*CFG-BLOCK-ERR-POS;
+    $<err-pos>=<?> { $*CFG-BLOCK-ERR-POS = $<err-pos> }
     <block-head>
     [ <block-name> <block-class>? ]?
     <?before '{'>
@@ -374,14 +397,17 @@ token statement-terminator {
 token statement-terminate {
     <statement-terminator>
     {
-        unless !$*CFG-GRAMMAR.strict.syntax || (~$<statement-terminator><terminator> eq ';') {
-            self.panic: "Missing semicolon"
-        }
+        unless !$*CFG-GRAMMAR.strict.syntax
+               || ($<statement-terminator>
+                   && $<statement-terminator><terminator>
+                   && ~$<statement-terminator><terminator> eq ';')
+        { self.panic: "Missing semicolon" }
     }
 }
 
 token bad-statement {
-    [ .*? [ ';' || $$ || '}' ] ] <.panic: "Unrecognized statement">
+    <?> <.panic: "Unrecognized statement">
+#    [ .*? [ ';' || $$ || '}' ] ] <.panic: "Unrecognized statement">
 }
 
 token block-head {
@@ -405,9 +431,7 @@ token block-body {
     :temp $*CFG-INNER-PARENT;
     [ '{' <.ws> ] ~ [ <.ws> '}' <.statement-terminate> ]
     [
-        {
-            self.validate-block
-        }
+        { $*CFG-BLOCK-ERR-POS.validate-block }
         <.enter-block>
         <statement-list>
     ]
@@ -454,8 +478,21 @@ proto token value {*}
 multi token value:sym<string> {
     <dq-string> | <sq-string>
 }
+multi token value:sym<num> {
+    <[-+]>? [
+        | [ \d* '.' \d+ ]
+        | [ \d+ ]
+    ]
+    e <[-+]>? \d+ <.wb> { self.set-value: Num, :num($/) }
+}
+multi token value:sym<rat> {
+    <[-+]>? [
+        | [ $<numerator>=\d* '.' $<denominator>=\d+ <.wb> ]
+        | [ $<numerator>=\d+ '.' <!before \d> ]
+    ] { self.set-value: Rat, :rat($/) }
+}
 multi token value:sym<int> {
-    ['-' | '+']? \d+ { self.set-value: Int, :int($/) }
+    <[-+]>? \d+ <!before <[.e]>> { self.set-value: Int, :int($/) }
 }
 multi token value:sym<bool> {
     $<bool-val>=[ <.bool-true> | <.bool-false> ] { self.set-value: Bool, :bool($/) }

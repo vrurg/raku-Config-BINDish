@@ -1,0 +1,241 @@
+use v6.d;
+use Test::Async <Config::BINDish::Test Base>;
+use Config::BINDish;
+use Config::BINDish::Grammar;
+use Config::BINDish::AST;
+use Config::BINDish::X;
+
+plan 4, :parallel;
+
+subtest "Basics" => {
+    plan 31;
+
+    my $cfg = Config::BINDish.new;
+    $cfg.read: string => q:to/CFG/;
+        opt "top level";
+
+        blk {
+            opt 42;
+            subblk "level 1.a" {
+                opt 1.3;
+            }
+            subblk "level 1.a" special {
+                opt -1.3;
+            }
+            subblk "level 1.b" {
+                opt 4.2;
+            }
+        }
+        CFG
+
+    my $top = $cfg.top;
+    is $top.value('opt'), "top level", "simple top-level option value";
+    my $opt = $top.option('opt');
+    isa-ok $opt, Config::BINDish::AST::Option, "method option returns an AST::Option instance";
+    is $opt.keyword.type, Str, "option's keyword container type";
+    is $opt.keyword.type-name, 'keyword', "option's keyword container type name";
+    is $opt.keyword.payload, "opt", "option's keyword container payload";
+    isa-ok $opt.value.type, Str, "option's value container type";
+    is $opt.value.type-name, "dq-string", "option's value container type name";
+    is $opt.value.payload, "top level", "option's value container payload";
+
+    my $blk = $top.block("blk");
+
+    isa-ok $blk, Config::BINDish::AST::Block, "a block is returned by method 'block'";
+    nok $blk.name.defined, "block is unnamed";
+    nok $blk.class.defined, "block is unclassified";
+    is ~$blk.keyword, "blk", "block type";
+
+    $opt = $blk.option("opt");
+    isa-ok $opt, Config::BINDish::AST::Option, "option object in block `blk`";
+    is $blk.value("opt"), 42, "option `opt` value in block `blk`";
+
+    my $subblk = $blk.block("subblk");
+    nok $subblk.defined, "a named subblock can't be found without name given";
+
+    $subblk = $blk.block("subblk", :name("level 1"));
+    nok $subblk.defined, "a named subblock can't be found if requested name is wrong";
+
+    $subblk = $blk.block("subblk", :name("level 1.a"));
+    ok $subblk.defined, "named subblock found";
+    isa-ok $subblk, Config::BINDish::AST::Block, "subblock type";
+    is ~$subblk.name, "level 1.a", "the right subblock is found";
+    nok $subblk.class.defined, "subblock is unclassified";
+    is ~$subblk.keyword, "subblk", "subblock type";
+
+    $opt = $subblk.option("opt");
+    isa-ok $opt, Config::BINDish::AST::Option, "option object in subblock `subblk`";
+    is $subblk.value("opt"), 1.3, "option `opt` value in subblock `subblk`";
+
+    $subblk = $blk.block("subblk", :name("level 1.a"), :class<special>);
+    ok $subblk.defined, "classified subblock found";
+    isa-ok $subblk, Config::BINDish::AST::Block, "subblock type";
+    is ~$subblk.name, "level 1.a", "the right subblock is found";
+    ok $subblk.class.defined, "subblock is classified";
+    is ~$subblk.class, "special", "subblock class";
+    is ~$subblk.keyword, "subblk", "subblock type";
+    is $subblk.value("opt"), -1.3, "subblock option value";
+
+    is $top.block("blk").block("subblk", :name("level 1.b")).value("opt"),
+       4.2,
+       "chaining of methods 'block'";
+}
+
+subtest "Method 'get'" => {
+    plan 6;
+    my $cfg = Config::BINDish.new;
+    $cfg.read: string => q:to/CFG/;
+        multi "1" {
+            opt 42;
+            subblk "level 1.a" {
+                opt 1.3;
+                subsubblk "level 2" nesting {
+                    opt2 "π";
+                }
+            }
+            subblk "level 1.a" special {
+                opt -1.3;
+            }
+            subblk "level 1.b" {
+                opt 4.2;
+            }
+        }
+
+        multi {
+            opt "just multi"
+        }
+
+        multi "special" class {
+            num 3.14e0;
+        }
+
+        top-opt 3.1415926;
+        CFG
+
+    is $cfg.get("top-opt"), 3.1415926, "get on top-level option";
+    is $cfg.get("multi" => "opt"),
+       "just multi",
+       "get on a nameless block";
+    is $cfg.get(:multi => "opt"),
+       "just multi",
+       "get with a Pair for nameless block";
+    is $cfg.get(:multi("1")
+                => :subblk("level 1.a")
+                   => :subsubblk("level 2", "nesting")
+                      => 'opt2'),
+       "π",
+       "get on a deep structure";
+    is $cfg.get(:multi(<special class>) => "num"),
+       3.14e0,
+       "get on a top-level named classified block";
+    isa-ok $cfg.get(:block<multi>, :name<special>, :class<class>),
+           Config::BINDish::AST::Block,
+           ":block('type') gives a block";
+
+#    say $cfg.top then :multi("special", "class");
+#    say $cfg.top then :multi("1")
+#                  then :subblk("level 1.a") then "opt";
+}
+
+# Multiple block declarations are allowed. But some operations on such configs are limited.
+subtest "Multi" => {
+    plan 17;
+    my $cfg = Config::BINDish.new;
+    $cfg.read: string => q:to/CFG/;
+        multi {
+            id 0;
+        }
+
+        multi "1" {
+            id 1;
+            first "foo";
+            subblk "level 1.a" {
+                opt 1.3;
+                subsubblk "level 2" nesting {
+                    opt2 "π";
+                }
+            }
+            subblk "level 1.a" special {
+                opt -1.3;
+            }
+            subblk "level 1.b" {
+                id "1.b.1";
+                first "1.foo";
+            }
+        }
+
+        multi "1" extra {
+            id 1.1;
+        }
+
+        multi "1" {
+            id 2;
+            second "bar";
+            subblk "level 1.b" {
+                id "1.b.2";
+                second "2.foo";
+            }
+        }
+        CFG
+
+    my $top = $cfg.top;
+
+    is $top.blocks('multi', :name("1")).eager.elems, 2, "all multi blocks found";
+    is-deeply $top.blocks('multi', :name("1")).eager.map( *.value("id") ),
+              (1, 2),
+              "iterated over multi blocks";
+
+    throws-like { $top.block("multi", :name("1")) },
+                X::Block::Ambiguous,
+                "can't get a single block when multiple are declared";
+
+    is $top.blocks('multi', :name("1"), :class('extra')).eager.elems,
+       1,
+       "classified block do not mix up with just named blocks";
+
+    # Flatten down the structure
+    my $flat = $top.flatten;
+
+    is $flat.blocks('multi', :name("1")).eager.elems, 1, "multi block flattens into a single block";
+
+    lives-ok { $flat.block("multi", :name("1")) },
+             "method block do not fail as we have just one now";
+
+    is $flat.block("multi", :name("1")).value("id"),
+       2,
+       "option from the second variant overrides the first";
+
+    is $flat.block("multi", :name("1")).value("first"),
+       "foo",
+       "unique option from the first variant";
+
+    is $flat.block("multi", :name("1")).value("second"),
+       "bar",
+       "unique option from the second variant";
+
+    my $subblk-a = $flat.block("multi", :name("1")).block("subblk", :name("level 1.a"));
+    ok $subblk-a.defined, "subblock is there after flattening";
+    is $subblk-a.value("opt"), 1.3, "subblock option is not lost either";
+
+    my $subblk-b = $flat.block("multi", :name("1")).block("subblk", :name("level 1.b"));
+    ok $subblk-b.defined, "multi-subblock is there after flattening";
+    is $subblk-b.value("id"), "1.b.2", "option from second multi-subblock overrides the first variant";
+    is $subblk-b.value("first"), "1.foo", "unique option from the first subblock is preserved";
+    is $subblk-b.value("second"), "2.foo", "unique option from the second subblock is preserved";
+
+    my $subsubblk = $subblk-a.block("subsubblk", :name("level 2"), :class("nesting"));
+    ok $subsubblk.defined, "second level subblock is not lost";
+    is $subsubblk.value("opt2"), "π", "option from a second level subblock";
+}
+
+subtest "Value List Block" => {
+    my $cfg = Config::BINDish.new;
+    $cfg.read: string => q:to/CFG/;
+blist {
+    "a"; "b"; "c";
+}
+CFG
+    is-deeply $cfg.top.block('blist').values.eager, <a b c>, "list block values";
+}
+
+done-testing;

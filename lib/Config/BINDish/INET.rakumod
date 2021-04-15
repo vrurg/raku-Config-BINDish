@@ -109,13 +109,13 @@ role Actions is BINDish-actions {
         make Config::BINDish::AST.new-ast: 'Value',
                                            type => IP::Addr,
                                            type-name => $ip-type,
-                                           value => $ip-obj;
+                                           payload => $ip-obj;
     }
 
     method value:sym<URL>($/) {
         make Config::BINDish::AST.new-ast: 'Value',
                                            type => Str,
                                            type-name => 'URL',
-                                           value => ~$/;
+                                           payload => ~$/;
     }
 }

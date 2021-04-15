@@ -1,35 +1,49 @@
 use v6.d;
-use Test;
+use Test::Async;
 use Config::BINDish;
 use Config::BINDish::INET;
+use IP::Addr;
 
-my $c = Config::BINDish.new(:!strict);
+plan 21;
 
-my $res = $c.read(string => q:to/CFG/);
-myaddr4 192.168.0.0/255.255.0.0;
-myaddr6 2001:db8:85a3::8a2e:370:7334/49;
-base https://localhost;
+my $cfg = Config::BINDish.new;
 
-server {
-    base https://test.com/subpath
-}
+$cfg.read: string => q:to/CFG/, :!strict;
+addr4 192.168.0.1;
+network-a4 10.13.0.0/16;
+network-b4 10.42.1.0/255.255.255.0;
+network6 2001:db8:85a3::8a2e:370:7334/49;
+
+url-a https://localhost;
+url-b https://docs.raku.org/language/grammar_tutorial;
+url-c ftp://ftp.freebsd.org;
 CFG
 
-say "-------- PARSE";
-say $res;
-say "-------- AST";
-$res.ast.dump;
+my $top = $cfg.top;
 
-my $addr = $res.ast.value('myaddr4');
-say $addr;
+my %IPs =
+    addr4 => '192.168.0.1',
+    network-a4 => '10.13.0.0/16',
+    network-b4 => '10.42.1.0/24',
+    network6 => '2001:db8:85a3::8a2e:370:7334/49',
+    ;
 
-$addr = $res.ast.value('myaddr6');
-say $addr;
+for %IPs.sort -> (:key($opt), :$value) {
+    isa-ok $top.value($opt), IP::Addr, "$opt: IP address is parsed into IP::Addr";
+    my $IPver = $opt.substr(*-1);
+    is $top.option($opt).value.type-name, 'IPv' ~ $IPver, "$opt: option type name is IPv$IPver";
+    is $top.value($opt).gist, $value, "$opt: IP address value";
+}
 
-$addr = $res.ast.value('base');
-say $addr;
-say $res.ast.option('base');
+my %URLs =
+    url-a => 'https://localhost',
+    url-b => 'https://docs.raku.org/language/grammar_tutorial',
+    url-c => 'ftp://ftp.freebsd.org';
 
-say "in-block base: ", $res.ast.block('server').value('base');
+for %URLs.sort -> (:key($opt), :$value) {
+    isa-ok $top.value($opt), Str, "$opt: URL is parsed into Str";
+    is $top.option($opt).value.type-name, "URL", "$opt: option type name is 'URL'";
+    is $top.value($opt), $value, "$opt: URL value";
+}
 
 done-testing;

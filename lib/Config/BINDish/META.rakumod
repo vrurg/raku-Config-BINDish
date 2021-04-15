@@ -12,7 +12,9 @@ our sub META6 {
         'AttrX::Mooish',
         'IP::Addr',
     ],
-    # test-depends   => <Test::META>,
+    test-depends   => [
+        'Test::Async',
+    ],
     # build-depends  => <META6 p6doc Pod::To::Markdown>,
     tags           => <CONFIG>,
     authors        => ['Vadim Belman <vrurg@lflat.org>'],

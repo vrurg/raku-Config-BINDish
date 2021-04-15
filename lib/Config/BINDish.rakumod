@@ -1,5 +1,47 @@
 use v6.d;
-unit class Config::BINDish:ver<0.0.1>:api<0.1>;
+use NQPHLL:from<NQP>;
+use nqp;
+unit class Config::BINDish:ver<0.0.0>:api<0.1>;
+
+BEGIN {
+    Config::BINDish.HOW does role ExtensibleHOW {
+        my Mu @grammar-extensions;
+        my Mu @actions-extensions;
+
+        method extend-grammar( Mu \ext ) {
+            @grammar-extensions.push: ext;
+        }
+        method extend-actions( Mu \ext ) {
+            @actions-extensions.push: ext;
+        }
+
+        method grammar-extensions { @grammar-extensions }
+        method actions-extensions { @actions-extensions }
+    }
+
+    my sub phaser-blk($what, Mu \extension) {
+        QAST::Block.new(
+            QAST::Stmts.new,
+            QAST::Stmts.new(
+                QAST::Op.new(
+                    :op<callmethod>,
+                    :name("extend-" ~ $what),
+                    QAST::WVal.new(:value( nqp::decont(Config::BINDish.HOW) )),
+                    QAST::WVal.new(:value( nqp::decont(extension) ))
+                    )
+                )
+            );
+    }
+
+    multi trait_mod:<is>( Mu:U \extension, :$BINDish-grammar! ) is export {
+        my $blk := phaser-blk('grammar', extension);
+        $*W.add_phaser($*LEAF, 'INIT', $*W.create_code_obj_and_add_child($blk, 'Block'), $blk);
+    }
+    multi trait_mod:<is>( Mu:U \extension, :$BINDish-actions! ) is export {
+        my $blk := phaser-blk('actions', extension);
+        $*W.add_phaser($*LEAF, 'INIT', $*W.create_code_obj_and_add_child($blk, 'Block'), $blk);
+    }
+}
 
 use AttrX::Mooish;
 use Config::BINDish::Grammar;
@@ -30,30 +72,27 @@ my class ParametericCacheHOW {
 
 my \grammar-cache = ParametericCacheHOW.new_type(Config::BINDish::Grammar);
 my \actions-cache = ParametericCacheHOW.new_type(Config::BINDish::Actions);
-our @grammar-extensions;
-our @actions-extensions;
 
-BEGIN {
-    multi trait_mod:<is>( Mu:U \extension, :$BINDish-grammar! ) is export {
-        @Config::BINDish::grammar-extensions.push: extension if $BINDish-grammar;
-    }
-    multi trait_mod:<is>( Mu:U \extension, :$BINDish-actions! ) is export {
-        @Config::BINDish::actions-extensions.push: extension if $BINDish-actions;
-    }
-}
-
-has Config::BINDish::Grammar::Strictness:D() $.strict = False;
+has Config::BINDish::Grammar::Strictness:D(  ) $.strict = False;
 
 has Mu @.grammar-extensions;
 has Mu @.actions-extensions;
+# User-defined configuration structure. See Grammar's declare-blocks and declare-options
+has %.blocks;
+has %.options;
 # It makes no sense to override the grammar because it's the core of this all. Only extensions are allowed.
 has Config::BINDish::Grammar $.grammar is mooish( :lazy, :clearer ) is built( False );
 has Config::BINDish::Actions $.actions is mooish( :lazy, :clearer );
+# Source file
+has IO::Path $.file;
 
 # Flatten config by default if True
 has Bool:D $.flat = False;
 
-submethod TWEAK(*%p) {
+has $.top handles <get>;
+has $.match;
+
+submethod TWEAK( *%p ) {
     if %p<extend-grammar>:exists {
         self.extend-grammar: |%p<extend-grammar>
     }
@@ -62,13 +101,13 @@ submethod TWEAK(*%p) {
     }
 }
 
-method extend-grammar(+@ext) {
+method extend-grammar( +@ext ) {
     @!grammar-extensions.append: @ext;
     self.clear-grammar;
     self
 }
 
-method extend-actions(+@ext) {
+method extend-actions( +@ext ) {
     @!actions-extensions.append: @ext;
     self.clear-actions;
     self
@@ -76,20 +115,62 @@ method extend-actions(+@ext) {
 
 method build-grammar is raw {
     # Reverse makes extensions declared late to override those declared earlier. In MRO first in the order is first invoked.
-    Metamodel::Primitives.parameterize_type: grammar-cache, |@!grammar-extensions.reverse, |@grammar-extensions.reverse;
+    Metamodel::Primitives.parameterize_type: grammar-cache,
+                                             |@!grammar-extensions.reverse,
+                                             |::?CLASS.HOW.grammar-extensions.reverse;
 }
 
 method build-actions is raw {
-    Metamodel::Primitives.parameterize_type: actions-cache, |@!actions-extensions.reverse, |@actions-extensions.reverse;
+    Metamodel::Primitives.parameterize_type: actions-cache,
+                                             |@!actions-extensions.reverse,
+                                             |::?CLASS.HOW.actions-extensions.reverse;
 }
 
-proto method read( | ) {*}
-multi method read(::?CLASS:U: |c) {
+proto method read( | ) {
+    LEAVE { $!top = $!match.made if $!match && $!match.made };
+    $!match = {*}
+}
+multi method read( ::?CLASS:U: |c ) {
     self.new.read: |c
 }
-multi method read(::?CLASS:D: Str:D :$file, |c) {
-    $.grammar.parse: $file.IO.slurp, :$.actions, :$!strict, :$!flat, |c
+multi method read( ::?CLASS:D: IO:D(Str:D) :$!file, |c ) {
+    $.grammar.parse: $!file.slurp,
+                     :$.actions,
+                     :$!strict,
+                     :$!flat,
+                     :%!blocks,
+                     :%!options,
+                     |c
 }
-multi method read(::?CLASS:D: Str:D :$string, |c) {
-    $.grammar.parse: $string, :$.actions, :$!strict, :$!flat, |c
+multi method read( ::?CLASS:D: Str:D :$string, |c ) {
+    $.grammar.parse: $string,
+                     :$.actions,
+                     :$!strict,
+                     :$!flat,
+                     :%!blocks,
+                     :%!options,
+                     |c
+}
+
+# Experimental
+proto sub infix:«then»( Config::BINDish::AST::Parent:D, $ )
+    is assoc<left>
+    is looser( &infix:«=>» )
+    is export {*}
+multi sub infix:«then»( Config::BINDish::AST::Parent:D $node,
+                        Pair:D $blk ( :key($type), :value( ( $name, $class ) )
+                        where $blk.value ~~ Positional )
+    --> Config::BINDish::AST::Parent:D )
+{
+    $node.block: $type, :$name, |( :$class with $class );
+}
+multi sub infix:«then»( Config::BINDish::AST::Parent:D $node,
+                        Pair:D $blk ( :key($type),
+                                      :value($name) ) --> Config::BINDish::AST::Parent:D )
+{
+    $node.block: $type, |( :$name if $name && $name !~~ Bool )
+}
+multi sub infix:«then»( Config::BINDish::AST::Parent:D $node, Str:D $opt )
+{
+    $node.value: $opt
 }

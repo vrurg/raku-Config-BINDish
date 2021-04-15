@@ -1,0 +1,22 @@
+use v6.d;
+use Test::Async <Config::BINDish::Test Base>;
+use Config::BINDish;
+
+my $cfg = Config::BINDish.new;
+
+ok ?$cfg.read(file => $?FILE.IO.parent(1).add('070-test.config')), "config file loaded and parsed";
+
+ok $cfg.file.defined, "source file recorded";
+
+is-cfg-stmt-list $cfg.match,
+                 %( statements => %(
+                        0 => UNIX-comment => comment-body => " Test config",
+                        1 => %(
+                            block-head => block-type => "general",
+                            block-body => token-statements(
+                                statements => 0 => %(
+                                    option-name => "comment",
+                                    option-value => q<"test only">))))),
+                 "config file structure";
+
+done-testing;

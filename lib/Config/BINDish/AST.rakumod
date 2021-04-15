@@ -5,6 +5,7 @@ use Config::BINDish::X;
 role Config::BINDish::AST::Parent {...};
 class Config::BINDish::AST::Block {...}
 class Config::BINDish::AST::Option {...}
+class Config::BINDish::AST::Value {...}
 
 class Config::BINDish::AST {
     has Config::BINDish::AST::Parent $.parent;
@@ -15,7 +16,8 @@ class Config::BINDish::AST {
     }
 
     my %ast-types;
-    method gist {'*dummy*'}
+
+    method gist {!!!}
 
     method set-parent( ::?CLASS:D: Config::BINDish::AST::Parent $!parent) { self }
 
@@ -62,7 +64,6 @@ role Config::BINDish::AST::Container {
     }
 
     has Mu    $.payload   is built(:bind) handles @coercers is default(Any);
-#    has Mu    $.payload   is built(:bind) is default(Any);
     has Mu    $.type      is built(:bind) is default(Any);
     has Str:D $.type-name is default('any');
 
@@ -110,7 +111,13 @@ role Config::BINDish::AST::Container {
     }
 
     method gist(::?CLASS:D: Bool :$detailed) {
-        ($detailed ?? "[" ~ $!type-name ~ " of " ~ $!type.^name ~ "] " !! "") ~ $!payload.gist
+        my $q = $!type ~~ Str && $!type-name ne 'keyword'
+            ?? ($!type-name eq 'dq-string'
+                ?? '"'
+                !! "'")
+            !! "";
+        my $str = $!type ~~ Str ?? $q ~ $!payload.gist ~ $q !! $!payload.gist;
+        ($detailed ?? "[" ~ $!type-name ~ " of " ~ $!type.^name ~ "] " !! "") ~ $str
     }
 }
 
@@ -172,8 +179,8 @@ role Config::BINDish::AST::Parent {
         self.find-all: -> $ast {
             $ast.^isa(Config::BINDish::AST::Block)
             && ($ast.keyword ~~ $block)
-            && ( !$name.defined || ($ast.name ~~ $name) )
-            && ( !$class.defined || ($ast.class ~~ $class) )
+            && ( !($name.defined || $ast.name.defined) || ($name.defined && $ast.name ~~ $name) )
+            && ( !($class.defined || $ast.class.defined) || ($class.defined && $ast.class ~~ $class) )
         }, :$local
     }
     multi method find-all(::?CLASS:D: :$option!, Bool :$local --> Seq:D) {
@@ -189,7 +196,7 @@ role Config::BINDish::AST::Parent {
             when 1 { @b.head }
             when 0 { Nil }
             default {
-                Config::BINDish::X::BLock::Ambiguous.new(type => $block, :count($_), |%p).throw
+                Config::BINDish::X::Block::Ambiguous.new(type => $block, :count($_), |%p).throw
             }
         }
     }
@@ -236,6 +243,54 @@ role Config::BINDish::AST::Parent {
             return .value.payload
         }
         Nil
+    }
+
+    method values(::?CLASS:D: Bool :$raw) {
+        self.find-all({ .^isa(Config::BINDish::AST::Value) })
+            .map: { $raw ?? $_ !! .payload }
+    }
+
+    proto method get(::?CLASS:D: |) {*}
+    multi method get(::?CLASS:D: Str:D $option, Bool :$raw) {
+        $raw ?? self.option($option) !! self.value($option)
+    }
+    multi method get(::?CLASS:D: Str:D :$option) {
+        self.option($option)
+    }
+    multi method get(::?CLASS:D: Str:D :$value) {
+        self.value($value)
+    }
+    multi method get(::?CLASS:D: Str:D :$block, *%p) {
+        self.block($block, |%p)
+    }
+    multi method get(::CLASS:D: Pair:D $path where $path.value ~~ Pair:D | Str:D) {
+        my proto traverse(Config::BINDish::AST::Block:D, |) {*}
+        multi traverse(Config::BINDish::AST::Block:D $blk, Str:D $option, *%p) {
+            $blk.value: $option, |%p
+        }
+        multi traverse(Config::BINDish::AST::Block:D $blk, Str:D :$block) {
+            $blk.block: $block;
+        }
+        multi traverse(Config::BINDish::AST::Block:D $blk,
+                       Pair:D :$block (:key($type), :value( ($name, $class?) ) ) where $block.value ~~ Positional)
+        {
+            $blk.block: $type, :$name, |(:$class with $class)
+        }
+        multi traverse(Config::BINDish::AST::Block:D $blk,
+                       Pair:D :$block (:key($type), :value($name)))
+        {
+            # Don't pass True as :name if block in the search path defined as :block-type
+            $blk.block: $type, |(:$name unless $name.^isa: Bool)
+        }
+        multi traverse(Config::BINDish::AST::Block:D $blk,
+                       Pair:D $path (:key($block), :value($subpath)) where $path.value ~~ Pair:D | Str:D)
+        {
+            my $subblk = traverse($blk, :$block);
+            return Nil without $subblk;
+            traverse($subblk, $subpath)
+        }
+
+        traverse(self, $path)
     }
 }
 
