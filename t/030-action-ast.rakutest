@@ -8,7 +8,7 @@ use Config::BINDish::X;
 plan 4, :parallel;
 
 subtest "Basics" => {
-    plan 31;
+    plan 29;
 
     my $cfg = Config::BINDish.new;
     $cfg.read: string => q:to/CFG/;
@@ -32,10 +32,8 @@ subtest "Basics" => {
     is $top.value('opt'), "top level", "simple top-level option value";
     my $opt = $top.option('opt');
     isa-ok $opt, Config::BINDish::AST::Option, "method option returns an AST::Option instance";
-    is $opt.keyword.type, Str, "option's keyword container type";
     is $opt.keyword.type-name, 'keyword', "option's keyword container type name";
     is $opt.keyword.payload, "opt", "option's keyword container payload";
-    isa-ok $opt.value.type, Str, "option's value container type";
     is $opt.value.type-name, "dq-string", "option's value container type name";
     is $opt.value.payload, "top level", "option's value container payload";
 

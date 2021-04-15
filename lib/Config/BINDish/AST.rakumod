@@ -54,35 +54,24 @@ class Config::BINDish::AST {
 }
 
 role Config::BINDish::AST::Container {
-    my @coercers;
-    BEGIN {
-        # Get all suspected methods-coercers. A method is considered coercer if lexical named after the method name is
-        # a typeobject.
-        for Any.^methods(:all).map(*.name).grep({ LEXICAL::{$_}:exists }) {
-            @coercers.push: $_ if ! LEXICAL::{$_}.defined
-        }
-    }
-
-    has Mu    $.payload   is built(:bind) handles @coercers is default(Any);
-    has Mu    $.type      is built(:bind) is default(Any);
+    has Mu    $.payload   is built(:bind)
+                          handles @Config::BINDish::Grammar::coercers
+                          is default(Any);
     has Str:D $.type-name is default('any');
 
     method !SET-FROM-CONTAINER(::?ROLE:D: ::?ROLE $cont) {
         with $cont {
             $!payload := .payload<>;
-            $!type := .type<>;
             $!type-name = .type-name;
         }
         else {
             $!payload = Nil;
-            $!type = Nil;
             $!type-name = Nil;
         }
     }
 
     method !SET-FROM-PROFILE(::?ROLE:D: *%profile) {
         $!payload := %profile<payload><> if %profile<payload>:exists;
-        $!type := %profile<type><> if %profile<type>:exists;
         $!type-name = %profile<type-name> if %profile<type-name>:exists;
     }
 
@@ -90,34 +79,30 @@ role Config::BINDish::AST::Container {
 
     multi method COERCE(Config::BINDish::Grammar::Value:D $val --> ::?ROLE:D) {
         self.new-ast: self.node-name,
-                      payload => .value,
-                      type => .type,
-                      type-name => .type-name,
+                      payload => .coerced,
+                      type-name => .type-name
                       with $val
     }
     multi method COERCE(Any:D $payload --> ::?ROLE:D) {
         my $type-name = $payload ~~ Stringy ?? 'sq-string' !! $payload.^name.lc;
-        self.new-ast: self.node-name,
-                      :$payload,
-                      :type($payload.WHAT),
-                      :$type-name
+        self.new-ast: self.node-name, :$payload, :$type-name
     }
 
     multi method ACCEPTS(::?ROLE:D $val) {
-        $val.type ~~ $!type && $val.payload ~~ $!payload
+        $val.payload ~~ $!payload
     }
     multi method ACCEPTS(Any:D $val) {
-        $val.WHAT ~~ $!type && $val ~~ $!payload
+        $val ~~ $!payload
     }
 
     method gist(::?CLASS:D: Bool :$detailed) {
-        my $q = $!type ~~ Str && $!type-name ne 'keyword'
+        my $q = $!payload ~~ Stringy && $!type-name ne 'keyword'
             ?? ($!type-name eq 'dq-string'
                 ?? '"'
                 !! "'")
             !! "";
-        my $str = $!type ~~ Str ?? $q ~ $!payload.gist ~ $q !! $!payload.gist;
-        ($detailed ?? "[" ~ $!type-name ~ " of " ~ $!type.^name ~ "] " !! "") ~ $str
+        my $str = $q ~ $!payload.gist ~ $q;
+        ($detailed ?? "[" ~ $!type-name ~ " of " ~ $!payload.^name ~ "] " !! "") ~ $str
     }
 }
 
@@ -272,15 +257,15 @@ role Config::BINDish::AST::Parent {
             $blk.block: $block;
         }
         multi traverse(Config::BINDish::AST::Block:D $blk,
-                       Pair:D :$block (:key($type), :value( ($name, $class?) ) ) where $block.value ~~ Positional)
+                       Pair:D :$block (:key($btype), :value( ($name, $class?) ) ) where $block.value ~~ Positional)
         {
-            $blk.block: $type, :$name, |(:$class with $class)
+            $blk.block: $btype, :$name, |(:$class with $class)
         }
         multi traverse(Config::BINDish::AST::Block:D $blk,
-                       Pair:D :$block (:key($type), :value($name)))
+                       Pair:D :$block (:key($btype), :value($name)))
         {
             # Don't pass True as :name if block in the search path defined as :block-type
-            $blk.block: $type, |(:$name unless $name.^isa: Bool)
+            $blk.block: $btype, |(:$name unless $name.^isa: Bool)
         }
         multi traverse(Config::BINDish::AST::Block:D $blk,
                        Pair:D $path (:key($block), :value($subpath)) where $path.value ~~ Pair:D | Str:D)
@@ -366,7 +351,7 @@ class Config::BINDish::AST::TOP
     is Config::BINDish::AST::Block
 {
     method new(*%c) {
-        nextwith keyword => self.new-ast('Value', :payload('*TOP*'), :type(Str), :type-name<keyword>), |%c
+        nextwith keyword => self.new-ast('Value', :payload('*TOP*'), :type-name<keyword>), |%c
     }
     method gist(::?CLASS:D:) { "*TOP*" }
 }

@@ -5,15 +5,24 @@ use nqp;
 unit grammar Config::BINDish::Grammar;
 use Config::BINDish::X;
 
+our @coercers;
+BEGIN {
+    # Get all suspected methods-coercers. A method is considered coercer if lexical named after the method name is
+    # a typeobject.
+    for Any.^methods(:all).map(*.name).grep({ LEXICAL::{$_}:exists }) {
+        @coercers.push: $_ unless LEXICAL::{$_}.defined
+    }
+}
+
 class Context {...}
 
 class Value {
     has Str:D $.type-name is required;
     has Mu $.type is required;
-    has Mu $.value is required;
+    has Mu $.payload is required handles @coercers;
 
-    method gist {
-        my $val = Str($!value);
+    method gist(::?CLASS:D:) {
+        my $val = Str($!payload);
         my $quote = $!type-name eq 'dq-string' ?? '"' !! "'";
         $!type ~~ Stringy ?? $quote ~ $val ~ $quote !! $val
     }
@@ -36,7 +45,7 @@ role StatementProps {
     multi method ACCEPTS(Context:D $ctx) {
         my $cur-block = $ctx.cur-block-ctx;
         return $cur-block.type eq 'TOP' if $!top-only;
-        $!in ?? ( $cur-block.keyword && $cur-block.keyword.value ∈ $!in) !! True
+        $!in ?? ( $cur-block.keyword && $cur-block.keyword.payload ∈ $!in) !! True
     }
 }
 
@@ -76,21 +85,21 @@ class Context {
     has StatementProps $.props;
     has ::?CLASS $.parent;
 
-    method parent(Int:D $count = 0 --> ::?CLASS:D) {
+    method parent(::?CLASS:D: Int:D $count = 0 --> ::?CLASS:D) {
         return $!parent unless $count;
         $!parent.parent($count - 1)
     }
 
-    method cur-block-ctx(--> Context) {
+    method cur-block-ctx(::?CLASS:D: --> Context) {
         return self if $!type eq 'TOP' | 'BLOCK';
         $!parent.cur-block-ctx
     }
 
-    method description {
+    method description(::?CLASS:D:) {
         given $!type {
             when 'TOP'    { 'global context' }
-            when 'BLOCK'  { "block '" ~ $!keyword.value ~ ($!name ?? " " ~ $!name.gist !! "") ~ "'" }
-            when 'OPTION' { "option '" ~ $!keyword.value ~ "'" }
+            when 'BLOCK'  { "block '" ~ $!keyword ~ ($!name.defined ?? " " ~ $!name.gist !! "") ~ "'" }
+            when 'OPTION' { "option '" ~ $!keyword ~ "'" }
             default {
                 die "Internal: looks like " ~ $_ ~ " context hasn't been given a description!"
             }
@@ -122,8 +131,8 @@ has %.options;
 has @.contexts;
 
 method set-value(Mu $type is raw, *%tinfo where *.elems == 1 --> Value:D) {
-    my ($type-name, $value) = %tinfo.kv;
-    $*CFG-VALUE = Value.new: :$type, :$value, :$type-name
+    my ($type-name, $payload) = %tinfo.kv;
+    $*CFG-VALUE = Value.new: :$type, :$payload, :$type-name
 }
 
 submethod TWEAK(|) {
@@ -226,7 +235,7 @@ method option-ok(Str:D $keyword) {
 
 method enter-option {
     self.push-ctx: :type<OPTION>,
-                   :props( %!opt-props{$*CFG-KEYWORD.value} ),
+                   :props( %!opt-props{Str($*CFG-KEYWORD)} ),
                    :keyword( $*CFG-KEYWORD )
 }
 
@@ -243,12 +252,12 @@ method validate-option {
     my %options = $grammar.opt-props;
     if %options {
         my $ctx = self.cfg-ctx.cur-block-ctx;
-        my $keyword = $*CFG-KEYWORD.value;
+        my $keyword = Str($*CFG-KEYWORD);
         my $props = %options{$keyword};
         if $props {
             self.panic: X::Parse::Context, :what<option>, :keyword($*CFG-KEYWORD), :$ctx
                 unless self.option-ok($keyword) && !$ctx.props.value-only;
-            my $value = $*CFG-VALUE // Value.new: :type(Bool), :type-name('bool'), :value;
+            my $value = $*CFG-VALUE // Value.new: :type(Bool), :type-name('bool'), :payload;
             unless $value ~~ $props {
                 self.panic: X::Parse::ValueType, :what<option>, :keyword($*CFG-KEYWORD), :$props, :$value
             }
@@ -263,7 +272,7 @@ method validate-option {
 method validate-block {
     my $ctx = self.cfg-ctx;
     my $grammar = $*CFG-GRAMMAR;
-    my Str:D $block-type = $*CFG-BLOCK-TYPE.value;
+    my Str:D() $block-type = $*CFG-BLOCK-TYPE;
     my StatementProps $props;
     my %blocks = $*CFG-GRAMMAR.blk-props;
     if %blocks {
@@ -326,7 +335,7 @@ rule TOP {
     {
         self.push-ctx: :type<TOP>,
                        :props(BlockProps.new),
-                       :keyword(Value.new: :value<TOP>, :type(Str), :type-name<keyword>);
+                       :keyword(Value.new: :payload<TOP>, :type(Str), :type-name<keyword>);
     }
     <statement-list>
 }
@@ -457,7 +466,7 @@ token UNIX-comment {
 }
 
 token keyword {
-    <.alpha> [ \w | '-' ]* { $*CFG-KEYWORD = Value.new: :type(Str), :type-name<keyword>, :value(~$/) }
+    <.alpha> [ \w | '-' ]* { $*CFG-KEYWORD = Value.new: :type(Str), :type-name<keyword>, :payload(~$/) }
 }
 
 token bool-true {
