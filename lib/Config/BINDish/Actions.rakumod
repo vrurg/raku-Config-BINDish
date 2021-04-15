@@ -90,7 +90,7 @@ method value:sym<int>($/) {
     make Config::BINDish::AST.new-ast('Value',
                                       :type(Int),
                                       :type-name<int>,
-                                      :payload($/.Int));
+                                      :payload(Int(~$/)));
 }
 
 method value:sym<bool>($/) {
