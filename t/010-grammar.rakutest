@@ -12,6 +12,136 @@ subtest "Grammar Basics", {
             top => %(),
         ),
 
+        "int number" => %(
+            source => '1234',
+            top => statements => 0 => value => "1234",
+        ),
+
+        "int number prettified" => %(
+            source => '1_000_000',
+            top => statements => 0 => value => "1_000_000",
+        ),
+
+        "K-int" => %(
+            source => '1_000_000K',
+            top => statements => 0 => value => "1_000_000K",
+        ),
+
+        "k-int" => %(
+            source => '1_000_000k',
+            top => statements => 0 => value => "1_000_000k",
+        ),
+
+        "M-int" => %(
+            source => '1_000_000M',
+            top => statements => 0 => value => "1_000_000M",
+        ),
+
+        "G-int" => %(
+            source => '1_000_000G',
+            top => statements => 0 => value => "1_000_000G",
+        ),
+
+        "T-int" => %(
+            source => '1_000_000T',
+            top => statements => 0 => value => "1_000_000T",
+        ),
+
+        "P-int" => %(
+            source => '1_000_000P',
+            top => statements => 0 => value => "1_000_000P",
+        ),
+
+        "bin number" => %(
+            source => '0b1_100_100',
+            top => statements => 0 => value => "0b1_100_100",
+        ),
+
+        "octal number" => %(
+            source => '0o1_000_000',
+            top => statements => 0 => value => "0o1_000_000",
+        ),
+
+        "hex number" => %(
+            source => '0xBeef_000',
+            top => statements => 0 => value => "0xBeef_000",
+        ),
+
+        "rat number full" => %(
+            source => '1234.5678',
+            top => statements => 0 => value => "1234.5678",
+        ),
+
+        "rat number denominator" => %(
+            source => '.5678',
+            top => statements => 0 => value => ".5678",
+        ),
+
+        "rat number numerator" => %(
+            source => '1234.',
+            top => statements => 0 => value => "1234.",
+        ),
+
+        "rat number prettified" => %(
+            source => '1_000.234_567',
+            top => statements => 0 => value => "1_000.234_567",
+        ),
+
+        "rat number numerator prettified" => %(
+            source => '1_000.',
+            top => statements => 0 => value => "1_000.",
+        ),
+
+        "rat number denumerator prettified" => %(
+            source => '.000_1',
+            top => statements => 0 => value => ".000_1",
+        ),
+
+        "K-rat" => %(
+            source => '3.1415926K',
+            top => statements => 0 => value => "3.1415926K",
+        ),
+
+        "k-rat" => %(
+            source => '3.1415926k',
+            top => statements => 0 => value => "3.1415926k",
+        ),
+
+        "M-rat" => %(
+            source => '3.1415926M',
+            top => statements => 0 => value => "3.1415926M",
+        ),
+
+        "G-rat" => %(
+            source => '3.1415926G',
+            top => statements => 0 => value => "3.1415926G",
+        ),
+
+        "T-rat" => %(
+            source => '3.1415926T',
+            top => statements => 0 => value => "3.1415926T",
+        ),
+
+        "P-rat" => %(
+            source => '3.1415926P',
+            top => statements => 0 => value => "3.1415926P",
+        ),
+
+        "bin int" => %(
+            source => '0b1001',
+            top => statements => 0 => value => "0b1001",
+        ),
+
+        "oct int" => %(
+            source => '0o777',
+            top => statements => 0 => value => "0o777",
+        ),
+
+        "hex int" => %(
+            source => '0xbEEf',
+            top => statements => 0 => value => "0xbEEf",
+        ),
+
         "bare option" => %(
             source => "opt",
 #            plans => 0 => 5,
@@ -336,12 +466,22 @@ subtest "Grammar Basics", {
 }
 
 subtest "Errors" => {
-    plan 5;
+    plan 7;
 
     throws-like { Config::BINDish::Grammar.parse: '{}'; },
                 Config::BINDish::X::Parse::General,
                 "config syntax error",
                 message => /:s Unrecognized statement/;
+
+    throws-like { Config::BINDish::Grammar.parse: '0o1239'; },
+                Config::BINDish::X::Parse::BadNum,
+                "bad oct number",
+                message => /:s Bad number/;
+
+    throws-like { Config::BINDish::Grammar.parse: '0x123SA'; },
+                Config::BINDish::X::Parse::BadNum,
+                "bad hex number",
+                message => /:s Bad number/;
 
     throws-like { Config::BINDish::Grammar.parse: 'block {}', :strict },
                 Config::BINDish::X::Parse::General,

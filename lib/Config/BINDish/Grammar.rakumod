@@ -5,6 +5,8 @@ use nqp;
 unit grammar Config::BINDish::Grammar;
 use Config::BINDish::X;
 
+our %multipliers = K => 1024, M => 1024², G => 1024³, T => 1024⁴, P => 1024⁵;
+
 our @coercers;
 BEGIN {
     # Get all suspected methods-coercers. A method is considered coercer if lexical named after the method name is
@@ -487,6 +489,29 @@ token sq-string {
     \' ~ \' $<string>=<.qstring("'")> { self.set-value: Str, :sq-string($<string>) }
 }
 
+token decimal {
+    [ \d+ ]+ % '_'
+}
+token heximal {
+    [ <xdigit>+ ]+ % '_'
+}
+
+token natural_num {
+    [
+        | [ 0 <?before <[bodx]>>: [
+                | [ b <decimal> ]
+                | [ o <decimal> ]
+                | [ d <decimal> ]
+                | [ x <heximal> ]
+            ] ]
+        | <decimal>
+    ]
+}
+
+token num_suffix {
+    <?after <xdigit>> <[KkMmGgTtPp]>
+}
+
 proto token value {*}
 multi token value:sym<string> {
     <dq-string> | <sq-string>
@@ -499,13 +524,41 @@ multi token value:sym<num> {
     e <[-+]>? \d+ <.wb> { self.set-value: Num, :num($/) }
 }
 multi token value:sym<rat> {
-    <[-+]>? [
-        | [ $<numerator>=\d* '.' $<denominator>=\d+ <.wb> ]
-        | [ $<numerator>=\d+ '.' <!before \d> ]
-    ] { self.set-value: Rat, :rat($/) }
+    $<sign>=<[-+]>? [
+        | [ $<numerator>=<.decimal> '.' <!before <.decimal>> ]
+        | [ [ $<numerator>=<.decimal>? '.' $<denominator>=<.decimal> ]
+            <num_suffix>? <.wb> ]
+    ]
+    {
+        my Int $multiplier = 1;
+        with $<num_suffix> {
+            $multiplier = %multipliers{$_.uc};
+        }
+        my $icard = Rat($<sign>
+                        ~ ($<numerator> || '0')
+                        ~ '.'
+                        ~ ($<denominator> || '0'));
+
+        self.panic(X::Parse::BadNum) if $icard ~~ Failure;
+        self.set-value: Rat, :rat($icard * $multiplier)
+    }
 }
 multi token value:sym<int> {
-    <[-+]>? \d+ <!before <[.e]>> { self.set-value: Int, :int($/) }
+    $<err-pos>=<?before <[-+]>? \d>
+    [ $<icard>=[ <[-+]>?: <natural_num> ]
+        [ [<num_suffix>? <.wb> ]
+          | { $<err-pos>.panic: X::Parse::BadNum } ]
+    ]
+    <!before <[.e]>>
+    {
+        my Int $multiplier = 1;
+        with $<num_suffix> {
+            $multiplier = %multipliers{$_.uc};
+        }
+        my $icard = Int($<icard>);
+        self.panic(X::Parse::BadNum) if $icard ~~ Failure;
+        self.set-value: Int, :int($icard * $multiplier);
+    }
 }
 multi token value:sym<bool> {
     $<bool-val>=[ <.bool-true> | <.bool-false> ] { self.set-value: Bool, :bool($/) }

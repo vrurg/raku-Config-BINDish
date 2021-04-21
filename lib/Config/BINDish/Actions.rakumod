@@ -90,7 +90,7 @@ method value:sym<rat>($/) {
     make Config::BINDish::AST.new-ast('Value',
                                       :type(Rat),
                                       :type-name<rat>,
-                                      :payload(Rat(~$/)));
+                                      :payload(Rat($*CFG-VALUE.payload)));
 }
 
 method value:sym<num>($/) {
@@ -104,7 +104,7 @@ method value:sym<int>($/) {
     make Config::BINDish::AST.new-ast('Value',
                                       :type(Int),
                                       :type-name<int>,
-                                      :payload(Int(~$/)));
+                                      :payload(Int($*CFG-VALUE.payload)));
 }
 
 method value:sym<bool>($/) {

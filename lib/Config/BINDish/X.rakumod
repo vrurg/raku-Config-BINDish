@@ -27,6 +27,12 @@ class Config::BINDish::X::Parse::General does Config::BINDish::X::Parse {
     }
 }
 
+class Config::BINDish::X::Parse::BadNum does Config::BINDish::X::Parse {
+    method message {
+        self.wrap-message: "Bad number"
+    }
+}
+
 class Config::BINDish::X::Parse::Context does Config::BINDish::X::Parse {
     has Str:D $.what is required; # Option or block
     has $.keyword is required; # Block type or option name

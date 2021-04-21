@@ -5,7 +5,7 @@ use Config::BINDish::Grammar;
 use Config::BINDish::AST;
 use Config::BINDish::X;
 
-plan 4, :parallel;
+plan 7, :parallel;
 
 subtest "Basics" => {
     plan 29;
@@ -77,6 +77,60 @@ subtest "Basics" => {
     is $top.block("blk").block("subblk", :name("level 1.b")).value("opt"),
        4.2,
        "chaining of methods 'block'";
+}
+
+subtest "Int formats" => {
+    plan 3;
+
+    my $cfg = Config::BINDish.new;
+    $cfg.read: string => q:to/CFG/;
+opt-b 0b1000;
+opt-o 0o1000;
+opt-x 0x1000;
+CFG
+
+    my $top = $cfg.top;
+    is $top.value("opt-b"), 0b1000, "binary 1000";
+    is $top.value("opt-o"), 0o1000, "octal 1000";
+    is $top.value("opt-x"), 0x1000, "hex 1000";
+}
+
+subtest "Number suffixes" => {
+    plan 5;
+
+    my $cfg = Config::BINDish.new;
+    $cfg.read: string => q:to/CFG/;
+opt-k 2k;
+opt-m 3M;
+opt-g 5G;
+opt-t 1.3T;
+opt-p 3.14P;
+CFG
+
+    my $top = $cfg.top;
+    is $top.value("opt-k"), 2*1024, "k-suffix";
+    is $top.value("opt-m"), 3*1024², "M-suffix";
+    is $top.value("opt-g"), 5*1024³, "G-suffix";
+    is $top.value("opt-t"), 1.3*1024⁴, "T-suffix";
+    is $top.value("opt-p"), 3.14*1024⁵, "P-suffix";
+}
+
+subtest "Prettified numbers" => {
+    plan 4;
+
+    my $cfg = Config::BINDish.new;
+    $cfg.read: string => q:to/CFG/;
+opt-int 12_345_678;
+opt-neg-int -12_345_678;
+opt-rat 12_345.678_999;
+opt-neg-rat -12_345.678_999;
+CFG
+
+    my $top = $cfg.top;
+    is $top.value("opt-int"), 12345678, "plain int";
+    is $top.value("opt-neg-int"), -12345678, "negative int";
+    is $top.value("opt-rat"), 12345.678999, "plain rat";
+    is $top.value("opt-neg-rat"), -12345.678999, "negative rat";
 }
 
 subtest "Method 'get'" => {
