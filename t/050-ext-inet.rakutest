@@ -4,7 +4,7 @@ use Config::BINDish;
 use Config::BINDish::INET;
 use IP::Addr;
 
-plan 21;
+plan 25;
 
 my $cfg = Config::BINDish.new;
 
@@ -17,6 +17,11 @@ network6 2001:db8:85a3::8a2e:370:7334/49;
 url-a https://localhost;
 url-b https://docs.raku.org/language/grammar_tutorial;
 url-c ftp://ftp.freebsd.org;
+
+network 192.168.1.0/24 {
+    default-gw 192.168.1.100;
+    fallback-gw 192.168.1.101;
+}
 CFG
 
 my $top = $cfg.top;
@@ -45,5 +50,12 @@ for %URLs.sort -> (:key($opt), :$value) {
     is $top.option($opt).value.type-name, "URL", "$opt: option type name is 'URL'";
     is $top.value($opt), $value, "$opt: URL value";
 }
+
+my $network = $top.block('network', :name<192.168.1.0/24>);
+
+ok $network.defined, "block 'network' is found";
+is $network.name.type-name, 'IPv4', "network block type-name is IPv4";
+isa-ok $network.name.payload, IP::Addr, "network block payload type is IP::Addr";
+is '192.168.1.101', ~$network.value('fallback-gw'), "a network block option value";
 
 done-testing;

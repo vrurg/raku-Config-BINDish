@@ -181,6 +181,14 @@ subtest "Grammar Basics", {
                     option-value => dq-string => string => "foo",
                     statement-terminate => statement-terminator => ""))),
 
+        "keyword value option" => %(
+            source => "opt foo",
+            top => %(
+                statements => 0 => %(
+                    option-name => "opt",
+                    option-value => keyword => "foo",
+                    statement-terminate => statement-terminator => "" ))),
+
         "terminated string value option" => %(
             source => "opt \"foo\";",
             top => %(
@@ -493,7 +501,7 @@ subtest "Errors" => {
                 "option needs a terminator in strict mode",
                 message => /:s Missing semicolon/;
 
-    throws-like { Config::BINDish::Grammar.parse: 'block { option foo; };', :!strict },
+    throws-like { Config::BINDish::Grammar.parse: 'block { option !foo; };', :!strict },
                 Config::BINDish::X::Parse::General,
                 "option value can't be parsed",
                 message => /:s Unrecognized statement/;
@@ -503,7 +511,7 @@ subtest "Errors" => {
                         block {
                             val 1;
                             opt "foo";
-                            option bar
+                            option !bar
                         }
                         CFG
                 },

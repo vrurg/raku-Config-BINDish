@@ -5,7 +5,7 @@ use Config::BINDish::Grammar;
 use Config::BINDish::AST;
 use Config::BINDish::X;
 
-plan 4;
+plan 5;
 
 # The purpose of this test suite is to make sure that in strict mode only pre-declared constructs are allowed.
 my $custom-set-invoked = False;
@@ -28,19 +28,50 @@ role CustomExt is BINDish-grammar {
 my $cfg = Config::BINDish.new:
         :strict{:blocks, :options},
         blocks => %(
-            general => { :top-only },
+            general => { :top-only, :!named },
             subsystem => { :top-only, :named },
             paths => { :in<general subsystem>, :named, :type(Str), :value-only },
+            blist => { :named, :!classified, :type-name<keyword>, :value-only },
         ),
         options => %(
             base => { :in<paths>, type => Str },
-            max => { :in<general>, type => Int }
+            max => { :in<general>, type => Int },
+            multi-type => { :in<general>, type => Int | Rat },
+            stringy => { :in<general>, type-name => /\- string$/ },
         );
 
 does-ok $cfg.grammar, CustomExt, "grammar does our custom extension";
 
 $cfg.read: string => '';
 ok $custom-set-invoked, "custom extension setup method has been invoked";
+
+subtest "Syntax" => {
+    plan 6;
+
+    lives-ok { $cfg.read: string => q<my-top "named" { }> },
+             "when name is optional it can be used";
+
+    lives-ok { $cfg.read: string => q<subsystem "named" classified { }> },
+             "when class is optional it can be used";
+
+    lives-ok { $cfg.read: string => q<my-top "named" classified { }> },
+             "when name and class are optional both can be used";
+
+    throws-like { $cfg.read: string => q<subsystem { }> },
+                Config::BINDish::X::Parse::MissingPart,
+                "when block must be named",
+                :message(/"Name is missing in declaration of block 'subsystem'"/);
+
+    throws-like { $cfg.read: string => q<general "named" { }> },
+                Config::BINDish::X::Parse::ExtraPart,
+                "when block must be unnamed",
+                :message(/"Name is unexpected in declaration of block 'general'"/);
+
+    throws-like { $cfg.read: string => q<blist "named" classified { }> },
+                Config::BINDish::X::Parse::ExtraPart,
+                "block can't be classified",
+                :message(/"Class is unexpected in declaration of block 'blist \"named\"'"/);
+}
 
 subtest "Structure" => {
     plan 4;
@@ -80,7 +111,7 @@ subtest "Structure" => {
                                         CFG
                 },
                 Config::BINDish::X::Parse::Context,
-                "option used in a vlue-only block is an error",
+                "option used in a value-only block is an error",
                 :message(/"Option 'base' cannot be used in block 'paths \"public\"'"/);
 
     throws-like { $cfg.read: string => q:to/CFG/;
@@ -93,16 +124,16 @@ subtest "Structure" => {
                 },
                 Config::BINDish::X::Parse::ValueType,
                 "bad value type within a vlue-only block",
-                :message(/"Block 'paths' expects (Str) value but got (Int)"/);
+                :message(/"Block 'paths' expects a (Str) value but got <int> of (Int)"/);
 }
 
 subtest "Value validation" => {
-    plan 6;
+    plan 11;
 
     throws-like { $cfg.read: string => q<op-top 1;>; },
                 Config::BINDish::X::Parse::ValueType,
                 "bad option value type",
-                :message(/"Option 'op-top' expects (Str) value but got (Int)"/);
+                :message(/"Option 'op-top' expects a (Str) value but got <int> of (Int)"/);
 
     lives-ok { $cfg.read: string => q<op-top "ok";>; }, "valid option type";
 
@@ -114,7 +145,7 @@ subtest "Value validation" => {
                 },
                 Config::BINDish::X::Parse::ValueType,
                 "option in a block, bad value",
-                :message(/"Option 'max' expects (Int) value but got (Rat)"/);
+                :message(/"Option 'max' expects a (Int) value but got <rat> of (Rat)"/);
 
     lives-ok { $cfg.read: string => q:to/CFG/;
                                 general {
@@ -136,7 +167,7 @@ subtest "Value validation" => {
                 },
                 Config::BINDish::X::Parse::ValueType,
                 "bad value type in a block",
-                :message(/"Block 'paths' expects (Str) value but got (Rat)"/);
+                :message(/"Block 'paths' expects a (Str) value but got <rat> of (Rat)"/);
 
     lives-ok { $cfg.read: string => q:to/CFG/;
                                         general {
@@ -148,6 +179,89 @@ subtest "Value validation" => {
                                         CFG
              },
              "all block values are good";
+
+    lives-ok { $cfg.read: string => q:to/CFG/;
+                                        general {
+                                            multi-type 42;
+                                            multi-type 3.1415926;
+                                            stringy "dq-string";
+                                            stringy 'sq-string';
+                                        }
+                                        CFG
+             },
+             "multi-typed options are accepted";
+
+    throws-like { $cfg.read: string => q:to/CFG/;
+                                        general {
+                                            multi-type 1.0e1;
+                                        }
+                                        CFG
+                },
+                Config::BINDish::X::Parse::ValueType,
+                "multi-type option only accepts allowed types",
+                :message(/"Option 'multi-type' expects a any((Int), (Rat)) value but got <num> of (Num)"/);
+
+    throws-like { $cfg.read: string => q:to/CFG/;
+                                        general {
+                                            stringy 13;
+                                        }
+                                        CFG
+                },
+                Config::BINDish::X::Parse::ValueType,
+                "multi-type option only accepts allowed types",
+                :message(/"Option 'stringy' expects a \/\\- string\$\/ value but got <int> of (Int)"/);
+
+    subtest "keyword list in a value-only block", :instant, {
+        plan 5;
+
+        if lives-ok { $cfg.read: string => q:to/CFG/;
+                                    blist "keywords" {
+                                        foo; bar; baz;
+                                    }
+                                    CFG
+             }, "keyword list block"
+        {
+            is-cfg-stmt-list $cfg.match,
+                             %(
+                                 statements => 0 => %(
+                                     block-head => block-type => "blist",
+                                     block-name => value => dq-string => string => "keywords",
+                                     block-body => token-statements(
+                                         message => "block values list",
+                                         stmt-count => 3,
+                                         statements => %(
+                                             0 => value => keyword => "foo",
+                                             1 => value => keyword => "bar",
+                                             2 => value => keyword => "baz",
+                                         )
+                                                                                                             )
+                                 )),
+                             "parsed structure of a value-only block";
+
+            my $blist = $cfg.top.block('blist', :name<keywords>);
+            my @expected = <foo bar baz>;
+
+            for ^3 -> $idx {
+                my $child = $blist.children[$idx];
+                subtest "block child value $idx", :instant, {
+                    plan 3;
+                    isa-ok $child, Config::BINDish::AST::Value, "is a AST::Value";
+                    is $child.type-name, 'keyword', "is a keyword";
+                    is $child.payload, @expected[$idx], "keyword value";
+                }
+            }
+        }
+    }
+
+    throws-like { $cfg.read: string => q:to/CFG/;
+                                        blist "strings" {
+                                            "foo";
+                                        }
+                                        CFG
+                },
+                Config::BINDish::X::Parse::ValueType,
+                "value-only block constrained by type-name",
+                :message(/"Block 'blist' expects a <keyword> value but got <dq-string> of (Str)"/);
 }
 
 done-testing;

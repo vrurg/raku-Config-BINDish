@@ -55,7 +55,15 @@ class Config::BINDish::X::Parse::MissingPart does Config::BINDish::X::Parse {
     has Str:D $.what is required;
     has Str:D $.block-spec is required;
     method message {
-        self.wrap-message: $.what.tc ~ " is missing in a declaration of block '" ~ $.block-spec ~ "'"
+        self.wrap-message: $.what.tc ~ " is missing in declaration of block '" ~ $!block-spec ~ "'"
+    }
+}
+
+class Config::BINDish::X::Parse::ExtraPart does Config::BINDish::X::Parse {
+    has Str:D $.what is required;
+    has Str:D $.block-spec is required;
+    method message {
+        self.wrap-message: $.what.tc ~ " is unexpected in declaration of block '" ~ $.block-spec ~ "'"
     }
 }
 
@@ -67,8 +75,8 @@ class Config::BINDish::X::Parse::ValueType does Config::BINDish::X::Parse {
     method message {
         self.wrap-message: $.what.tc
                            ~ " " ~ $.keyword.gist
-                           ~ " expects " ~ $.props.type-as-str
-                           ~ " value but got " ~ $.value.type.gist;
+                           ~ " expects a " ~ $.props.type-as-str
+                           ~ " value but got " ~ $.value.type-as-str;
     }
 }
 

@@ -18,7 +18,21 @@ BEGIN {
 
 class Context {...}
 
-class Value {
+role TypeStringify {
+    method type-name {...}
+    method type {...}
+
+    method type-as-str(--> Str:D) {
+        my @parts;
+        with $.type-name {
+            @parts.push: $_ ~~ Stringy ?? '<' ~ $_ ~ '>' !! .gist
+        }
+        @parts.push: $.type.gist unless $.type<> =:= Mu;
+        @parts.join(" of ")
+    }
+}
+
+class Value does TypeStringify {
     has Str:D $.type-name is required;
     has Mu $.type is required;
     has Mu $.payload is required handles @coercers;
@@ -51,7 +65,7 @@ role StatementProps {
     }
 }
 
-role ContainerProps {
+role ContainerProps does TypeStringify {
     # These attributes are used as RHS of a smartmatch.
     # NOTE: These are kept separate from StatementProps because extensions may add non-container type statements.
     has $.type-name;
@@ -61,19 +75,15 @@ role ContainerProps {
         (!$!type-name.defined || $val.type-name ~~ $!type-name)
         && ($!type =:= Mu || $val.type ~~ $!type)
     }
-
-    method type-as-str {
-        ($!type-name ~ " of " with $!type-name) ~ $!type.gist
-    }
 }
 
 class OptionProps does StatementProps does ContainerProps {}
 
 class BlockProps does StatementProps does ContainerProps {
-    # Block must be named
-    has Bool:D $.named = False;
-    # Block must have a class
-    has Bool:D $.classified = False;
+    # Block must be named or is optional if not set
+    has Bool $.named;
+    # Block must have a class or is optional if not set
+    has Bool $.classified;
     # Block can only contain values, no options or blocks allowed
     has Bool:D $.value-only = False;
 }
@@ -132,9 +142,13 @@ has %.options;
 # Context stack. Normally a new context is created on per-parent basis.
 has @.contexts;
 
-method set-value(Mu $type is raw, *%tinfo where *.elems == 1 --> Value:D) {
+proto method set-value(|) {*}
+multi method set-value(Mu $type is raw, *%tinfo where *.elems == 1 --> Value:D) {
     my ($type-name, $payload) = %tinfo.kv;
     $*CFG-VALUE = Value.new: :$type, :$payload, :$type-name
+}
+multi method set-value(Value:D $val --> Value:D) {
+    $*CFG-VALUE = $val
 }
 
 submethod TWEAK(|) {
@@ -278,17 +292,30 @@ method validate-block {
     my StatementProps $props;
     my %blocks = $*CFG-GRAMMAR.blk-props;
     if %blocks {
-        $props = $_ with %blocks{$block-type};
-        if $props {
+        with %blocks{$block-type} {
+            $props = $_;
             self.panic: X::Parse::Context, :what<block>, :keyword($*CFG-BLOCK-TYPE), :$ctx
                 unless self.block-ok($block-type);
-            self.panic: X::Parse::MissingPart, :what<name>, :block-spec($block-type)
-                unless !$props.named || $*CFG-BLOCK-NAME;
-            self.panic: X::Parse::MissingPart,
-                        :what<class>,
-                        :block-spec($block-type ~
-                                    ~ ($*CFG-BLOCK-NAME ?? " " ~ $*CFG-BLOCK-NAME !! ''))
-                unless !$props.classified || $*CFG-BLOCK-CLASS;
+            with $props.named {
+                self.panic: X::Parse::MissingPart, :what<name>, :block-spec($block-type)
+                    unless !$_ || $*CFG-BLOCK-NAME.defined;
+                self.panic: X::Parse::ExtraPart, :what<name>, :block-spec($block-type)
+                    if !$_ && $*CFG-BLOCK-NAME.defined;
+            }
+            if $props.named {
+                with $props.classified {
+                    self.panic: X::Parse::MissingPart,
+                                :what<class>,
+                                :block-spec( $block-type ~
+                                             ~( $*CFG-BLOCK-NAME ?? " " ~ $*CFG-BLOCK-NAME.gist !! '' ) )
+                        unless !$_ || $*CFG-BLOCK-CLASS.defined;
+                    self.panic: X::Parse::ExtraPart,
+                                :what<class>,
+                                :block-spec( $block-type ~
+                                             ~( $*CFG-BLOCK-NAME ?? " " ~ $*CFG-BLOCK-NAME.gist !! '' ) )
+                        if !$_ && $*CFG-BLOCK-CLASS.defined;
+                }
+            }
         }
         elsif $grammar.strict.blocks {
             self.panic: X::Parse::Unknown, :what('block type'), :keyword($block-type)
@@ -301,7 +328,6 @@ method validate-value {
     my $ctx = self.cfg-ctx;
     my $props = $ctx.props;
     if $props && $props ~~ ContainerProps {
-#        my $grammar = $*CFG-GRAMMAR;
         unless (my $value = $*CFG-VALUE) ~~ $props {
             self.panic: X::Parse::ValueType, :what($ctx.type.lc), :keyword($ctx.keyword), :$props, :$value
         }
@@ -368,14 +394,29 @@ multi rule statement:sym<value> {
 }
 
 multi rule statement:sym<option> {
-    :my $*CFG-KEYWORD;
+    :my Value $*CFG-KEYWORD;
     :my Value $*CFG-VALUE;
+    $<err-pos>=<?>
     $<option-name>=<.keyword>
     { self.enter-option }
     [
-    [$<option-value>=<.value> ]?
+    [ $<option-value>=<.value>
+    ]?
         <?before <.statement-terminator>>
-        $<err-pos>=<?> <statement-terminate>
+        <statement-terminate>
+        <?{ # Inside a value-only block we skip boolean-only option because it will be re-parsed as a keyword.
+            # But options with a value must cause a panic.
+            my $ctx = self.cfg-ctx.cur-block-ctx;
+            my $ok = True;
+            if $ctx.props andthen .value-only {
+                $<err-pos>.panic( X::Parse::Context,
+                                  :what<option>,
+                                  :keyword($*CFG-KEYWORD),
+                                  :$ctx ) with $<option-value>;
+                $ok = False;
+            }
+            $ok
+        }>
         { $<err-pos>.validate-option }
     ]
     | <?{
@@ -468,7 +509,8 @@ token UNIX-comment {
 }
 
 token keyword {
-    <.alpha> [ \w | '-' ]* { $*CFG-KEYWORD = Value.new: :type(Str), :type-name<keyword>, :payload(~$/) }
+    <.wb> $<kwd>=[ <.alpha> [ \w | '-' ]* ] <.wb>
+    { $*CFG-KEYWORD = Value.new: :type(Str), :type-name<keyword>, :payload(~$<kwd>) }
 }
 
 token bool-true {
@@ -516,6 +558,14 @@ proto token value {*}
 multi token value:sym<string> {
     <dq-string> | <sq-string>
 }
+
+multi token value:sym<keyword> {
+    <?{ self.cfg-ctx.type eq 'OPTION'
+        || (self.cfg-ctx.cur-block-ctx.props andthen .value-only) }>
+    :my Value:D $*CFG-KEYWORD;
+    <keyword> { $*CFG-GRAMMAR.set-value($*CFG-KEYWORD) }
+}
+
 multi token value:sym<num> {
     <[-+]>? [
         | [ \d* '.' \d+ ]

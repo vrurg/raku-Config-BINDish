@@ -58,10 +58,10 @@ is-cfg-stmt-list $match,
                                  option-value => foo-type => 'foo' ))))),
                  "grammar is extended with a new value type";
 
-throws-like { $cfg.grammar.parse: q<block { option bar }>, :!strict },
+throws-like { $cfg.grammar.parse: q<block { option !bar }>, :!strict },
             Config::BINDish::X::Parse,
             "control test to ensure we haven't accidentally added another custom value type",
-            message => /"Unrecognized statement" .* "⏏option bar }"/;
+            message => /"Unrecognized statement" .* "⏏option !bar }"/;
 
 @setup-order = [];
 $grammar = $cfg.extend-grammar(role Ext3 {
@@ -95,10 +95,10 @@ is-cfg-stmt-list $match,
                                  option-value => bar-type => 'bar' ))))),
                  "manually added extension also can extend the grammar";
 
-throws-like { $cfg.grammar.parse: q<block { option baz }>, :!strict },
+throws-like { $cfg.grammar.parse: q<block { option !baz }>, :!strict },
             Config::BINDish::X::Parse,
             "no other custom value types so far",
-            message => /"Unrecognized statement" .* "⏏option baz }"/;
+            message => /"Unrecognized statement" .* "⏏option !baz }"/;
 
 @setup-order = [];
 $cfg = Config::BINDish.new;
@@ -109,9 +109,9 @@ is-deeply @setup-order, ['Ext2', 'Ext1'], "extensions added with the method are 
 try $cfg.grammar.parse: '{}';
 is-deeply @panic-order, ['Ext2', 'Ext1'], "method overriding doesn't include manually added role too";
 
-throws-like { $cfg.grammar.parse: q<block { option bar }>, :!strict },
+throws-like { $cfg.grammar.parse: q<block { option !bar }>, :!strict },
             Config::BINDish::X::Parse,
             "no custom value type defined by manually added extension",
-            message => /"Unrecognized statement" .* "⏏option bar }"/;
+            message => /"Unrecognized statement" .* "⏏option !bar }"/;
 
 done-testing;
