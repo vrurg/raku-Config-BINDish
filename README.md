@@ -37,6 +37,8 @@ DISCLAIMER
 
 This module is very much experimental in the sense of the API it provides. The grammar is expected to be more stable, yet no warranties can be given at the moment.
 
+Also, all the documentation here is created in write-only mode. No proof-reading has been done yet. All kinds of ugliness anticipated! My apologies for this, hope to get some spare hours to fix it some day.
+
 PREFACE
 =======
 
