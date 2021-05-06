@@ -5,7 +5,7 @@ use Config::BINDish::Grammar;
 use Config::BINDish::AST;
 use Config::BINDish::X;
 
-plan 7, :!parallel;
+plan 7, :parallel;
 
 subtest "Basics" => {
     plan 29;

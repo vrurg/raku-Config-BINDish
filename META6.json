@@ -1,5 +1,5 @@
 {
-  "api": 0.1,
+  "api": "0.0.1",
   "auth": "zef:vrurg",
   "authors": [
     "Vadim Belman <vrurg@lflat.org>"
@@ -14,7 +14,7 @@
   "license": "Artistic-2.0",
   "meta-version": "0",
   "name": "Config::BINDish",
-  "production": false,
+  "production": true,
   "provides": {
     "Config::BINDish": "lib/Config/BINDish.rakumod",
     "Config::BINDish::AST": "lib/Config/BINDish/AST.rakumod",
