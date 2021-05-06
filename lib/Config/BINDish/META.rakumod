@@ -31,6 +31,7 @@ our sub META6 {
         'Config::BINDish::Grammar' => 'lib/Config/BINDish/Grammar.rakumod',
         'Config::BINDish::INET' => 'lib/Config/BINDish/INET.rakumod',
         'Config::BINDish::META' => 'lib/Config/BINDish/META.rakumod',
+        'Config::BINDish::Test' => 'lib/Config/BINDish/Test.rakumod',
         'Config::BINDish::X' => 'lib/Config/BINDish/X.rakumod',
     },
     license        => 'Artistic-2.0',
