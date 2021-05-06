@@ -107,14 +107,12 @@ role Actions is BINDish-actions {
         my $ip-type = 'IPv' ~ $ip-obj.version;
 
         make Config::BINDish::AST.new-ast: 'Value',
-                                           type => IP::Addr,
                                            type-name => $ip-type,
                                            payload => $ip-obj;
     }
 
     method value:sym<URL>($/) {
         make Config::BINDish::AST.new-ast: 'Value',
-                                           type => Str,
                                            type-name => 'URL',
                                            payload => ~$/;
     }

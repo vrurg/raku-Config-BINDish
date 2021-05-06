@@ -1,0 +1,517 @@
+=begin pod
+=head1 NAME
+
+C<Config::BINDish::Grammar> - the central class of everything in C<Config::BINDish>
+
+=head1 DESCRIPTION
+
+This class is responsible for the actual parsing of the configuration. It is not recommended for direct use.
+L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish.md>
+C<read> method must be used instead.
+
+The class inherits from the standard L<C<Grammar>|https://docs.raku.org/type/Grammar> class.
+
+=head1 ATTRIBUTES
+
+=head3 L<C<Bool:D>|https://docs.raku.org/type/Bool> C<$.flat>
+
+If set this attribute expects blocks to be flattened down. I.e. whenever a block has a duplicate declaration in the
+config the later declaration must be applied on top of the first one. This doesn't change grammar's behavior but rather
+serves as a note for the actions class to take care of the situation. One way or another, if this attribute is I<True>
+then the user expects a single block C<foo "bar"> representation to exists after the following sample is parsed:
+
+    foo "bar" { fubar 1; }
+    baz { }
+    foo "bar" { fubar 2; fubaz 3.14; }
+
+How the options are dealt with is the sole prerogative of the actions implementation.
+L<C<Config::BINDish::Actions>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Actions.md>
+re-delegates handling of flattening to the underlying
+L<C<Config::BINDish::AST>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/AST.md> class.
+It, in turn, will overwrite earlier option declarations with latter ones. So, when one queries for C<fubar> the value
+returned will be I<2>.
+
+See L<#$*CFG-FLAT-BLOCKS>.
+
+=head3 L<C<Config::BINDish::Grammar::Strictness>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/Strictness.md> C<$.strict = False>
+
+Defines what strictness modes are activated. See
+L<C<Config::BINDish::Grammar::Strictness>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/Strictness.md>.
+
+=head3  C<%.blocks>
+
+User-defined blocks in hash form. Passed to C<declare-blocks> method at object construction time.
+
+See
+L<C<Config::BINDish::Grammar::BlockProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/BlockProps.md>
+and L<#Pre-declaration> section for more information.
+
+=head3  C<%.options>
+
+User-defined options in hash form. Passed to C<declare-options> method at object construction time.
+
+See
+L<C<Config::BINDish::Grammar::OptionProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/OptionProps.md>
+and L<#Pre-declaration> section for more information.
+
+=head1 DYNAMIC VARIABLES
+
+The grammar declares and uses a set of dynamic variables to pass certain information between its rules, tokens, methods,
+and the actions object.
+
+=head3 C<$*CFG-GRAMMAR>
+
+The primary grammar object. Due to the way the L<C<Grammar>|https://docs.raku.org/type/Grammar> is implemented C<self> does not always point to the same
+object created by the initial C<parse> method. These instances are not full clones of the original grammar and do not
+inherit all attribute values from it. For this reason when access to the user-set attributes is needed the original
+grammar is better be easily available.
+
+=head3 C<$*CFG-FLAT-BLOCKS>
+
+Set to C<$.flat> attribute value.
+
+=head3 C<$*CFG-INNER-PARENT>
+
+Provided for actions convenience. Intended to hold an instance of
+L<C<Config::BINDish::AST::Parent>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/AST/Parent.md>.
+
+=head3 C<$*CFG-TOP>
+
+Provided for actions convenience. Intended to hold an instance of
+L<C<Config::BINDish::AST::TOP>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/AST/TOP.md>.
+
+=head3 L<C<Config::BINDish::Grammar::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/Value.md> C<$*CFG-VALUE>
+
+Must be provided directly or indirectly by any rule or token invoking the C< <value>> token. This variable will be set to a
+L<C<Config::BINDish::Grammar::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/Value.md>
+instance created by C<set-value> method.
+
+=head3 L<C<Config::BINDish::Grammar::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/Value.md> C<$*CFG-KEYWORD>
+
+Set by C< <keyword>> token. The value stored will be of type L<C<Str>|https://docs.raku.org/type/Str> and have type name
+I<"keyword">.
+
+=head3 C<$*CFG-BLOCK-TYPE>, C<$*CFG-BLOCK-NAME>, C<$*CFG-BLOCK-CLASS>
+
+All three are of
+L<C<Config::BINDish::Grammar::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/Value.md> type.
+When the following example is parsed:
+
+    foo "bar" baz { }
+
+The variables will be set to:
+
+=item type: "foo" of L<C<Str>|https://docs.raku.org/type/Str>, type-name I<"keyword">
+=item name: "bar" of L<C<Str>|https://docs.raku.org/type/Str>, type name I<"dq-string">
+=item class: "baz" of L<C<Str>|https://docs.raku.org/type/Str>, type name I<"keyword">
+
+Note that the name could be of any value, supported by the grammar. If an extension adds a new value type then the
+type can also be used as a type name. Say, with
+L<C<Config::BINDish::INET>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/INET.md>
+loaded one can have the following valid declaration:
+
+    IP 192.168.1.42 { }
+
+For which the name will be set to type C<IP::Addr>, type-name I<"IPv4">.
+
+=head3 C<$*CFG-BLOCK-ERR-POS>
+
+This variable is set to a L<C<Match>|https://docs.raku.org/type/Match> object pointing at the location where current
+block declaration starts. Can be used for error reporting.
+
+=head1 METHODS
+
+=head3 C<set-value(Mu \type, *%value)>
+
+This methods creates a new
+L<C<Config::BINDish::Grammar::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/Value.md>
+object and assigns it to C<$*CFG-VALUE>. Takes value's type object as its single positional parameter. Type name and
+payload are passed as the only named argument of the method call. Here is how a single-quoted string is handled by
+the grammar:
+
+    token sq-string {
+        \' ~ \' $<string>=<.qstring("'")>
+        {
+            self.set-value: Str, :sq-string($<string>)
+        }
+    }
+
+In this example the new
+L<C<Config::BINDish::Grammar::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/Value.md>
+object will be created with payload set from C<$<string>>, type name set to I<"sq-string">, and type set to
+L<C<Str>|https://docs.raku.org/type/Str>.
+
+=head3 C<submethod setup-BINDish>
+
+When the grammar is instantiated it iterates over all of its parents and roles and invokes each unique C<setup-BINDish>
+submethod it finds. While it may seem to look as a duplicate of C<TWEAK>, the purpose of using this approach is to
+eliminate the differences in handling of submethods by Raku versions 6.c/d and 6.e.
+
+See also L<#Pre-declaration> section in L<#EXTENSIONS>.
+
+=head3 C<multi declare-blocks(%blocks)>
+=head3 C<multi declare-blocks(*%blocks)>
+
+Pre-declare blocks properties. See L<#Pre-declaration> section below for details.
+
+=head3 C<multi declare-options(%options)>
+=head3 C<multi declare-options(*%options)>
+
+Pre-declare options properties. See L<#Pre-declaration> section below for details.
+
+=head3 C<cfg-ctx()>
+
+Returns current active context object. See L<C<Config::BINDish::Grammar::Context>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/Context.md>.
+
+The method will automatically fall back to C<$*CFG-GRAMMAR> if the instance it is invoked upon is not the primary
+grammar object.
+
+=head3 C<push-ctx(*%ctx-profile)>
+
+Creates and pushes to context stack a new
+L<C<Config::BINDish::Grammar::Context>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/Context.md>
+object. Returns the new context.
+
+Falls back to C<$*CFG-GRAMMAR> if necessary.
+
+=head3 C<pop-ctx()>
+
+Pops and returns the current context object from the context stack. Will die if attempt to pop the I<"TOP"> context
+is made.
+
+=head3 C<block-ok(Str:D $block-type --> Bool)>
+
+Returns I<True> if block C<$block-type> can be used in the current context. For example, if a block type I<name-servers>
+is L<pre-declared|#Pre-declaration> to be only allowed within a I<network> block then C<block-ok> will return I<False>
+if I<name-servers> is used in a I<host> block or at the configuration top-level.
+
+=head3 C<option-ok(Str:D $keyword --> Bool)>
+
+Similarly to C<block-ok> method, returns I<True> only if option C<$keyword> is allowed in the current block context.
+
+=head3 C<enter-option()>
+
+Set the current context as I<"OPTION">. Uses L<C<$*CFG-KEYWORD>|#$*CFG-KEYWORD> to determine option name and fetch its
+pre-declarion properties if there are any.
+
+Knowing if current context is option or not is rather useful to find out of a syntax element should have special
+treatment. For example, if a keyword is seen in option context it is treated as a value, not as a boolean option. For
+example:
+
+    access-allowed private-acl;
+
+Here C<private-acl> is parsed as a string I<'private-acl'> with type name set to C<keyword>. Our code could then
+consult with the type name to find out the value is by chance a reference to a block or another option.
+
+=head3 C<leave-option()>
+
+Must be invoked when leaving option context.
+
+=head3 C<leave-block()>
+
+Must be invoked when leaving block context.
+
+=head3 C<validate-block()>
+
+Does complex validation of a block based on its type, name, and, possibly, class. Uses pre-set variables
+L<C<$*CFG-BLOCK-TYPE>|#$*CFG-BLOCK-TYPE>, L<C<$*CFG-BLOCK-NAME>|#$*CFG-BLOCK-NAME>,
+L<C<$*CFG-BLOCK-CLASS>|#$*CFG-BLOCK-CLASS>. If block passes the validation then a new block context is pushed onto
+the context stack.
+
+Can throw one of
+L<C<Config::BINDish::X::Parse::Context>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/X/Parse/Context.md>,
+L<C<Config::BINDish::X::Parse::ExtraPart>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/X/Parse/ExtraPart.md>,
+L<C<Config::BINDish::X::Parse::MissingPart>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/X/Parse/MissingPart.md>,
+or L<C<Config::BINDish::X::Parse::Unknown>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/X/Parse/Unknown.md>.
+
+
+=head3 C<validate-option()>
+
+Does complex validation of an option based on its name. Uses pre-set variables
+L<C<$*CFG-KEYWORD>|#$*CFG-KEYWORD> and L<C<$*CFG-VALUE>|#$*CFG-VALUE>.
+
+Contrary to C<validate-block> method results in leaving option context.
+
+Can throw one of
+L<C<Config::BINDish::X::Parse::Context>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/X/Parse/Context.md>,
+L<C<Config::BINDish::X::Parse::ValueType>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/X/Parse/ValueType.md>,
+or L<C<Config::BINDish::X::Parse::Unknown>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/X/Parse/Unknown.md>.
+
+=head3 C<validate-value()>
+
+Makes sure a value can be used in the current context. Uses variable L<C<$*CFG-VALUE>|#$*CFG-VALUE>.
+
+Can throw
+L<C<Config::BINDish::X::Parse::ValueType>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/X/Parse/ValueType.md>.
+
+=head3 C<multi method panic(Str:D $msg)>
+
+Throws
+L<C<Config::BINDish::X::Parse::General>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/X/Parse/General.md>
+with message C<$msg>.
+
+=head3 C<multi method panic(Config::BINDish::X::Parse:U \exception, Str $msg?, *%profile)>
+
+Creates an object of type C<exception> using C<%profile> as named arguments for constructor and throws it. If $msg
+is specified then it is added to the profile as named argument C<:$msg>.
+
+Both C<panic> methods also pass the grammar object they're invoked upon as C<cursor> named argument to provide
+the exception instance with error location and other useful information.
+
+=head1 GRAMMAR ELEMENTS
+
+Rules and tokens listed in this section are the ones considered public API of this module. Those not listed here but
+implemented by the grammar are considered implementation detail and can be changed or removed any time without prior
+notice.
+
+Description provided here would mostly be rather succinct. Checking with the grammar source is the most correct way
+of understanding it.
+
+=head2 Rules And Tokens
+
+=head3 C<rule TOP>
+
+See L<C<Grammar>|https://docs.raku.org/type/Grammar>.
+
+Pushes I<"TOP"> context onto the stack and invokes C<statement-list>.
+
+=head3 C<token enter-TOP>
+
+Does nothing, used as anchor for
+L<C<Config::BINDish::Actions>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Actions.md>.
+
+=head3 C<rule statement-list>
+
+Used in the global and block contexts.
+
+=head3 C<proto statement>
+
+Currently defined statements are (as named within C<:sym<...>> postfix):
+
+=item comment
+=item value
+=item option
+=item block
+=item empty
+
+=head3 C<token statement-terminator>
+
+Matches a statement terminator. Doesn't take the current strictness mode into account and tries matching as if
+non-strict syntax mode is used.
+
+=head3 C<token statement-terminate>
+
+A wrapper around C<statement-terminator> which validates it against the current syntax strictness mode.
+
+=head3 C<token block-head>
+
+Parses the block type keyword. Sets
+L<C<$*CFG-BLOCK-TYPE>|#$*CFG-BLOCK-TYPE>.
+
+=head3 C<token block-name>
+
+Parses the block name. Sets
+L<C<$*CFG-BLOCK-NAME>|#$*CFG-BLOCK-NAME>.
+
+=head3 C<token block-class>
+
+Parses the block name. Sets
+L<C<$*CFG-BLOCK-CLASS>|#$*CFG-BLOCK-CLASS>.
+
+=head3 C<token block-body>
+
+Validates the block and sets the current block context.
+
+=head3 C<C-comment>, C<CPP-comment>, C<UNIX-comment>
+
+Three types of comments
+
+=head3 C<keyword>
+
+Parses a keyword which is defined as an alpha-numeric identifier starting and ending with a word boundary. Sets
+L<C<$*CFG-KEYWORD>|#$*CFG-KEYWORD>.
+
+=head3 C<token dq-string>, C<token sq-string>
+
+Double- and single-quoted strings. The standard grammar and actions do not care about the exact nature of a string.
+But extensions could adjust their behavior based on the string type. For example,
+L<C<Config::BINDish::Expandable>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Expandable.md>
+implements macro expansion for double-quoted strings only.
+
+=head3 C<proto token value>
+
+Umbrella-rule for all value types. If you plan an extension for a new value type then this is where you plug it into.
+
+The following value types are currently implemented, listed as named within C<:sym<...>> postfix:
+
+=item string
+=item keyword
+=item num
+=item rat
+=item int
+=item bool
+
+=head2 Named captures
+
+Some named captures are also considered public API.
+
+=head3 C<$<err-pos>>
+
+Records the location to which call of method C<panic> should be bound. In other words, if the location within a rule
+body where we make the decision about syntax validity is different from the location where the user would understand it
+best then C<panic> should be invoked as:
+
+    $<err-pos>.panic: X::Parse::AError, ...;
+
+For example, we parse an option like:
+
+    pi 3.1415926;
+
+When all the information we need to validate it is collected our grammar points at the position right after the
+terminating semi-colon. If we do C<self.panic(...)> then the error message look kind of the following:
+
+    Option pi cannot be used in block...
+      at line N
+        pi 3.1415926;⏏
+
+But with C<$<err-pos>.panic(...)> it would rather be:
+
+    Option pi cannot be used in block...
+      at line N
+        ⏏pi 3.1415926;
+
+Which certainly makes more sense to the user.
+
+=head3 C<$<option-name>>, C<$<option-value>>
+
+Point to parsed option name and value L<C<Match>|https://docs.raku.org/type/Match>es.
+
+=head3 C<$<block-type>>
+
+Points to parsed block type L<C<Match>|https://docs.raku.org/type/Match> object.
+
+=head3 C<$<string>>
+
+Points to actual string body of a stringy value. I.e. for I<what "The answer is 42"> this capture will be a
+L<C<Match>|https://docs.raku.org/type/Match> object pointing at I<The answer is 42> part of the source, quotes excluded.
+
+=EXTENSIONS
+
+This section provides tips for writing own grammar extensions. See
+L<C<Config::BINDish::Actions>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Actions.md> to find read about action extensions.
+
+=head2 Pre-declaration
+
+I<Note:> This section also applies to attributes L<C<%.blocks>|#%.blocks> and L<C<%.options>|#%.options> mentioned
+above.
+
+An extension can pre-declare own blocks and options. It must do so by declaring a submethod named C<setup-BINDish>
+and calling methods C<declare-blocks> and C<declare-options>. Both methods take L<C<Hash>|https://docs.raku.org/type/Hash> objects or named arguments.
+In other words, the following two calls are identical:
+
+    self.declare-options: opt1 => {:top-only}, opt2 => %(:in<foo>, :type<Num>);
+    self.declare-options: %( opt1 => {:top-only}, opt2 => %(:in<foo>, :type<Num>) );
+
+Each hash or named argument key define the keyword of corresponding construct. Apparently, in the above example
+options C<opt1> and C<opt2> are declared.
+
+Keys of each option or block declaration define corresponding properties of each entitity. They're also named after
+attributes of the following typeobjects:
+
+=item L<C<Config::BINDish::Grammar::StatementProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/StatementProps.md>,
+    L<C<Config::BINDish::Grammar::ContainerProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/ContainerProps.md>
+    - common to both options and blocks
+=item L<C<Config::BINDish::Grammar::OptionProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/OptionProps.md>
+    - specific to options
+=item L<C<Config::BINDish::Grammar::BlockProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/BlockProps.md>
+    - specific to blocks
+
+
+=head3 Keys common to both options and blocks
+
+Statement level keys:
+
+=item C<top-only> - a statement can not be part of any block declaration
+=item C<in> - set of blocks inside which a statement is allowed
+
+Container level keys:
+
+=item C<type-name> - allowed type names
+=item C<type> – allowed types
+
+The above two keys are used as RHS for smartmatching. It allows explicit declarations of the following kind:
+
+    my $cfg = Config::BINDish.new:
+            :strict{:options},
+            options => %(
+                multi-type => { :in<general>, type => Int | Rat },
+                stringy => { :in<general>, type-name => /\- string$/ },
+            );
+
+With this we can have options like:
+
+    multi-type 2M;
+    multi-type 1.5G;
+    stringy "double quoted"; # Because of type name 'dq-string'
+    stringy 'single quoted"; # ... and 'sq-string'
+
+But not:
+
+    multi-type 1.5e2; # The value is Num
+    stringy bareword; # The value is a string, but its type name is 'keyword'
+
+=head3 Option-only keys
+
+Options currently do not have any declaration keys unique to them.
+
+=head3 Block-only keys
+
+=item C<named> - specifies if block must have a name. If omitted then the name part of block declaration is optional.
+    If I<True>, name is required; if I<False> then block can't have a name.
+=item C<classified> - similar to the C<named> above, but controls block class. Ignored altogether if C<named> is I<False>.
+=item C<value-only> - if I<True> then the block can only have a list of values in its body. Set to I<False> by default.
+    Only value-only blocks can contain keywords as values; all other blocks treat keywords as boolean options.
+
+=head2 Context
+
+Grammar object has a way of handling configuration file context by maintaining own context stack of
+L<C<Config::BINDish::Grammar::Context>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/Context.md>
+objects. See methods C<push-ctx>, C<pop-ctx>, and C<cur-ctx>.
+
+The only property of context which is guaranteed to be defined is its type. It's a string with context name. Currently
+only three of them can be seen: I<"TOP">, I<"BLOCK">, and I<"OPTION">.
+
+=head2 Extending The Grammar
+
+L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish.md>
+contains general information about writing extensions. Here we provide only grammar-specific details.
+
+Only the rules and tokens documented in corresponding section above are guaranteed to be supported and not be changed
+or removed without deprecation.
+
+The most common way to extend the grammar would be to add a new kind of statement or value type. This must be as
+easy as adding new rules or tokens akin to the following example:
+
+    role MyExtension is BINDish-grammar {
+        ...
+        multi rule statement:sym<your-statement> {
+            # Your statement syntax rules
+        }
+        multi token value:sym<your-type> {
+            # Your value syntax rules
+        }
+        ...
+    }
+
+=head1 SEE ALSO
+
+L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish.md>,
+L<C<Config::BINDish::Grammar::Strictness>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/Strictness.md>,
+L<C<Config::BINDish::Grammar::StatementProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/StatementProps.md>,
+L<C<Config::BINDish::Grammar::ContainerProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/ContainerProps.md>,
+L<C<Config::BINDish::Grammar::OptionProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/OptionProps.md>,
+L<C<Config::BINDish::Grammar::BlockProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/BlockProps.md>
+
+=AUTHOR Vadim Belman <vrurg@cpan.org>
+
+=end pod

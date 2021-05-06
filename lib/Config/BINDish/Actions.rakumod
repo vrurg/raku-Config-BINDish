@@ -59,15 +59,22 @@ method statement:sym<empty>($/) {
 }
 
 method dq-string($/) {
-    make Config::BINDish::AST.new-ast('Value',
-                                      :type-name<dq-string>,
-                                      :payload($<string>.chunks.map(*.value).join));
+    make Config::BINDish::AST.new-ast('Value', :payload($<string>.chunks.map(*.value).join));
 }
 
 method sq-string($/) {
-    make Config::BINDish::AST.new-ast('Value',
-                                      :type-name<sq-string>,
-                                      :payload($<string>.chunks.map(*.value).join));
+    make Config::BINDish::AST.new-ast('Value', :payload($<string>.chunks.map(*.value).join));
+}
+
+our %multipliers = K => 1024, M => 1024², G => 1024³, T => 1024⁴, P => 1024⁵;
+
+method num_suffix($/) {
+    with %multipliers{$/.uc} {
+        make $_
+    }
+    else {
+        die "Unknown numeric suffix '$/'";
+    }
 }
 
 method value:sym<string>($/) {
@@ -83,27 +90,38 @@ method value:sym<string>($/) {
 }
 
 method value:sym<keyword>($/) {
-    make Config::BINDish::AST.new-ast('Value',
-                                      :type-name<keyword>,
-                                      :payload(Str($*CFG-VALUE.payload)));
+    make Config::BINDish::AST.new-ast('Value', :payload(Str($*CFG-VALUE.payload)));
 }
 
 method value:sym<rat>($/) {
-    make Config::BINDish::AST.new-ast('Value',
-                                      :type-name<rat>,
-                                      :payload(Rat($*CFG-VALUE.payload)));
-}
+    my Int $multiplier = ($<num_suffix> andthen .made) || 1;
+    my $icard = Rat($<sign>
+                    ~ ($<numerator> || '0')
+                    ~ '.'
+                    ~ ($<denominator> || '0'));
 
-method value:sym<num>($/) {
-    make Config::BINDish::AST.new-ast('Value',
-                                      :type-name<num>,
-                                      :payload(Num(~$/)));
+    $<err-pos>.panic(X::Parse::BadNum) if $icard ~~ Failure;
+
+    make Config::BINDish::AST.new-ast('Value', :payload($icard * $multiplier));
 }
 
 method value:sym<int>($/) {
-    make Config::BINDish::AST.new-ast('Value',
-                                      :type-name<int>,
-                                      :payload(Int($*CFG-VALUE.payload)));
+    my Int $multiplier = ($<num_suffix> andthen .made) || 1;
+    my $icard = Int($<icard>);
+
+    $<err-pos>.panic(X::Parse::BadNum) if $icard ~~ Failure;
+
+    make Config::BINDish::AST.new-ast('Value', :payload($icard * $multiplier));
+}
+
+method value:sym<num>($/) {
+    my $int = $<int> || '0';
+    my $frac = $<frac> || '0';
+    my $num = Num($int ~ '.' ~ $frac ~ 'e' ~ $<exp>);
+
+    $<err-pos>.panic(X::Parse::BadNum) if $num ~~ Failure;
+
+    make Config::BINDish::AST.new-ast('Value', :payload($num));
 }
 
 method value:sym<bool>($/) {
@@ -111,15 +129,11 @@ method value:sym<bool>($/) {
 }
 
 method bool-true($/) {
-    make Config::BINDish::AST.new-ast('Value',
-                                      :type-name<bool>,
-                                      :payload)
+    make Config::BINDish::AST.new-ast('Value', :payload)
 }
 
 method bool-false($/) {
-    make Config::BINDish::AST.new-ast('Value',
-                                      :type-name<bool>,
-                                      :!payload);
+    make Config::BINDish::AST.new-ast('Value', :!payload);
 }
 
 method C-comment($/) {
@@ -142,7 +156,7 @@ method UNIX-comment($/) {
 method keyword($/) {
     make Config::BINDish::AST.new-ast('Value',
                                       :type-name<keyword>,
-                                      :payload(~$/))
+                                      :payload(Str($*CFG-KEYWORD.payload)))
 }
 
 method block-class($/) {

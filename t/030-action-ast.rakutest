@@ -5,7 +5,7 @@ use Config::BINDish::Grammar;
 use Config::BINDish::AST;
 use Config::BINDish::X;
 
-plan 7, :parallel;
+plan 7, :!parallel;
 
 subtest "Basics" => {
     plan 29;
@@ -32,6 +32,10 @@ subtest "Basics" => {
     is $top.value('opt'), "top level", "simple top-level option value";
     my $opt = $top.option('opt');
     isa-ok $opt, Config::BINDish::AST::Option, "method option returns an AST::Option instance";
+    unless $opt {
+        skip-rest "option not found";
+        test-suite.abort;
+    }
     is $opt.keyword.type-name, 'keyword', "option's keyword container type name";
     is $opt.keyword.payload, "opt", "option's keyword container payload";
     is $opt.value.type-name, "dq-string", "option's value container type name";

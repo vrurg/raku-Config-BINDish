@@ -34,5 +34,5 @@ our sub META6 {
         'Config::BINDish::X' => 'lib/Config/BINDish/X.rakumod',
     },
     license        => 'Artistic-2.0',
-    production     => False,
+    production     => True,
 }

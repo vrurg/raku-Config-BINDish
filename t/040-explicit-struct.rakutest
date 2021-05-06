@@ -128,7 +128,7 @@ subtest "Structure" => {
 }
 
 subtest "Value validation" => {
-    plan 11;
+    plan 12;
 
     throws-like { $cfg.read: string => q<op-top 1;>; },
                 Config::BINDish::X::Parse::ValueType,
@@ -208,8 +208,18 @@ subtest "Value validation" => {
                                         CFG
                 },
                 Config::BINDish::X::Parse::ValueType,
-                "multi-type option only accepts allowed types",
+                "stringy option only accepts '-string' named types",
                 :message(/"Option 'stringy' expects a \/\\- string\$\/ value but got <int> of (Int)"/);
+
+    throws-like { $cfg.read: string => q:to/CFG/;
+                                        general {
+                                            stringy bareword;
+                                        }
+                                        CFG
+                },
+                Config::BINDish::X::Parse::ValueType,
+                "stringy option doesn't accept a keyword even though it's a Str",
+                :message(/"Option 'stringy' expects a \/\\- string\$\/ value but got <keyword> of (Str)"/);
 
     subtest "keyword list in a value-only block", :instant, {
         plan 5;

@@ -1,7 +1,7 @@
 use v6.d;
 use NQPHLL:from<NQP>;
 use nqp;
-unit class Config::BINDish:ver<0.0.0>:api<0.1>;
+unit class Config::BINDish:ver<0.0.1>:api<0.0.1>;
 
 BEGIN {
     Config::BINDish.HOW does role ExtensibleHOW {
@@ -15,17 +15,21 @@ BEGIN {
             @actions-extensions.push: ext;
         }
 
-        method grammar-extensions { @grammar-extensions }
-        method actions-extensions { @actions-extensions }
+        method grammar-extensions {
+            @grammar-extensions
+        }
+        method actions-extensions {
+            @actions-extensions
+        }
     }
 
-    my sub phaser-blk($what, Mu \extension) {
+    my sub phaser-blk( $what, Mu \extension ) {
         QAST::Block.new(
             QAST::Stmts.new,
             QAST::Stmts.new(
                 QAST::Op.new(
                     :op<callmethod>,
-                    :name("extend-" ~ $what),
+                    :name( "extend-" ~ $what ),
                     QAST::WVal.new(:value( nqp::decont(Config::BINDish.HOW) )),
                     QAST::WVal.new(:value( nqp::decont(extension) ))
                     )
@@ -52,12 +56,12 @@ my class ParametericCacheHOW {
         my $meta := self.new;
         my $ctype := Metamodel::Primitives.create_type($meta, 'Uninstantiable');
         Metamodel::Primitives.set_parameterizer($ctype, sub ( Mu, \params ) {
-            $meta.generate_grammar(base-type, params)
+            $meta.generate-grammar(base-type, params)
         });
         $ctype
     }
 
-    method generate_grammar( Mu \obj, @extensions ) {
+    method generate-grammar( Mu \obj, @extensions ) {
         my \gmeta = obj.HOW.new;
         my $name = ( obj.^name, |@extensions.map({ '{' ~ .^name ~ '}' }) ).join("+");
         my \extended = gmeta.new_type(:$name);
@@ -133,7 +137,7 @@ proto method read( | ) {
 multi method read( ::?CLASS:U: |c ) {
     self.new.read: |c
 }
-multi method read( ::?CLASS:D: IO:D(Str:D) :$!file, |c ) {
+multi method read( ::?CLASS:D: IO:D( Str:D ) :$!file, |c ) {
     $.grammar.parse: $!file.slurp,
                      :$.actions,
                      :$!strict,

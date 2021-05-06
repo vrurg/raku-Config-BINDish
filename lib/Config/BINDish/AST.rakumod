@@ -35,7 +35,7 @@ class Config::BINDish::AST {
         %ast-types{$type-name} := ast-type;
     }
 
-    method new-ast(Str:D $node-type, |c --> Config::BINDish::AST) {
+    method new-ast(Str:D $node-type, |c --> Config::BINDish::AST:D) {
         %ast-types{$node-type}:exists
             ?? %ast-types{$node-type}.new(|c)
             !! (Config::BINDish::AST::{$node-type}:exists
@@ -57,7 +57,7 @@ role Config::BINDish::AST::Container {
     has Mu    $.payload   is built(:bind)
                           handles @Config::BINDish::Grammar::coercers
                           is default(Any);
-    has Str:D $.type-name is default('any');
+    has Str:D $.type-name = $*CFG-VALUE ?? $*CFG-VALUE.type-name !! 'any';
 
     method !SET-FROM-CONTAINER(::?ROLE:D: ::?ROLE $cont) {
         with $cont {
@@ -236,17 +236,17 @@ role Config::BINDish::AST::Parent {
     }
 
     proto method get(::?CLASS:D: |) {*}
-    multi method get(::?CLASS:D: Str:D $option, Bool :$raw) {
-        $raw ?? self.option($option) !! self.value($option)
+    multi method get(::?CLASS:D: Str:D $option, Bool :$raw, Bool :$local = True) {
+        $raw ?? self.option($option, :$local) !! self.value($option, :$local)
     }
-    multi method get(::?CLASS:D: Str:D :$option) {
-        self.option($option)
+    multi method get(::?CLASS:D: Str:D :$option, Bool :$local = True) {
+        self.option($option, :$local)
     }
-    multi method get(::?CLASS:D: Str:D :$value) {
-        self.value($value)
+    multi method get(::?CLASS:D: Str:D :$value, Bool :$local = True) {
+        self.value($value, :$local)
     }
-    multi method get(::?CLASS:D: Str:D :$block, *%p) {
-        self.block($block, |%p)
+    multi method get(::?CLASS:D: Str:D :$block, *%c) {
+        self.block($block, |%c)
     }
     multi method get(::CLASS:D: Pair:D $path where $path.value ~~ Pair:D | Str:D) {
         my proto traverse(Config::BINDish::AST::Block:D, |) {*}
@@ -299,7 +299,6 @@ class Config::BINDish::AST::Block
         $!class.set-parent(self);
         self
     }
-    method set-flat(::?CLASS:D: Bool:D $!flat = True) { self }
 
     method gist(::?CLASS:D:) {
         $.keyword.payload

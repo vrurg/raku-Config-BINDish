@@ -74,8 +74,8 @@ class AST::Macro
         for @.children -> $child {
             if $child.WHAT ~~ AST::BlkRef {
                 my %bp;
-                %bp<name> = $_ with $child.name;
-                %bp<class> = $_ with $child.class;
+                %bp<name> = .payload with $child.name;
+                %bp<class> = .payload with $child.class;
                 my $blk = $cur-blk.block($child.keyword, |%bp);
                 with $blk {
                     $cur-blk = $blk;

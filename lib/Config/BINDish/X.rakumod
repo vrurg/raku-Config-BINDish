@@ -153,3 +153,9 @@ class Config::BINDish::X::AST::DuplicateType is Config::BINDish::X {
         "Cannot register a duplicate of AST node type '$!type'"
     }
 }
+
+class Config::BINDish::X::CtxStack::Exhausted is Config::BINDish::X {
+    method message {
+        "Attempted to pop the topmost grammar context"
+    }
+}

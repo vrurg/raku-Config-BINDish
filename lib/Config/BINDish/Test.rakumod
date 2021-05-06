@@ -68,8 +68,9 @@ method is-cfg-stmts(Mu $match is raw, Hash() $struct, Str:D $message, Int :$plan
     self.subtest: :hidden, $message, -> \suite {
         suite.plan: $plan;
 
-        suite.is-struct-deeply: $match, $struct;
-#        suite.diag: $match.gist;
+        unless suite.is-struct-deeply: $match, $struct {
+            suite.diag: $match.gist;
+        }
     }
 }
 
@@ -113,29 +114,31 @@ method is-cfg-stmt-list(Mu $match is raw,
 }
 
 method run-grammar-tests(Mu \grmr, *@tests) is test-tool(:!wrap) {
-    for @tests -> (:key($message), :value(%struct)) {
-        my $match;
-        my $ex;
-        try {
-            $match = grmr.parse: %struct<source>;
-            CATCH {
-                default {
-                    $ex = $_;
+    self.anchor: {
+        for @tests -> ( :key($message), :value(%struct) ) {
+            my $match;
+            my $ex;
+            try {
+                $match = grmr.parse: %struct<source>;
+                CATCH {
+                    default {
+                        $ex = $_;
+                    }
                 }
             }
-        }
-        with $ex {
-            .rethrow unless $_ ~~ Config::BINDish::X::Parse;
-            self.locate-tool-caller(3);
-            self.proclaim: False, $message, { :comments($ex.message), caller => self.tool-caller }; # ~ "\n" ~ $ex.message;
-        }
-        else {
-            with %struct<top> {
-                self.is-cfg-stmt-list: $match, %struct<top>, $message;
+            with $ex {
+                .rethrow unless $_ ~~ Config::BINDish::X::Parse;
+                self.proclaim: False, $message, { :comments( $ex.message ), caller => self.tool-caller };
+                # ~ "\n" ~ $ex.message;
             }
             else {
-                self.flunk: $message;
-                self.diag: "*WARNING!* No 'top' key found for '$message'!";
+                with %struct<top> {
+                    self.is-cfg-stmt-list: $match, %struct<top>, $message;
+                }
+                else {
+                    self.flunk: $message;
+                    self.diag: "*WARNING!* No 'top' key found for '$message'!";
+                }
             }
         }
     }

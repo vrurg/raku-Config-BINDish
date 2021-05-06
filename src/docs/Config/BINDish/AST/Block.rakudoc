@@ -1,0 +1,75 @@
+=begin pod
+=head1 NAME
+
+C<class Config::BINDish::AST::Block> - representation of a configuration block
+
+=head1 DESCRIPTION
+
+Is L<C<Config::BINDish::AST>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/AST.md>.
+
+Does L<C<Config::BINDish::AST::Parent>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/AST/Parent.md>
+and L<C<Config::BINDish::AST::Decl>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/AST/Decl.md>.
+
+=head1 ATTRIBUTES
+
+=head3 L<C<Config::BINDish::AST::Container>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/AST/Container.md> C<$.name>
+
+Block name.
+
+=head3 L<C<Config::BINDish::AST::Container>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/AST/Container.md> C<$.class>
+
+Block class.
+
+=head3 L<C<Bool:D>|https://docs.raku.org/type/Bool> C<$.flat>
+
+A flat block doesn't allow multiple children of the same kind. In other words, for a flat block it is guaranteed that
+for the same named and classified blocks, or same options, there will always be only one child under the block's AST
+node.
+
+For example:
+
+    foo "bar" { # A flat block
+        opt1 "1";
+        opt1 2; # This will override the above
+        subblock "baz" {
+            opt2 "first";
+        }
+        subblock "baz" {
+            opt2 "second"; # :foo<bar> => :subblock<baz> => "opt2" will return "second"
+        }
+    }
+
+The attribute is by default set either to the value in C<$*CFG-FLAT-BLOCKS> or to I<False>.
+
+=head1 METHODS
+
+=head3 C<set-name(Config::BINDish::AST::Container:D $name)>
+
+Sets block name. Returns block object itself.
+
+=head3 C<set-class(Config::BINDish::AST::Container:D $class)>
+
+Sets block class. Returns block object itself.
+
+=head3 C<multi add(Config::BINDish::AST::Block:D $block)>
+
+Add C<$block> as a child.
+
+=head3 C<multi add(Config::BINDish::AST::Option $option)>
+
+Adds C<$option> as a child.
+
+=head3 C<flatten()>
+
+Returns a flattened copy of the block.
+
+=head1 SEE ALSO
+
+L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish.md>,
+L<C<Config::BINDish::AST>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/AST.md>
+
+=head1 AUTHOR
+
+Vadim Belman <vrurg@cpan.org>
+
+=end pod

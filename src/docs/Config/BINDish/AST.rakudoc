@@ -1,0 +1,91 @@
+=begin pod
+=head1 NAME
+
+C<Config::BINDish::AST> - the standard C<Config::BINDish> AST tree representation
+
+=head1 DESCRIPTION
+
+As a module C<Config::BINDish::AST> defines all standard AST node classes used by
+L<C<Config::BINDish::Actions>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Actions.md>
+to build the resulting representation of the parsed configuration.
+
+As a class C<Config::BINDish::AST> is the base class for all other AST node classes.
+
+=head1 ATTRIBUTES
+
+=head3 L<C<Config::BINDish::AST::Parent>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/AST/Parent.md> C<$.parent>
+
+Points to the parent node. Will stay undefined for the C<TOP> node.
+
+=head1 METHODS
+
+=head3 C<set-parent(Config::BINDish::AST::Parent:D $parent)>
+
+Sets C<$.parent> attribute.
+
+=head3 C<ast-name()>
+
+Returns current node name, based on the node class name. If the name starts with I<Config::BINDish::AST::> then this
+part is stripped off. Otherwise the class name is considered to be the name.
+
+=head3 C<dump(Int:D :$level = 0)>
+
+Dumps current node' string representation which consists of C<ast-name> and C<gist> and would be indented by C<$level>
+white spaces.
+
+=head3 C<register-type(Str:D $ast-name, Mu \ast-type)>
+
+Method registers an C<ast-type> class under C<$ast-name>. C<new-ast> method (see below) can later create a node instance
+based on its registered name.
+
+=head3 C<new-ast(Str:D $node-type, |profile --> Config::BINDish::AST:D)>
+
+Creates a new instance of ast node based on its name. The name can be either a registered AST node name, see
+C<register-type> method above; or a short name under C<Config::BINDish::AST::> namespace. If no associated AST type
+object is found then a failure wrapped around
+L<C<Config::BINDish::X::AST::DoesnExists>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/X/AST/DoesnExists.md>
+is returned.
+
+For example, with the following statement:
+
+    Config::BINDish::AST.register-type("MyAppNode", MyApp::Config::AST::Node);
+
+it is then possible to:
+
+    Config::BINDish::AST.new-ast("MyAppNode", :foo(42), :bar("The Answer")); # An instance of My::App::Config::AST::Node
+
+For one of the standard AST nodes one can:
+
+    Config::BINDish::AST.new-ast('Block', :name(...), :class(...), ...); # An instance of Config::BINDish::AST::Block
+
+=head3 C<<top-node(--> Config::BINDish::AST)>>
+
+Returns the topmost node, or, in other words, the root of the AST tree.
+
+=head1 AST NODE CLASSES AND ROLES
+
+=head2 Roles
+
+=item L<C<Config::BINDish::AST::Container>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/AST/Container.md>
+=item L<C<Config::BINDish::AST::Decl>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/AST/Decl.md>
+=item L<C<Config::BINDish::AST::Parent>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/AST/Parent.md>
+
+=head2 Classes
+
+=item L<C<Config::BINDish::AST::Block>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/AST/Block.md>
+=item L<C<Config::BINDish::AST::Comment>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/AST/Comment.md>
+=item L<C<Config::BINDish::AST::Option>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/AST/Option.md>
+=item L<C<Config::BINDish::AST::NOP>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/AST/NOP.md>
+=item L<C<Config::BINDish::AST::TOP>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/AST/TOP.md>
+=item L<C<Config::BINDish::AST::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/AST/Value.md>
+
+=head1 SEE ALSO
+
+L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish.md>,
+L<C<Config::BINDish::Aactions>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Aactions.md>
+
+=head1 AUTHOR
+
+Vadim Belman <vrurg@cpan.org>
+
+=end pod

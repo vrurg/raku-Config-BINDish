@@ -1,19 +1,19 @@
 use v6.d;
+
 #no precompilation;
 #use Grammar::Tracer;
 use nqp;
 unit grammar Config::BINDish::Grammar;
 use Config::BINDish::X;
 
-our %multipliers = K => 1024, M => 1024², G => 1024³, T => 1024⁴, P => 1024⁵;
-
 our @coercers;
 BEGIN {
     # Get all suspected methods-coercers. A method is considered coercer if lexical named after the method name is
     # a typeobject.
-    for Any.^methods(:all).map(*.name).grep({ LEXICAL::{$_}:exists }) {
-        @coercers.push: $_ unless LEXICAL::{$_}.defined
-    }
+    @coercers = (|Match.^methods(:all), |Str.^methods(:all))
+                    .map(*.name)
+                    .unique
+                    .grep({ LEXICAL::{$_}:exists && !LEXICAL::{$_}.defined });
 }
 
 class Context {...}
@@ -32,10 +32,11 @@ role TypeStringify {
     }
 }
 
+my subset Payload of Any where Match | Str;
 class Value does TypeStringify {
     has Str:D $.type-name is required;
     has Mu $.type is required;
-    has Mu $.payload is required handles @coercers;
+    has Payload:D $.payload is required handles @coercers;
 
     method gist(::?CLASS:D:) {
         my $val = Str($!payload);
@@ -44,7 +45,7 @@ class Value does TypeStringify {
     }
 
     method coerced(::?CLASS:D:) {
-        -> ::T { T($!payload) }($!type)
+        -> ::T { T($!payload) }.($!type)
     }
 }
 
@@ -61,7 +62,7 @@ role StatementProps {
     multi method ACCEPTS(Context:D $ctx) {
         my $cur-block = $ctx.cur-block-ctx;
         return $cur-block.type eq 'TOP' if $!top-only;
-        $!in ?? ( $cur-block.keyword && $cur-block.keyword.payload ∈ $!in) !! True
+        $!in ?? ( $cur-block.keyword && Str($cur-block.keyword.payload) ∈ $!in) !! True
     }
 }
 
@@ -110,8 +111,8 @@ class Context {
     method description(::?CLASS:D:) {
         given $!type {
             when 'TOP'    { 'global context' }
-            when 'BLOCK'  { "block '" ~ $!keyword ~ ($!name.defined ?? " " ~ $!name.gist !! "") ~ "'" }
-            when 'OPTION' { "option '" ~ $!keyword ~ "'" }
+            when 'BLOCK'  { "block '" ~ $!keyword.payload ~ ($!name.defined ?? " " ~ $!name.gist !! "") ~ "'" }
+            when 'OPTION' { "option '" ~ $!keyword.payload ~ "'" }
             default {
                 die "Internal: looks like " ~ $_ ~ " context hasn't been given a description!"
             }
@@ -227,11 +228,11 @@ method push-ctx(|c(*%profile) --> Context:D)
 
 method pop-ctx(--> Context:D) {
     return $*CFG-GRAMMAR.pop-ctx unless self === $*CFG-GRAMMAR;
-    die "Attempted to pop the top context" if @!contexts[*-1].type eq 'TOP';
+    Config::BINDish::X::CtxStack::Exhausted.new.throw if @!contexts[*-1].type eq 'TOP';
     @!contexts.pop
 }
 
-method block-ok(Str:D $type) {
+method block-ok(Str:D $type --> Bool:D) {
     my %blocks = $*CFG-GRAMMAR.blk-props;
     return True unless %blocks;
     with %blocks{$type} {
@@ -240,7 +241,7 @@ method block-ok(Str:D $type) {
     False
 }
 
-method option-ok(Str:D $keyword) {
+method option-ok(Str:D $keyword --> Bool:D) {
     my %options = $*CFG-GRAMMAR.opt-props;
     return True unless %options;
     with %options{$keyword} {
@@ -268,12 +269,12 @@ method validate-option {
     my %options = $grammar.opt-props;
     if %options {
         my $ctx = self.cfg-ctx.cur-block-ctx;
-        my $keyword = Str($*CFG-KEYWORD);
+        my $keyword = Str($*CFG-KEYWORD.payload);
         my $props = %options{$keyword};
         if $props {
             self.panic: X::Parse::Context, :what<option>, :keyword($*CFG-KEYWORD), :$ctx
                 unless self.option-ok($keyword) && !$ctx.props.value-only;
-            my $value = $*CFG-VALUE // Value.new: :type(Bool), :type-name('bool'), :payload;
+            my $value = $*CFG-VALUE // Value.new: :type(Bool), :type-name('bool'), :payload<True>;
             unless $value ~~ $props {
                 self.panic: X::Parse::ValueType, :what<option>, :keyword($*CFG-KEYWORD), :$props, :$value
             }
@@ -288,7 +289,7 @@ method validate-option {
 method validate-block {
     my $ctx = self.cfg-ctx;
     my $grammar = $*CFG-GRAMMAR;
-    my Str:D() $block-type = $*CFG-BLOCK-TYPE;
+    my Str:D() $block-type = $*CFG-BLOCK-TYPE.payload;
     my StatementProps $props;
     my %blocks = $*CFG-GRAMMAR.blk-props;
     if %blocks {
@@ -335,15 +336,6 @@ method validate-value {
 }
 
 method leave-block { self.pop-ctx }
-
-method block-description {
-    $*CFG-BLOCK-TYPE
-        ?? ($*CFG-BLOCK-TYPE
-            ~ ($*CFG-BLOCK-NAME
-                ?? " " ~ $*CFG-BLOCK-NAME
-                !! ""))
-        !! "*global context*"
-}
 
 proto method panic(|) {*}
 multi method panic(Str:D $msg) {
@@ -457,7 +449,9 @@ token statement-terminate {
                || ($<statement-terminator>
                    && $<statement-terminator><terminator>
                    && ~$<statement-terminator><terminator> eq ';')
-        { self.panic: "Missing semicolon" }
+        {
+            self.panic: "Missing semicolon"
+        }
     }
 }
 
@@ -510,7 +504,7 @@ token UNIX-comment {
 
 token keyword {
     <.wb> $<kwd>=[ <.alpha> [ \w | '-' ]* ] <.wb>
-    { $*CFG-KEYWORD = Value.new: :type(Str), :type-name<keyword>, :payload(~$<kwd>) }
+    { $*CFG-KEYWORD = Value.new: :type(Str), :type-name<keyword>, :payload($<kwd>) }
 }
 
 token bool-true {
@@ -531,8 +525,8 @@ token sq-string {
     \' ~ \' $<string>=<.qstring("'")> { self.set-value: Str, :sq-string($<string>) }
 }
 
-token decimal {
-    [ \d+ ]+ % '_'
+token decimal($max = 9) {
+    [ <{"<[0..$max]>"}>+ ]+ % '_'
 }
 token heximal {
     [ <xdigit>+ ]+ % '_'
@@ -541,8 +535,8 @@ token heximal {
 token natural_num {
     [
         | [ 0 <?before <[bodx]>>: [
-                | [ b <decimal> ]
-                | [ o <decimal> ]
+                | [ b <decimal(1)> ]
+                | [ o <decimal(7)> ]
                 | [ d <decimal> ]
                 | [ x <heximal> ]
             ] ]
@@ -563,35 +557,25 @@ multi token value:sym<keyword> {
     <?{ self.cfg-ctx.type eq 'OPTION'
         || (self.cfg-ctx.cur-block-ctx.props andthen .value-only) }>
     :my Value:D $*CFG-KEYWORD;
-    <keyword> { $*CFG-GRAMMAR.set-value($*CFG-KEYWORD) }
+    <keyword> { $*CFG-GRAMMAR.set-value: Str, :keyword($*CFG-KEYWORD.payload) }
 }
 
 multi token value:sym<num> {
-    <[-+]>? [
-        | [ \d* '.' \d+ ]
-        | [ \d+ ]
+    $<err-pos>=<?before <[-+]>? [\d | '.' \d]>
+    $<sign>=<[-+]>? [
+        | [ $<int>=\d* '.' $<frac>=\d+ ]
+        | [ $<int>=\d+ ]
     ]
-    e <[-+]>? \d+ <.wb> { self.set-value: Num, :num($/) }
+    e $<exp>=[<[-+]>? \d+] <.wb> { self.set-value: Num, :num($/) }
 }
 multi token value:sym<rat> {
+    $<err-pos>=<?before <[-+]>? [\d | '.' \d]>
     $<sign>=<[-+]>? [
         | [ $<numerator>=<.decimal> '.' <!before <.decimal>> ]
         | [ [ $<numerator>=<.decimal>? '.' $<denominator>=<.decimal> ]
             <num_suffix>? <.wb> ]
     ]
-    {
-        my Int $multiplier = 1;
-        with $<num_suffix> {
-            $multiplier = %multipliers{$_.uc};
-        }
-        my $icard = Rat($<sign>
-                        ~ ($<numerator> || '0')
-                        ~ '.'
-                        ~ ($<denominator> || '0'));
-
-        self.panic(X::Parse::BadNum) if $icard ~~ Failure;
-        self.set-value: Rat, :rat($icard * $multiplier)
-    }
+    { self.set-value: Rat, :rat($/) }
 }
 multi token value:sym<int> {
     $<err-pos>=<?before <[-+]>? \d>
@@ -600,15 +584,7 @@ multi token value:sym<int> {
           | { $<err-pos>.panic: X::Parse::BadNum } ]
     ]
     <!before <[.e]>>
-    {
-        my Int $multiplier = 1;
-        with $<num_suffix> {
-            $multiplier = %multipliers{$_.uc};
-        }
-        my $icard = Int($<icard>);
-        self.panic(X::Parse::BadNum) if $icard ~~ Failure;
-        self.set-value: Int, :int($icard * $multiplier);
-    }
+    { self.set-value: Int, :int($/) }
 }
 multi token value:sym<bool> {
     $<bool-val>=[ <.bool-true> | <.bool-false> ] { self.set-value: Bool, :bool($/) }

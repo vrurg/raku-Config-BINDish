@@ -21,7 +21,7 @@ my role Ext1 is BINDish-grammar {
     }
 
     multi token value:sym<foo> {
-        $<foo-type>='foo' { self.set-value: Foo, :foo($/) }
+        $<foo-type>='$foo' { self.set-value: Foo, :foo($/) }
     }
 }
 
@@ -46,7 +46,7 @@ try $cfg.grammar.parse: '{}';
 is-deeply @panic-order, ['Ext2', 'Ext1'], "overridden methods are invoked in the same order";
 
 # Note that the same test in 010-grammar.rakutest causes the standard grammar to throw.
-my $match = $cfg.grammar.parse: q<block { option foo }>, :!strict;
+my $match = $cfg.grammar.parse: q<block { option $foo }>, :!strict;
 is-cfg-stmt-list $match,
                  %( statements => 0 => %(
                      block-head => block-type => 'block',
@@ -55,7 +55,7 @@ is-cfg-stmt-list $match,
                          statements => %(
                              0 => %(
                                  option-name => "option",
-                                 option-value => foo-type => 'foo' ))))),
+                                 option-value => foo-type => '$foo' ))))),
                  "grammar is extended with a new value type";
 
 throws-like { $cfg.grammar.parse: q<block { option !bar }>, :!strict },

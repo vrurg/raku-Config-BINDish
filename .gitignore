@@ -2,3 +2,4 @@
 lib/.precomp
 t/lib/.precomp
 *.iml
+/zef/

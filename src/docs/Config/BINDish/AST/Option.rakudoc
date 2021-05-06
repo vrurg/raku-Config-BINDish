@@ -1,0 +1,27 @@
+=begin pod
+=head1 NAME
+
+C<class Config::BINDish::AST::Option> - configuration option representation
+
+=head1 DESCRIPTION
+
+Is L<C<Config::BINDish::AST>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/AST.md>.
+
+Does L<C<Config::BINDish::AST::Decl>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/AST/Decl.md>.
+
+=head1 ATTRIBUTES
+
+=head3 L<C<Config::BINDish::AST::Container>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/AST/Container.md> C<$.value>
+
+Option value.
+
+=head1 SEE ALSO
+
+L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish.md>,
+L<C<Config::BINDish::AST>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/AST.md>
+
+=head1 AUTHOR
+
+Vadim Belman <vrurg@cpan.org>
+
+=end pod
