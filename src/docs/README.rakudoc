@@ -96,7 +96,7 @@ For example:
     block 3.14 { }
 
 Or, with
-L<C<Config::BINDish::INET>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/INET.md>
+L<C<Config::BINDish::INET>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/INET.md>
 loaded it could even be:
 
     network 192.168.1.0/24 {
@@ -211,7 +211,7 @@ There is no limit on nesting blocks:
     }
 
 *NB* We use strings for IP addresses. But with bundled
-L<C<Config::BINDish::INET>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/INET.md>
+L<C<Config::BINDish::INET>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/INET.md>
 extension one can have it like C<gw 172.1.2.1;>. But this paper tries to stick to the barebones module as much as
 possible.
 
@@ -278,7 +278,7 @@ where they end is totally up to them!
 
 =head1 SEE ALSO
 
-L<Config::BINDish|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish.md>
+L<Config::BINDish|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish.md>
 
 =AUTHOR Vadim Belman <vrurg@cpan.org>
 =end pod

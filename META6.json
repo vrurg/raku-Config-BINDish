@@ -1,5 +1,5 @@
 {
-  "api": "0.0.1",
+  "api": "0.0.2",
   "auth": "zef:vrurg",
   "authors": [
     "Vadim Belman <vrurg@lflat.org>"
@@ -39,5 +39,5 @@
   "test-depends": [
     "Test::Async"
   ],
-  "version": "0.0.1"
+  "version": "0.0.2"
 }

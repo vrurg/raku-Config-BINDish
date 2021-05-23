@@ -1,0 +1,11 @@
+=begin pod
+=head1 VERSIONS
+
+=head2 v0.0.2
+
+=item Implemented grammar value type (C«value:sym<type>») specification
+=item Replaced dot (C<.>) separator with slash (C</>) in macros: C<"{block.option}"> is now C<"{block/option}">
+=item Implemented parent block reference in macros: C<"{../../option}">
+=item API version bumped to v0.0.2
+
+=end pod

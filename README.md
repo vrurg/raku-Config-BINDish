@@ -99,7 +99,7 @@ Note how `block-name` is declaread as a `value`. It means that any valid option 
 
     block 3.14 { }
 
-Or, with [`Config::BINDish::INET`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/INET.md) loaded it could even be:
+Or, with [`Config::BINDish::INET`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/INET.md) loaded it could even be:
 
     network 192.168.1.0/24 {
     }
@@ -199,7 +199,7 @@ There is no limit on nesting blocks:
         }
     }
 
-*NB* We use strings for IP addresses. But with bundled [`Config::BINDish::INET`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/INET.md) extension one can have it like `gw 172.1.2.1;`. But this paper tries to stick to the barebones module as much as possible.
+*NB* We use strings for IP addresses. But with bundled [`Config::BINDish::INET`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/INET.md) extension one can have it like `gw 172.1.2.1;`. But this paper tries to stick to the barebones module as much as possible.
 
 So far the examples written as if the parser works in relaxed mode. In strict mode the rule of *mandatory semi-colon* applies and a block must always be terminated with `;`:
 
@@ -253,7 +253,7 @@ where they end is totally up to them!
 SEE ALSO
 ========
 
-[Config::BINDish](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish.md)
+[Config::BINDish](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish.md)
 
 AUTHOR
 ======

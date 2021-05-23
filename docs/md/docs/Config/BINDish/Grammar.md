@@ -6,7 +6,7 @@ NAME
 DESCRIPTION
 ===========
 
-This class is responsible for the actual parsing of the configuration. It is not recommended for direct use. [`Config::BINDish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish.md) `read` method must be used instead.
+This class is responsible for the actual parsing of the configuration. It is not recommended for direct use. [`Config::BINDish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish.md) `read` method must be used instead.
 
 The class inherits from the standard [`Grammar`](https://docs.raku.org/type/Grammar) class.
 
@@ -21,25 +21,25 @@ If set this attribute expects blocks to be flattened down. I.e. whenever a block
     baz { }
     foo "bar" { fubar 2; fubaz 3.14; }
 
-How the options are dealt with is the sole prerogative of the actions implementation. [`Config::BINDish::Actions`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Actions.md) re-delegates handling of flattening to the underlying [`Config::BINDish::AST`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/AST.md) class. It, in turn, will overwrite earlier option declarations with latter ones. So, when one queries for `fubar` the value returned will be *2*.
+How the options are dealt with is the sole prerogative of the actions implementation. [`Config::BINDish::Actions`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/Actions.md) re-delegates handling of flattening to the underlying [`Config::BINDish::AST`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/AST.md) class. It, in turn, will overwrite earlier option declarations with latter ones. So, when one queries for `fubar` the value returned will be *2*.
 
 See [$*CFG-FLAT-BLOCKS](#$*CFG-FLAT-BLOCKS).
 
-### [`Config::BINDish::Grammar::Strictness`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/Strictness.md) `$.strict = False`
+### [`Config::BINDish::Grammar::Strictness`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/Grammar/Strictness.md) `$.strict = False`
 
-Defines what strictness modes are activated. See [`Config::BINDish::Grammar::Strictness`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/Strictness.md).
+Defines what strictness modes are activated. See [`Config::BINDish::Grammar::Strictness`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/Grammar/Strictness.md).
 
 ### `%.blocks`
 
 User-defined blocks in hash form. Passed to `declare-blocks` method at object construction time.
 
-See [`Config::BINDish::Grammar::BlockProps`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/BlockProps.md) and [Pre-declaration](#Pre-declaration) section for more information.
+See [`Config::BINDish::Grammar::BlockProps`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/Grammar/BlockProps.md) and [Pre-declaration](#Pre-declaration) section for more information.
 
 ### `%.options`
 
 User-defined options in hash form. Passed to `declare-options` method at object construction time.
 
-See [`Config::BINDish::Grammar::OptionProps`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/OptionProps.md) and [Pre-declaration](#Pre-declaration) section for more information.
+See [`Config::BINDish::Grammar::OptionProps`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/Grammar/OptionProps.md) and [Pre-declaration](#Pre-declaration) section for more information.
 
 DYNAMIC VARIABLES
 =================
@@ -56,23 +56,23 @@ Set to `$.flat` attribute value.
 
 ### `$*CFG-INNER-PARENT`
 
-Provided for actions convenience. Intended to hold an instance of [`Config::BINDish::AST::Parent`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/AST/Parent.md).
+Provided for actions convenience. Intended to hold an instance of [`Config::BINDish::AST::Parent`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/AST/Parent.md).
 
 ### `$*CFG-TOP`
 
-Provided for actions convenience. Intended to hold an instance of [`Config::BINDish::AST::TOP`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/AST/TOP.md).
+Provided for actions convenience. Intended to hold an instance of [`Config::BINDish::AST::TOP`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/AST/TOP.md).
 
-### [`Config::BINDish::Grammar::Value`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/Value.md) `$*CFG-VALUE`
+### [`Config::BINDish::Grammar::Value`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/Grammar/Value.md) `$*CFG-VALUE`
 
-Must be provided directly or indirectly by any rule or token invoking the `<value>` token. This variable will be set to a [`Config::BINDish::Grammar::Value`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/Value.md) instance created by `set-value` method.
+Must be provided directly or indirectly by any rule or token invoking the `<value>` token. This variable will be set to a [`Config::BINDish::Grammar::Value`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/Grammar/Value.md) instance created by `set-value` method.
 
-### [`Config::BINDish::Grammar::Value`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/Value.md) `$*CFG-KEYWORD`
+### [`Config::BINDish::Grammar::Value`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/Grammar/Value.md) `$*CFG-KEYWORD`
 
 Set by `<keyword>` token. The value stored will be of type [`Str`](https://docs.raku.org/type/Str) and have type name *"keyword"*.
 
 ### `$*CFG-BLOCK-TYPE`, `$*CFG-BLOCK-NAME`, `$*CFG-BLOCK-CLASS`
 
-All three are of [`Config::BINDish::Grammar::Value`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/Value.md) type. When the following example is parsed:
+All three are of [`Config::BINDish::Grammar::Value`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/Grammar/Value.md) type. When the following example is parsed:
 
     foo "bar" baz { }
 
@@ -84,7 +84,7 @@ The variables will be set to:
 
   * class: "baz" of [`Str`](https://docs.raku.org/type/Str), type name *"keyword"*
 
-Note that the name could be of any value, supported by the grammar. If an extension adds a new value type then the type can also be used as a type name. Say, with [`Config::BINDish::INET`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/INET.md) loaded one can have the following valid declaration:
+Note that the name could be of any value, supported by the grammar. If an extension adds a new value type then the type can also be used as a type name. Say, with [`Config::BINDish::INET`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/INET.md) loaded one can have the following valid declaration:
 
     IP 192.168.1.42 { }
 
@@ -99,7 +99,7 @@ METHODS
 
 ### `set-value(Mu \type, *%value)`
 
-This methods creates a new [`Config::BINDish::Grammar::Value`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/Value.md) object and assigns it to `$*CFG-VALUE`. Takes value's type object as its single positional parameter. Type name and payload are passed as the only named argument of the method call. Here is how a single-quoted string is handled by the grammar:
+This methods creates a new [`Config::BINDish::Grammar::Value`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/Grammar/Value.md) object and assigns it to `$*CFG-VALUE`. Takes value's type object as its single positional parameter. Type name and payload are passed as the only named argument of the method call. Here is how a single-quoted string is handled by the grammar:
 
     token sq-string {
         \' ~ \' $<string>=<.qstring("'")>
@@ -108,7 +108,7 @@ This methods creates a new [`Config::BINDish::Grammar::Value`](https://github.co
         }
     }
 
-In this example the new [`Config::BINDish::Grammar::Value`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/Value.md) object will be created with payload set from `$<string>`, type name set to *"sq-string"*, and type set to [`Str`](https://docs.raku.org/type/Str).
+In this example the new [`Config::BINDish::Grammar::Value`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/Grammar/Value.md) object will be created with payload set from `$<string>`, type name set to *"sq-string"*, and type set to [`Str`](https://docs.raku.org/type/Str).
 
 ### `submethod setup-BINDish`
 
@@ -130,13 +130,13 @@ Pre-declare options properties. See [Pre-declaration](#Pre-declaration) section 
 
 ### `cfg-ctx()`
 
-Returns current active context object. See [`Config::BINDish::Grammar::Context`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/Context.md).
+Returns current active context object. See [`Config::BINDish::Grammar::Context`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/Grammar/Context.md).
 
 The method will automatically fall back to `$*CFG-GRAMMAR` if the instance it is invoked upon is not the primary grammar object.
 
 ### `push-ctx(*%ctx-profile)`
 
-Creates and pushes to context stack a new [`Config::BINDish::Grammar::Context`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/Context.md) object. Returns the new context.
+Creates and pushes to context stack a new [`Config::BINDish::Grammar::Context`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/Grammar/Context.md) object. Returns the new context.
 
 Falls back to `$*CFG-GRAMMAR` if necessary.
 
@@ -174,7 +174,7 @@ Must be invoked when leaving block context.
 
 Does complex validation of a block based on its type, name, and, possibly, class. Uses pre-set variables [`$*CFG-BLOCK-TYPE`](#$*CFG-BLOCK-TYPE), [`$*CFG-BLOCK-NAME`](#$*CFG-BLOCK-NAME), [`$*CFG-BLOCK-CLASS`](#$*CFG-BLOCK-CLASS). If block passes the validation then a new block context is pushed onto the context stack.
 
-Can throw one of [`Config::BINDish::X::Parse::Context`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/X/Parse/Context.md), [`Config::BINDish::X::Parse::ExtraPart`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/X/Parse/ExtraPart.md), [`Config::BINDish::X::Parse::MissingPart`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/X/Parse/MissingPart.md), or [`Config::BINDish::X::Parse::Unknown`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/X/Parse/Unknown.md).
+Can throw one of [`Config::BINDish::X::Parse::Context`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/X/Parse/Context.md), [`Config::BINDish::X::Parse::ExtraPart`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/X/Parse/ExtraPart.md), [`Config::BINDish::X::Parse::MissingPart`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/X/Parse/MissingPart.md), or [`Config::BINDish::X::Parse::Unknown`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/X/Parse/Unknown.md).
 
 ### `validate-option()`
 
@@ -182,17 +182,17 @@ Does complex validation of an option based on its name. Uses pre-set variables [
 
 Contrary to `validate-block` method results in leaving option context.
 
-Can throw one of [`Config::BINDish::X::Parse::Context`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/X/Parse/Context.md), [`Config::BINDish::X::Parse::ValueType`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/X/Parse/ValueType.md), or [`Config::BINDish::X::Parse::Unknown`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/X/Parse/Unknown.md).
+Can throw one of [`Config::BINDish::X::Parse::Context`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/X/Parse/Context.md), [`Config::BINDish::X::Parse::ValueType`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/X/Parse/ValueType.md), or [`Config::BINDish::X::Parse::Unknown`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/X/Parse/Unknown.md).
 
 ### `validate-value()`
 
 Makes sure a value can be used in the current context. Uses variable [`$*CFG-VALUE`](#$*CFG-VALUE).
 
-Can throw [`Config::BINDish::X::Parse::ValueType`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/X/Parse/ValueType.md).
+Can throw [`Config::BINDish::X::Parse::ValueType`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/X/Parse/ValueType.md).
 
 ### `multi method panic(Str:D $msg)`
 
-Throws [`Config::BINDish::X::Parse::General`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/X/Parse/General.md) with message `$msg`.
+Throws [`Config::BINDish::X::Parse::General`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/X/Parse/General.md) with message `$msg`.
 
 ### `multi method panic(Config::BINDish::X::Parse:U \exception, Str $msg?, *%profile)`
 
@@ -218,7 +218,7 @@ Pushes *"TOP"* context onto the stack and invokes `statement-list`.
 
 ### `token enter-TOP`
 
-Does nothing, used as anchor for [`Config::BINDish::Actions`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Actions.md).
+Does nothing, used as anchor for [`Config::BINDish::Actions`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/Actions.md).
 
 ### `rule statement-list`
 
@@ -272,7 +272,7 @@ Parses a keyword which is defined as an alpha-numeric identifier starting and en
 
 ### `token dq-string`, `token sq-string`
 
-Double- and single-quoted strings. The standard grammar and actions do not care about the exact nature of a string. But extensions could adjust their behavior based on the string type. For example, [`Config::BINDish::Expandable`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Expandable.md) implements macro expansion for double-quoted strings only.
+Double- and single-quoted strings. The standard grammar and actions do not care about the exact nature of a string. But extensions could adjust their behavior based on the string type. For example, [`Config::BINDish::Expandable`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/Expandable.md) implements macro expansion for double-quoted strings only.
 
 ### `proto token value`
 
@@ -338,7 +338,7 @@ EXTENSIONS
 
 
 
-This section provides tips for writing own grammar extensions. See [`Config::BINDish::Actions`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Actions.md) to find read about action extensions.
+This section provides tips for writing own grammar extensions. See [`Config::BINDish::Actions`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/Actions.md) to find read about action extensions.
 
 Pre-declaration
 ---------------
@@ -354,11 +354,11 @@ Each hash or named argument key define the keyword of corresponding construct. A
 
 Keys of each option or block declaration define corresponding properties of each entitity. They're also named after attributes of the following typeobjects:
 
-  * [`Config::BINDish::Grammar::StatementProps`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/StatementProps.md), [`Config::BINDish::Grammar::ContainerProps`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/ContainerProps.md) - common to both options and blocks
+  * [`Config::BINDish::Grammar::StatementProps`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/Grammar/StatementProps.md), [`Config::BINDish::Grammar::ContainerProps`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/Grammar/ContainerProps.md) - common to both options and blocks
 
-  * [`Config::BINDish::Grammar::OptionProps`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/OptionProps.md) - specific to options
+  * [`Config::BINDish::Grammar::OptionProps`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/Grammar/OptionProps.md) - specific to options
 
-  * [`Config::BINDish::Grammar::BlockProps`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/BlockProps.md) - specific to blocks
+  * [`Config::BINDish::Grammar::BlockProps`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/Grammar/BlockProps.md) - specific to blocks
 
 ### Keys common to both options and blocks
 
@@ -410,14 +410,14 @@ Options currently do not have any declaration keys unique to them.
 Context
 -------
 
-Grammar object has a way of handling configuration file context by maintaining own context stack of [`Config::BINDish::Grammar::Context`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/Context.md) objects. See methods `push-ctx`, `pop-ctx`, and `cur-ctx`.
+Grammar object has a way of handling configuration file context by maintaining own context stack of [`Config::BINDish::Grammar::Context`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/Grammar/Context.md) objects. See methods `push-ctx`, `pop-ctx`, and `cur-ctx`.
 
 The only property of context which is guaranteed to be defined is its type. It's a string with context name. Currently only three of them can be seen: *"TOP"*, *"BLOCK"*, and *"OPTION"*.
 
 Extending The Grammar
 ---------------------
 
-[`Config::BINDish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish.md) contains general information about writing extensions. Here we provide only grammar-specific details.
+[`Config::BINDish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish.md) contains general information about writing extensions. Here we provide only grammar-specific details.
 
 Only the rules and tokens documented in corresponding section above are guaranteed to be supported and not be changed or removed without deprecation.
 
@@ -437,7 +437,7 @@ The most common way to extend the grammar would be to add a new kind of statemen
 SEE ALSO
 ========
 
-[`Config::BINDish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish.md), [`Config::BINDish::Grammar::Strictness`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/Strictness.md), [`Config::BINDish::Grammar::StatementProps`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/StatementProps.md), [`Config::BINDish::Grammar::ContainerProps`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/ContainerProps.md), [`Config::BINDish::Grammar::OptionProps`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/OptionProps.md), [`Config::BINDish::Grammar::BlockProps`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/BlockProps.md)
+[`Config::BINDish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish.md), [`Config::BINDish::Grammar::Strictness`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/Grammar/Strictness.md), [`Config::BINDish::Grammar::StatementProps`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/Grammar/StatementProps.md), [`Config::BINDish::Grammar::ContainerProps`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/Grammar/ContainerProps.md), [`Config::BINDish::Grammar::OptionProps`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/Grammar/OptionProps.md), [`Config::BINDish::Grammar::BlockProps`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/Grammar/BlockProps.md)
 
 AUTHOR
 ======

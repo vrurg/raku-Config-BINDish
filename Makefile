@@ -43,7 +43,7 @@ PM_SRC=$(shell find lib -name '*.rakumod' | xargs grep -l '^=begin')
 POD_SRC=$(shell find $(DOC_SRC_DIR) -name '*.rakudoc' -and -not \( -name 'README.rakudoc' -or -name 'ChangeLog.rakudoc' \))
 DOC_SRC=$(POD_SRC) $(PM_SRC)
 DOC_DEST=$(shell find lib doc \( -name '*.rakumod' -o \( -name '*.rakudoc' -and -not -name 'README.rakudoc' \) \) | xargs grep -l '^=begin' | sed 's,^[^/]*/,,')
-CHANGELOG_SRC=$(DOC_SRC_DIR)/Cro/RPC/JSON/ChangeLog.rakudoc
+CHANGELOG_SRC=$(DOC_SRC_DIR)/ChangeLog.rakudoc
 
 .SUFFXES: .md .rakudoc
 
@@ -92,7 +92,7 @@ doc_gen: $(DOC_BUILDER)
 	@echo "===> Updating documentation sources"
 	@raku $(DOC_BUILDER) $(DOC_BUILD_ARGS) --md $(DOC_SRC)
 	@raku $(DOC_BUILDER) $(DOC_BUILD_ARGS) --md --output=./README.md $(DOC_SRC_DIR)/README.rakudoc
-	#@raku $(DOC_BUILDER) $(DOC_BUILD_ARGS) --md --output=./ChangeLog.md $(CHANGELOG_SRC)
+	@raku $(DOC_BUILDER) $(DOC_BUILD_ARGS) --md --output=./ChangeLog.md $(CHANGELOG_SRC)
 
 #md: ./README.md $(addprefix $(MD_DIR)/,$(patsubst %.rakudoc,%.md,$(patsubst %.rakumod,%.md,$(DOC_DEST))))
 

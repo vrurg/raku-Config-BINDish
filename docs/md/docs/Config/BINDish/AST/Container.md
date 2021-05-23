@@ -25,7 +25,7 @@ or even easier:
 
 ### [`Str:D`](https://docs.raku.org/type/Str) `$.type-name`
 
-The type name describing `$.payload`. Normally borrowed from [`Config::BINDish::Grammar::Value`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/Value.md).
+The type name describing `$.payload`. Normally borrowed from [`Config::BINDish::Grammar::Value`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/Grammar/Value.md).
 
 Defaults to *"any"*.
 
@@ -39,11 +39,11 @@ Returns node class `shortname`.
 COERCIONS
 =========
 
-The role supports specialized coercion from [`Config::BINDish::Grammar::Value`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/Value.md):
+The role supports specialized coercion from [`Config::BINDish::Grammar::Value`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/Grammar/Value.md):
 
     my Config::BINDish::AST::Container $c = Config::BINDish::AST::Value($grammar-value);
 
-In this case new container's payload and type name are set from corresponding attributes of [`Config::BINDish::Grammar::Value`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/Value.md) instance. The `payload` is obtained using the `coerced` method of [`Config::BINDish::Grammar::Value`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/Grammar/Value.md).
+In this case new container's payload and type name are set from corresponding attributes of [`Config::BINDish::Grammar::Value`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/Grammar/Value.md) instance. The `payload` is obtained using the `coerced` method of [`Config::BINDish::Grammar::Value`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/Grammar/Value.md).
 
 For any other kind of value it is stored in the `$.payload` attribute. And the type name is set to lowercased name of the value's class. The only exception is any of `Stringy`-consuming class for which the type name is set to *"sq-string"*.
 
@@ -58,7 +58,7 @@ Matches `$val` against our `$.payload`.
 SEE ALSO
 ========
 
-[`Config::BINDish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish.md), [`Config::BINDish::AST`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.1/docs/md/Config/BINDish/AST.md)
+[`Config::BINDish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish.md), [`Config::BINDish::AST`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/AST.md)
 
 AUTHOR
 ======

@@ -17,7 +17,7 @@ subtest "Nesting" => {
             url https://s2.local;
         }
         resources {
-            url "{/server("{/default-server}").url}";
+            url "{/server("{/default-server}")/url}";
         }
         CFG
 
@@ -31,21 +31,21 @@ subtest "Nesting" => {
 }
 
 subtest "Base", {
-    plan 9;
+    plan 11;
     my $cfg-src = q:to/CFG/;
 
         name "test config";
         description "Meaningless {name}...";
-        test1 "block {server(S1, addr).name} is visible";
-        test2 "path from a subblock: {server(S1, addr).resource(Img).path}";
-        test3 "integer: {server(S1, addr).resource(Img).max-size}";
-        test4 "subblock name with spaces: {server(S1, addr).meta('spaced name').id}";
+        test1 "block {server(S1, addr)/name} is visible";
+        test2 "path from a subblock: {server(S1, addr)/resource(Img)/path}";
+        test3 "integer: {server(S1, addr)/resource(Img)/max-size}";
+        test4 "subblock name with spaces: {server(S1, addr)/meta('spaced name')/id}";
 
         server "S1" addr {
             name "server addresses";
             description "Block about {name}.";
-            test1 "block-related: {meta("spaced name").id}";
-            base https://localhost/;
+            test1 "block-related: {meta("spaced name")/id}";
+            base https://localhost;
             resource "Img" {
                 path "img";
                 max-size 1024;
@@ -55,13 +55,17 @@ subtest "Base", {
             }
             general {
                 scripts "v3.14";
+                sub-url "{../base}/sub";
+                deep {
+                    sub-sub-url "{../../base}/sub-sub"
+                }
             }
         }
 
         server "S1" path {
             root "/usr/local/www";
-            img-pool "{root}/{/server("S1", addr).resource(Img).path}";
-            scripts "{root}/scripts/{/server(S1, addr).general.scripts}";
+            img-pool "{root}/{/server("S1", addr)/resource(Img)/path}";
+            scripts "{root}/scripts/{/server(S1, addr)/general/scripts}";
         }
         CFG
 
@@ -99,6 +103,11 @@ subtest "Base", {
 
     is $blk2.value("img-pool"), "/usr/local/www/img", "expanded from both local and another block options";
     is $blk2.value("scripts"), "/usr/local/www/scripts/v3.14", "reference to a nameless block";
+
+    my $sub-blk = $blk1.block("general");
+    is $sub-blk.value("sub-url"), "https://localhost/sub", "reference to parent block";
+    $sub-blk = $sub-blk.block("deep");
+    is $sub-blk.value("sub-sub-url"), "https://localhost/sub-sub", "reference to parent of the parent block";
 }
 
 done-testing;

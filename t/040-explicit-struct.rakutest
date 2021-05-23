@@ -5,7 +5,7 @@ use Config::BINDish::Grammar;
 use Config::BINDish::AST;
 use Config::BINDish::X;
 
-plan 5;
+plan 6;
 
 # The purpose of this test suite is to make sure that in strict mode only pre-declared constructs are allowed.
 my $custom-set-invoked = False;
@@ -22,6 +22,7 @@ role CustomExt is BINDish-grammar {
             op-top => { :top-only, :type(Str) },
             op-sub => { :in<my-top-named>, :type-name<bool> },
             op-any => {},
+            op-numish => { value-sym => <int num rat> },
     }
 }
 
@@ -128,7 +129,7 @@ subtest "Structure" => {
 }
 
 subtest "Value validation" => {
-    plan 12;
+    plan 14;
 
     throws-like { $cfg.read: string => q<op-top 1;>; },
                 Config::BINDish::X::Parse::ValueType,
@@ -272,6 +273,61 @@ subtest "Value validation" => {
                 Config::BINDish::X::Parse::ValueType,
                 "value-only block constrained by type-name",
                 :message(/"Block 'blist' expects a <keyword> value but got <dq-string> of (Str)"/);
+
+    throws-like { $cfg.read: string => q:to/CFG/;
+                                        op-numish "12";
+                                        CFG
+                },
+                Config::BINDish::X::Parse::SpecificValue,
+                "option value parsing is limited to specific types",
+                :message(/"Option 'op-numish' must be int, or num, or rat"/);
+
+    lives-ok { $cfg.read: string => q:to/CFG/;
+                                        op-numish 3.14;
+                                        CFG
+             },
+             "option parses ok when has specific value type";
+}
+
+subtest "Competing Value Types" => {
+    # When custom value type competes with another value type in terms of parsing it then specifying value-sym for an
+    # option may help in specifying what exact value type is expected.
+    # For example, in this test 'whatever' type is defined in a way it competes with double-quoted strings because it
+    # starts and ends with double quotes. By setting value-sym to either 'string' or 'whatever' we limit parsing to
+    # these particular types only.
+    plan 2;
+    my role BadValueType {
+        # It is bad because it competes with dq-string
+        token value:sym<whatever> {
+            '"*"' { self.set-value: Str, :whatever($/) }
+        }
+    }
+
+    my role BVTActions {
+        method value:sym<whatever>($/) {
+            make Config::BINDish::AST.new-ast: 'Value', :payload('*');
+        }
+    }
+
+    for <string dq-string>, <whatever whatever> -> ($sym, $type-name) {
+        subtest "value type is $sym" => {
+            plan 4;
+            my $cfg = Config::BINDish.new:
+                :strict{:blocks, :options},
+                extend-grammar => [BadValueType],
+                extend-actions => [BVTActions],
+                options => %( foo => { :type(Str), value-sym => ($sym) } );
+            lives-ok {
+                         $cfg.read: string => q:to/CFG/;
+                                foo "*";
+                                CFG
+            }, "parsed with option being a $sym";
+            my $option = $cfg.get("foo", :raw);
+            ok $option.defined, "option object is present";
+            isa-ok $option.value.payload, Str, "option's value is Str";
+            is $option.value.type-name, $type-name, "option's value type name is $type-name";
+        }
+    }
 }
 
 done-testing;
