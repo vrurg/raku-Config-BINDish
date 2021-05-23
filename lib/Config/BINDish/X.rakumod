@@ -19,6 +19,12 @@ role Config::BINDish::X::Parse is Config::BINDish::X {
     }
 }
 
+role Config::BINDish::X::Contextish {
+    has Str:D $.what is required;
+    has $.keyword is required;
+    has $.ctx is required;
+}
+
 class Config::BINDish::X::Parse::General does Config::BINDish::X::Parse {
     has Str:D $.msg is required;
 
@@ -33,11 +39,10 @@ class Config::BINDish::X::Parse::BadNum does Config::BINDish::X::Parse {
     }
 }
 
-class Config::BINDish::X::Parse::Context does Config::BINDish::X::Parse {
-    has Str:D $.what is required; # Option or block
-    has $.keyword is required; # Block type or option name
-    has $.ctx is required;
-
+class Config::BINDish::X::Parse::Context
+    does Config::BINDish::X::Parse
+    does Config::BINDish::X::Contextish
+{
     method message {
         self.wrap-message: $.what.tc ~ " " ~ $.keyword.gist ~ " cannot be used in " ~ $.ctx.description;
     }
@@ -67,19 +72,30 @@ class Config::BINDish::X::Parse::ExtraPart does Config::BINDish::X::Parse {
     }
 }
 
-class Config::BINDish::X::Parse::ValueType does Config::BINDish::X::Parse {
-    has Str:D $.what is required;
-    has $.keyword is required;
-    has $.props is required;
+class Config::BINDish::X::Parse::ValueType
+    does Config::BINDish::X::Parse
+    does Config::BINDish::X::Contextish
+{
     has $.value is required;
     method message {
         self.wrap-message: $.what.tc
                            ~ " " ~ $.keyword.gist
-                           ~ " expects a " ~ $.props.type-as-str
+                           ~ " expects a " ~ $.ctx.props.type-as-str
                            ~ " value but got " ~ $.value.type-as-str;
     }
 }
 
+class Config::BINDish::X::Parse::SpecificValue
+    does Config::BINDish::X::Parse
+    does Config::BINDish::X::Contextish
+{
+    method message {
+        self.wrap-message: $.what.tc
+                            ~ " " ~ $.keyword.gist
+                            ~ " must be "
+                            ~ $.ctx.props.value-sym.join(", or ")
+    }
+}
 
 role Config::BINDish::X::Ambiguous[Str:D $ast-type] is Config::BINDish::X {
     has Int:D $.count is required;

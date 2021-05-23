@@ -67,6 +67,9 @@ role StatementProps {
 }
 
 role ContainerProps does TypeStringify {
+    # A list of value token sym names allowed for this container. For example, an option can be limited to be a
+    # value:sym<int> only.
+    has List(Str) $.value-sym;
     # These attributes are used as RHS of a smartmatch.
     # NOTE: These are kept separate from StatementProps because extensions may add non-container type statements.
     has $.type-name;
@@ -252,7 +255,7 @@ method option-ok(Str:D $keyword --> Bool:D) {
 
 method enter-option {
     self.push-ctx: :type<OPTION>,
-                   :props( %!opt-props{Str($*CFG-KEYWORD)} ),
+                   :props( $*CFG-GRAMMAR.opt-props{Str($*CFG-KEYWORD)} ),
                    :keyword( $*CFG-KEYWORD )
 }
 
@@ -276,7 +279,7 @@ method validate-option {
                 unless self.option-ok($keyword) && !$ctx.props.value-only;
             my $value = $*CFG-VALUE // Value.new: :type(Bool), :type-name('bool'), :payload<True>;
             unless $value ~~ $props {
-                self.panic: X::Parse::ValueType, :what<option>, :keyword($*CFG-KEYWORD), :$props, :$value
+                self.panic: X::Parse::ValueType, :what<option>, :keyword($*CFG-KEYWORD), :ctx(self.cfg-ctx), :$value
             }
         }
         elsif $grammar.strict.options {
@@ -330,7 +333,7 @@ method validate-value {
     my $props = $ctx.props;
     if $props && $props ~~ ContainerProps {
         unless (my $value = $*CFG-VALUE) ~~ $props {
-            self.panic: X::Parse::ValueType, :what($ctx.type.lc), :keyword($ctx.keyword), :$props, :$value
+            self.panic: X::Parse::ValueType, :what($ctx.type.lc), :keyword($ctx.keyword), :$ctx, :$value
         }
     }
 }
@@ -381,7 +384,7 @@ multi token statement:sym<comment> {
 # A string, number, boolean, or any user-defined type.
 multi rule statement:sym<value> {
     :my Value $*CFG-VALUE;
-    $<err-pos>=<?> <value> <statement-terminate>
+    $<err-pos>=<?> $<value>=<.maybe-specific-value("block")> <statement-terminate>
     { $<err-pos>.validate-value }
 }
 
@@ -392,7 +395,7 @@ multi rule statement:sym<option> {
     $<option-name>=<.keyword>
     { self.enter-option }
     [
-    [ $<option-value>=<.value>
+    [ $<option-value>=<.maybe-specific-value("option")>
     ]?
         <?before <.statement-terminator>>
         <statement-terminate>
@@ -548,6 +551,19 @@ token num_suffix {
     <?after <xdigit>> <[KkMmGgTtPp]>
 }
 
+method maybe-specific-value(Str:D $what) {
+    my $ctx = self.cfg-ctx;
+    if $ctx.props ~~ ContainerProps && $ctx.props.value-sym {
+        for $ctx.props.value-sym<> -> $sym {
+            with self."value:sym<$sym>"() {
+                return $_ if $_;
+            }
+        }
+        self.panic: X::Parse::SpecificValue, :$what, :$ctx, :keyword($*CFG-KEYWORD)
+    }
+    return self.value
+}
+
 proto token value {*}
 multi token value:sym<string> {
     <dq-string> | <sq-string>
@@ -555,7 +571,7 @@ multi token value:sym<string> {
 
 multi token value:sym<keyword> {
     <?{ self.cfg-ctx.type eq 'OPTION'
-        || (self.cfg-ctx.cur-block-ctx.props andthen .value-only) }>
+    || (self.cfg-ctx.cur-block-ctx.props andthen .value-only) }>
     :my Value:D $*CFG-KEYWORD;
     <keyword> { $*CFG-GRAMMAR.set-value: Str, :keyword($*CFG-KEYWORD.payload) }
 }
