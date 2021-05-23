@@ -1,5 +1,4 @@
 .idea/
-lib/.precomp
-t/lib/.precomp
+.precomp
 *.iml
 /zef/
