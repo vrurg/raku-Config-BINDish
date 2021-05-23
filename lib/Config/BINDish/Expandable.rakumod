@@ -45,8 +45,13 @@ class AST::BlkRef is Config::BINDish::AST does Config::BINDish::AST::Decl {
 
     method gist {
         $!keyword.gist
-        ~ (("(" ~ .gist ~ (", " ~ .gist with $!class) ~ ").") with $!name)
+        ~ (("(" ~ .gist ~ (", " ~ .gist with $!class) ~ ")/") with $!name)
     }
+}
+
+# Reference to parent block
+class AST::ParentBlk is Config::BINDish::AST {
+    method gist { "../" }
 }
 
 # Reference to a option. $.keyword is all we need of it
@@ -83,6 +88,9 @@ class AST::Macro
                 else {
                     Config::BINDish::X::Block::DoesntExists.new(type => $child.keyword, |%bp).throw
                 }
+            }
+            elsif $child.WHAT ~~ AST::ParentBlk {
+                $cur-blk = $cur-blk.parent;
             }
             else {
                 with $cur-blk.option($child.keyword) {
@@ -213,17 +221,20 @@ role Grammar is BINDish-grammar {
     token expandable-block-ref {
         :my $*CFG-KEYWORD;
         :my $*CFG-VALUE;
-        $<block-type>=<.keyword>
         [
-            '(' ~ ')'
-            [
-                <.ws>
-                [ $<block-name>=<.value> | $<block-name>=<.keyword> ]
-                [ <.ws> ',' <.ws> $<block-class>=<.keyword> ]?
-                <.ws>
-            ]
-        ]?
-        '.' # Block references always end with '.'
+            | $<parent-block>= '..'
+            | $<block-type>=<.keyword>
+                [
+                    '(' ~ ')'
+                    [
+                        <.ws>
+                        [ $<block-name>=<.value> | $<block-name>=<.keyword> ]
+                        [ <.ws> ',' <.ws> $<block-class>=<.keyword> ]?
+                        <.ws>
+                    ]
+                ]?
+        ]
+        '/' # Block references always end with '.'
     }
 }
 
@@ -278,14 +289,19 @@ role Actions is BINDish-actions {
 
     method expandable-block-ref($/) {
         my %profile;
-        %profile<keyword> = $<block-type>.ast;
-        with $<block-name> {
-            %profile<name> = .ast;
+        with $<parent-block> {
+            make AST::ParentBlk.new;
         }
-        with $<block-class> {
-            %profile<class> = .ast;
+        else {
+            %profile<keyword> = $<block-type>.ast;
+            with $<block-name> {
+                %profile<name> = .ast;
+            }
+            with $<block-class> {
+                %profile<class> = .ast;
+            }
+            make AST::BlkRef.new(|%profile);
         }
-        make AST::BlkRef.new(|%profile);
     }
 
     method expandable-option($/) {
