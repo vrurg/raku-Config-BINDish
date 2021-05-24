@@ -59,11 +59,11 @@ method statement:sym<empty>($/) {
 }
 
 method dq-string($/) {
-    make Config::BINDish::AST.new-ast('Value', :payload($<string>.chunks.map(*.value).join));
+    make Config::BINDish::AST.new-ast('Value', :payload($<string>.chunks.map(*.value).join), :type-name<dq-string>);
 }
 
 method sq-string($/) {
-    make Config::BINDish::AST.new-ast('Value', :payload($<string>.chunks.map(*.value).join));
+    make Config::BINDish::AST.new-ast('Value', :payload($<string>.chunks.map(*.value).join), :type-name<sq-string>);
 }
 
 our %multipliers = K => 1024, M => 1024², G => 1024³, T => 1024⁴, P => 1024⁵;
@@ -90,7 +90,7 @@ method value:sym<string>($/) {
 }
 
 method value:sym<keyword>($/) {
-    make Config::BINDish::AST.new-ast('Value', :payload(Str($*CFG-VALUE.payload)));
+    make Config::BINDish::AST.new-ast('Value', :payload(Str($*CFG-VALUE.payload)), :type-name<keyword>);
 }
 
 method value:sym<rat>($/) {
@@ -102,7 +102,7 @@ method value:sym<rat>($/) {
 
     $<err-pos>.panic(X::Parse::BadNum) if $icard ~~ Failure;
 
-    make Config::BINDish::AST.new-ast('Value', :payload($icard * $multiplier));
+    make Config::BINDish::AST.new-ast('Value', :payload($icard * $multiplier), :type-name<rat>);
 }
 
 method value:sym<int>($/) {
@@ -111,7 +111,7 @@ method value:sym<int>($/) {
 
     $<err-pos>.panic(X::Parse::BadNum) if $icard ~~ Failure;
 
-    make Config::BINDish::AST.new-ast('Value', :payload($icard * $multiplier));
+    make Config::BINDish::AST.new-ast('Value', :payload($icard * $multiplier), :type-name<int>);
 }
 
 method value:sym<num>($/) {
@@ -121,7 +121,7 @@ method value:sym<num>($/) {
 
     $<err-pos>.panic(X::Parse::BadNum) if $num ~~ Failure;
 
-    make Config::BINDish::AST.new-ast('Value', :payload($num));
+    make Config::BINDish::AST.new-ast('Value', :payload($num), :type-name<num>);
 }
 
 method value:sym<bool>($/) {
@@ -129,11 +129,11 @@ method value:sym<bool>($/) {
 }
 
 method bool-true($/) {
-    make Config::BINDish::AST.new-ast('Value', :payload)
+    make Config::BINDish::AST.new-ast('Value', :payload, :type-name<bool>)
 }
 
 method bool-false($/) {
-    make Config::BINDish::AST.new-ast('Value', :!payload);
+    make Config::BINDish::AST.new-ast('Value', :!payload, :type-name<bool>);
 }
 
 method C-comment($/) {
