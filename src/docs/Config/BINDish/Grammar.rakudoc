@@ -119,6 +119,10 @@ For which the name will be set to type C<IP::Addr>, type-name I<"IPv4">.
 This variable is set to a L<C<Match>|https://docs.raku.org/type/Match> object pointing at the location where current
 block declaration starts. Can be used for error reporting.
 
+=head3 C<$*CFG-SPECIFIC-VALUE-SYM>
+
+Set by the grammar whenever a specific value type is expected. See more details in L<#value-sym> section below.
+
 =head1 METHODS
 
 =head3 C<set-value(Mu \type, *%value)>
@@ -438,8 +442,9 @@ Container level keys:
 
 =item C<type-name> - allowed type names
 =item C<type> – allowed types
+=item C<value-sym> - list of expected value types; see below for more details
 
-The above two keys are used as RHS for smartmatching. It allows explicit declarations of the following kind:
+The first two keys are used as RHS for smartmatching. It allows explicit declarations of the following kind:
 
     my $cfg = Config::BINDish.new:
             :strict{:options},
@@ -459,6 +464,33 @@ But not:
 
     multi-type 1.5e2; # The value is Num
     stringy bareword; # The value is a string, but its type name is 'keyword'
+
+=head4 C<value-sym>
+
+This key is responsible for a little bit tricky but very powerful feature. Value parsing is implemented with C<value>
+token which is a C<proto>. Apparently, variants of the token are declared using C«:sym<...>» notation. C<value-sym>
+defines one or more types allowed for this container as they're specified between the angle brackets in C«:sym<...>»
+postfix in a C<value> token candidate. For example, if we want an option value to only be parsed as a numeric, we can
+declare it like:
+
+    options => %(
+        opt-numish => { value-sym => <int num rat> }
+    )
+
+And the parser will only try parsing C<opt-numish> value with C«value:sym<int>», C«value:sym<num>», or
+C«value:sym<rat>» candidates, ignoring all other. Moreover, it will set C<$*CFG-SPECIFIC-VALUE-SYM> dynamic to the
+currently considered type. This would allow the candidate to know that it is being expected to succeed and some
+additional measures could be taken to fulfill the expectation. For example, if we expect an option to be a file system
+path then the following example is likely not to parse correctly because the value can be considered both a keyword or
+a single path element:
+
+    pathy etc;
+
+For this reason C<file-path> candidate does not attempt parsing something as a path unless it finds a slash separator.
+I.e. for the above to work one must write it as C</etc> or C<etc/>.
+
+But if we declare the option with C<value-sym> set to C<file-path> then the ambiguity is explicitly resolved and
+C«value:sym<file-path>» will successfully parse C<etc> as a single-element path.
 
 =head3 Option-only keys
 

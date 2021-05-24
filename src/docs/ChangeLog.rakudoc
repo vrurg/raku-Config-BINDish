@@ -6,6 +6,7 @@
 =item Implemented grammar value type (C«value:sym<type>») specification
 =item Replaced dot (C<.>) separator with slash (C</>) in macros: C<"{block.option}"> is now C<"{block/option}">
 =item Implemented parent block reference in macros: C<"{../../option}">
+=item Added a new standard value type: file path
 =item API version bumped to v0.0.2
 
 =end pod
