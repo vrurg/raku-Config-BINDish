@@ -94,6 +94,10 @@ For which the name will be set to type `IP::Addr`, type-name *"IPv4"*.
 
 This variable is set to a [`Match`](https://docs.raku.org/type/Match) object pointing at the location where current block declaration starts. Can be used for error reporting.
 
+### `$*CFG-SPECIFIC-VALUE-SYM`
+
+Set by the grammar whenever a specific value type is expected. See more details in [value-sym](#value-sym) section below.
+
 METHODS
 =======
 
@@ -374,7 +378,9 @@ Container level keys:
 
   * `type` – allowed types
 
-The above two keys are used as RHS for smartmatching. It allows explicit declarations of the following kind:
+  * `value-sym` - list of expected value types; see below for more details
+
+The first two keys are used as RHS for smartmatching. It allows explicit declarations of the following kind:
 
     my $cfg = Config::BINDish.new:
             :strict{:options},
@@ -394,6 +400,22 @@ But not:
 
     multi-type 1.5e2; # The value is Num
     stringy bareword; # The value is a string, but its type name is 'keyword'
+
+#### `value-sym`
+
+This key is responsible for a little bit tricky but very powerful feature. Value parsing is implemented with `value` token which is a `proto`. Apparently, variants of the token are declared using `:sym<...>` notation. `value-sym` defines one or more types allowed for this container as they're specified between the angle brackets in `:sym<...>` postfix in a `value` token candidate. For example, if we want an option value to only be parsed as a numeric, we can declare it like:
+
+    options => %(
+        opt-numish => { value-sym => <int num rat> }
+    )
+
+And the parser will only try parsing `opt-numish` value with `value:sym<int>`, `value:sym<num>`, or `value:sym<rat>` candidates, ignoring all other. Moreover, it will set `$*CFG-SPECIFIC-VALUE-SYM` dynamic to the currently considered type. This would allow the candidate to know that it is being expected to succeed and some additional measures could be taken to fulfill the expectation. For example, if we expect an option to be a file system path then the following example is likely not to parse correctly because the value can be considered both a keyword or a single path element:
+
+    pathy etc;
+
+For this reason `file-path` candidate does not attempt parsing something as a path unless it finds a slash separator. I.e. for the above to work one must write it as `/etc` or `etc/`.
+
+But if we declare the option with `value-sym` set to `file-path` then the ambiguity is explicitly resolved and `value:sym<file-path>` will successfully parse `etc` as a single-element path.
 
 ### Option-only keys
 

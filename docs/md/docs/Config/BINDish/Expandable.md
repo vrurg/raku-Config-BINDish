@@ -19,13 +19,22 @@ To incorporate a value into a string the following macro format is used:
         description "{name} is a mock server"; # becomes "server.local is a mock server"
     }
 
-*option-path* defines a path to the option if it is located in another block. The path can be relative or absolute.
+*option-path* defines a path to the option if it is located in another block. It consist of a list of blocks in the order of nesting and must end with an option name. Elements in a path are separated with a slash (`/`) symbol.
 
-The absolute path is started with a slash:
+The path can be relative or absolute. Absolute paths are started with a slash:
 
     base-url "https://localhost"
     resource "Test" {
         url "{/base-url}/test";
+    }
+
+Relative paths can use double-dot notation to refer to a parent block:
+
+    pool "shared" {
+        base-url "https://base";
+        resource "bar" {
+            url "{../base-url}/bar"; # https://base/bar
+        }
     }
 
 To define a block where the option is to be located the following syntax is used:
@@ -41,10 +50,10 @@ For example:
         component "foo"
     }
     client-data {
-        url "{/resource(default).url}/{/resource("test1", addr).component}"; # https://localhost/foo
+        url "{/resource(default)/url}/{/resource("test1", addr)/component}"; # https://localhost/foo
     }
 
-Nested blocks are joined with a dot:
+Referring to a nested block can be done as in the following example:
 
     resource "default" {
         urls {
@@ -52,7 +61,7 @@ Nested blocks are joined with a dot:
         }
     }
     client-data {
-        user-profile "{/resource(default).urls.base}/user"; # https://localhost/user
+        user-profile "{/resource(default)/urls/base}/user"; # https://localhost/user
     }
 
 Symbol escaping is traditionally done with a backslash:

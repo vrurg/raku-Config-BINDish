@@ -15,9 +15,9 @@ SYNOPSIS
         server "s1" {
             name "my.server";
             paths {
-                base "/opt/myapp";
+                base /opt/myapp;
                 pool "files" static {
-                    "pub/img";
+                    ./pub/img;
                     "static/img";
                     "docs";
                 };
@@ -91,7 +91,7 @@ Very roughly, the configuration format supported by the module can be described 
     <block-type> ::= <keyword>
     <block-name> ::= <value>
     <block-class> ::= <keyword>
-    <value> ::= <string> | <int> | <num> | <rat>
+    <value> ::= <bool> | <string> | <int> | <num> | <rat> | <file-path>
 
 Depending on strict mode chosen, the terminating semi-colon can be either optional or mandatory. Also, block types and options can be either free-form or restricted to a certain set of allowed keyword.
 

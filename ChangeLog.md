@@ -10,5 +10,7 @@ v0.0.2
 
   * Implemented parent block reference in macros: `"{../../option}"`
 
+  * Added a new standard value type: file path
+
   * API version bumped to v0.0.2
 
