@@ -586,6 +586,7 @@ multi token value:sym<num> {
     ]
     e $<exp>=[<[-+]>? \d+] <.wb> { self.set-value: Num, :num($/) }
 }
+
 multi token value:sym<rat> {
     $<err-pos>=<?before <[-+]>? [\d | '.' \d]>
     $<sign>=<[-+]>? [
@@ -595,6 +596,7 @@ multi token value:sym<rat> {
     ]
     { self.set-value: Rat, :rat($/) }
 }
+
 multi token value:sym<int> {
     $<err-pos>=<?before <[-+]>? \d>
     [ $<icard>=[ <[-+]>?: <natural_num> ]
@@ -604,6 +606,18 @@ multi token value:sym<int> {
     <!before <[.e]>>
     { self.set-value: Int, :int($/) }
 }
+
 multi token value:sym<bool> {
     $<bool-val>=[ <.bool-true> | <.bool-false> ] { self.set-value: Bool, :bool($/) }
+}
+
+token path-component {
+    <[\N] - [;/]>+
+}
+multi token value:sym<file-path> {
+    [
+        | [['.' | '..' ]? '/' <.path-component>* %% '/']
+        | <?{ $*CFG-SPECIFIC-VALUE-SYM andthen $_ eq 'file-path' }> <.path-component>+ %% '/'
+    ]
+    { self.set-value: Str, :file-path($/) }
 }

@@ -128,6 +128,10 @@ method value:sym<bool>($/) {
     make $<bool-val>.made
 }
 
+method value:sym<file-path>($/) {
+    make Config::BINDish::AST.new-ast('Value', :payload(~$/), :type-name<file-path>)
+}
+
 method bool-true($/) {
     make Config::BINDish::AST.new-ast('Value', :payload, :type-name<bool>)
 }
