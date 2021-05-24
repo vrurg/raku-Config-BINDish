@@ -555,6 +555,8 @@ method maybe-specific-value(Str:D $what) {
     my $ctx = self.cfg-ctx;
     if $ctx.props ~~ ContainerProps && $ctx.props.value-sym {
         for $ctx.props.value-sym<> -> $sym {
+            # Make it possible for value parsers to know they're expected.
+            my $*CFG-SPECIFIC-VALUE-SYM = $sym;
             with self."value:sym<$sym>"() {
                 return $_ if $_;
             }
