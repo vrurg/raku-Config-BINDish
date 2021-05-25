@@ -2,3 +2,5 @@
 .precomp
 *.iml
 /zef/
+sdist/
+Config-BINDish-v*.tar.gz
