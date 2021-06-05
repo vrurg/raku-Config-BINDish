@@ -19,7 +19,7 @@ my class StatementsDescriptor {
     }
 }
 
-method is-struct-deeply(Match $match is raw, %struct, Str:D :$path = "") is test-tool {
+method is-struct-deeply(Match:D $match is raw, %struct, Str:D :$path = "") is test-tool {
     my $passed = True;
     for %struct.sort -> (:key($token), :value($matcher)) {
         my $token-path = $path ~ "<$token>";
@@ -46,7 +46,7 @@ method is-struct-deeply(Match $match is raw, %struct, Str:D :$path = "") is test
     $passed;
 }
 
-method is-cfg-stmts(Mu $match is raw, Hash() $struct, Str:D $message, Int :$plan is copy) is test-tool {
+method is-cfg-stmts(Mu:D $match is raw, Hash() $struct, Str:D $message, Int :$plan is copy) is test-tool {
     my sub struct-plan-estimate($substruct) {
         my $est = 0;
         for $substruct.values -> $matcher {
@@ -74,7 +74,7 @@ method is-cfg-stmts(Mu $match is raw, Hash() $struct, Str:D $message, Int :$plan
     }
 }
 
-method is-cfg-stmt-list(Mu $match is raw,
+method is-cfg-stmt-list(Mu:D $match is raw,
                         StatementsDescriptor() $desc,
                         Str $message? is copy,
                         Str :$path)
