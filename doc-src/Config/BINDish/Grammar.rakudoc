@@ -84,6 +84,10 @@ Current block or option context.
 
 Parent block context.
 
+=head3 C<$*CFG-AS-INCLUDE>
+
+If set to I<True> then it means that the current grammar is parsing included source.
+
 =head3 C<$*CFG-FLAT-BLOCKS>
 
 Set to C<$.flat> attribute value.
@@ -140,6 +144,11 @@ block declaration starts. Can be used for error reporting.
 =head3 C<$*CFG-SPECIFIC-VALUE-SYM>
 
 Set by the grammar whenever a specific value type is expected. See more details in L<#value-sym> section below.
+
+=head3 C<$*CFG-BACKTRACK-OPTION>, C<$*CFG-BACKTRACK-BLOCK>
+
+These variables are set by corresponding C<backtrack-*> method to indicate the context in which C<leave-*> methods are
+called. In other words, if C<!$*CFG-BACKTRACK-OPTION> is I<True> then an option has been successfully parsed.
 
 =head1 METHODS
 
