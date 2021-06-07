@@ -5,7 +5,7 @@ use Config::BINDish::Grammar;
 use Config::BINDish::AST;
 use Config::BINDish::X;
 
-plan 7, :parallel;
+plan 7, :!parallel;
 
 subtest "Basics" => {
     plan 29;
@@ -249,6 +249,7 @@ subtest "Multi" => {
        1,
        "classified block do not mix up with just named blocks";
 
+    my $*CFG-NESTING = 0;
     # Flatten down the structure
     my $flat = $top.flatten;
 

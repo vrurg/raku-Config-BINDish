@@ -8,6 +8,7 @@ use Config::BINDish::X;
 
 role AST::Expandable does Config::BINDish::AST::Container {
     has Bool $.expanded = False;
+
     method !maybe-expand {
         unless $!expanded {
             my $exp = self.expand;
@@ -39,13 +40,28 @@ role AST::Expandable does Config::BINDish::AST::Container {
 }
 
 # Reference to a block.
-class AST::BlkRef is Config::BINDish::AST does Config::BINDish::AST::Decl {
-    has Config::BINDish::AST::Container $.name;
-    has Config::BINDish::AST::Container $.class;
+class AST::BlkRef is Config::BINDish::AST::Node {
+    has Config::BINDish::AST::Container $!keyword;
+    has Config::BINDish::AST::Container $!name;
+    has Config::BINDish::AST::Container $!class;
 
-    method gist {
-        $!keyword.gist
-        ~ (("(" ~ .gist ~ (", " ~ .gist with $!class) ~ ")/") with $!name)
+    method keyword(::?CLASS:D:) {
+        $!keyword //= self.child('block-type');
+    }
+    method name(::?CLASS:D:) {
+        $!name //= self.child('block-name');
+    }
+    method class(::?CLASS:D:) {
+        $!class //= self.child('block-class');
+    }
+
+    method gist(::?CLASS:D: Bool() :$detailed = True) {
+        self.keyword.gist(:$detailed)
+        ~ (
+            ("(" ~ .gist(:$detailed)
+                ~ (", " ~ .gist(:$detailed) with self.class)
+                ~ ")/") with self.name
+        )
     }
 }
 
@@ -55,26 +71,31 @@ class AST::ParentBlk is Config::BINDish::AST {
 }
 
 # Reference to a option. $.keyword is all we need of it
-class AST::OptRef is Config::BINDish::AST does Config::BINDish::AST::Decl {
-    method gist {
-        $!keyword.gist
+class AST::OptRef is Config::BINDish::AST::Node {
+    has Config::BINDish::AST::Container $!keyword;
+
+    method keyword(::?CLASS:D:) {
+        $!keyword //= self.child('keyword')
+    }
+
+    method gist(::?CLASS:D: Bool() :$detailed = True) {
+        self.keyword.gist(:$detailed)
     }
 }
 
 # A macro is considered a node where children define path to an option which is always the last child.
 class AST::Macro
-    is Config::BINDish::AST
-    does Config::BINDish::AST::Parent
+    is Config::BINDish::AST::Node
     does AST::Expandable
 {
     # The path is relative to the TOP AST node.
     has Bool:D $.from-top = False;
 
-    method set-from-top(Bool:D $!from-top) {}
+    method set-from-top(::?CLASS:D: Bool:D $!from-top) {}
 
     method expand(::?CLASS:D:) {
         # If not from-top then
-        my $cur-blk = $!from-top ?? self.top-node !! self.parent.parent;
+        my $cur-blk = $!from-top ?? self.top-node !! self.parent(Config::BINDish::AST::Block);
         my $exp;
         for @.children -> $child {
             if $child.WHAT ~~ AST::BlkRef {
@@ -90,7 +111,7 @@ class AST::Macro
                 }
             }
             elsif $child.WHAT ~~ AST::ParentBlk {
-                $cur-blk = $cur-blk.parent;
+                $cur-blk = $cur-blk.parent(Config::BINDish::AST::Block);
             }
             else {
                 with $cur-blk.option($child.keyword) {
@@ -104,11 +125,11 @@ class AST::Macro
         $exp;
     }
 
-    method gist {
+    method gist(::?CLASS:D: :$detailed) {
         '{'
         ~ ('/' if $!from-top)
-        ~ @!children[^(*-1)].map(*.gist).join
-        ~ @!children.tail.gist
+        ~ @.children[^(*-1)].map(*.gist(:$detailed)).join
+        ~ @.children.tail.gist(:$detailed)
         ~ '}'
     }
 
@@ -120,8 +141,7 @@ class AST::Macro
 
 # String is a node where children are either values of Str/string type or AST::Macro.
 class AST::String
-    is Config::BINDish::AST
-    does Config::BINDish::AST::Parent
+    is Config::BINDish::AST::Node
     does AST::Expandable
 {
     method expand(::?CLASS:D:) {
@@ -137,8 +157,8 @@ class AST::String
         $exp-str
     }
 
-    method gist {
-        @.children.map({ .gist } ).join
+    method gist(::?CLASS:D: Bool :$detailed = True) {
+        @.children.map({ .gist(:!detailed) } ).join
     }
 
     multi method ACCEPTS(::?CLASS:D: $val) {
@@ -222,7 +242,7 @@ role Grammar is BINDish-grammar {
         :my $*CFG-KEYWORD;
         :my $*CFG-VALUE;
         [
-            | $<parent-block>= '..'
+            | $<parent-block>='..'
             | $<block-type>=<.keyword>
                 [
                     '(' ~ ')'
@@ -293,19 +313,16 @@ role Actions is BINDish-actions {
             make AST::ParentBlk.new;
         }
         else {
-            %profile<keyword> = $<block-type>.ast;
-            with $<block-name> {
-                %profile<name> = .ast;
-            }
-            with $<block-class> {
-                %profile<class> = .ast;
-            }
-            make AST::BlkRef.new(|%profile);
+            make my $blkref = AST::BlkRef.new(|%profile);
+            $blkref.add: .ast.mark-as('block-type') with $<block-type>;
+            $blkref.add: .ast.mark-as('block-name') with $<block-name>;
+            $blkref.add: .ast.mark-as('block-class') with $<block-class>;
         }
     }
 
     method expandable-option($/) {
-        make AST::OptRef.new: keyword => $<keyword>.ast
+        make my $oref = AST::OptRef.new;
+        $oref.add: $<keyword>.ast;
     }
 
     method expandable-macro($/) {

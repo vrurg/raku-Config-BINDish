@@ -1,0 +1,30 @@
+
+=begin pod
+=ROLE
+
+C<Config::BINDish::Grammar::TypeStringify> - default grammar type info stringification
+
+=METHODS
+
+=head2 Implemented
+
+=head3 C<type-as-str(--> Str:D)>
+
+Returns the stadndard representation of value type accompanied with type name.
+
+=head2 Required
+
+These methods are required by the role:
+
+=item C<type-name()>
+=item C<type()>
+
+=head1 SEE ALSO
+
+L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish.md>,
+L<C<Config::BINDish::Grammar>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/Grammar.md>,
+L<C<Config::BINDish::Grammar::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/Grammar/Value.md>,
+L<C<Config::BINDish::Grammar::ContainerProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/Grammar/ContainerProps.md>
+
+=AUTHOR Vadim Belman <vrurg@cpan.org>
+=end pod

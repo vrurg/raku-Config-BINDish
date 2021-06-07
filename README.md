@@ -37,7 +37,7 @@ DISCLAIMER
 
 This module is very much experimental in the sense of the API it provides. The grammar is expected to be more stable, yet no warranties can be given at the moment.
 
-Also, all the documentation here is created in write-only mode. No proof-reading has been done yet. All kinds of ugliness anticipated! My apologies for this, hope to get some spare hours to fix it some day.
+Also, all the documentation here is created in write-only mode. No proof-reading has been done yet. All kinds and levels of ugliness are anticipated! My apologies for the situation, hope to get some spare hours to fix it some day.
 
 PREFACE
 =======
@@ -78,8 +78,10 @@ That's about it. What makes BINDish different are:
 
   * Easy to extend. Not in the original BIND 9 implementation, of course. But for a third-party parser, like this one, it shouldn't be a big problem to allow `path /to/my/dir;` instead of `path "/to/my/dir";`. This module goes even further down the road; but I'll get back to this a bit later.
 
-File Format
------------
+SYNTAX
+======
+
+
 
 Very roughly, the configuration format supported by the module can be described as:
 
@@ -99,18 +101,18 @@ Note how `block-name` is declaread as a `value`. It means that any valid option 
 
     block 3.14 { }
 
-Or, with [`Config::BINDish::INET`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/INET.md) loaded it could even be:
+Or, with [`Config::BINDish::INET`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/INET.md) loaded it could even be:
 
     network 192.168.1.0/24 {
     }
 
-### Parsing modes
+Parsing Modes
+-------------
 
 A config file can be parsed in "strict" or "relaxed" mode, depending on what user needs. In strict mode certain restrictions are applied. This could help prevent accidental errors in a config.
 
-### The Syntax in examples
-
-#### Comments
+Comments
+--------
 
 Similarly to the original BIND 9 format, `Config::BINDish` supports C, C++, and Unix-style comments:
 
@@ -130,7 +132,8 @@ Comments are considered statements on their own. This limits where a comment can
          */
     }
 
-#### Options
+Options
+-------
 
 An option is declared with a keyword and an optional value. If the value is omitted then option is considered to have a *true* boolean value:
 
@@ -160,7 +163,31 @@ An option can also be limited as to where it can appear. For example, if a `reso
 
 Moreover, if strict mode is set for options the parser will only allow pre-declared ones.
 
-#### Blocks
+Reserved Options
+----------------
+
+An option name can be reserved for parser's special use. For now there is only one reserved option – `include`.
+
+### `include <source>`
+
+This option allows configuration from `<source>` to be injected into the location where `include` is used. For example, we have a file *common.inc*:
+
+    foo 42;
+    bar {
+        message "thanks for the fish!";
+    }
+
+And a config akin to the followin one:
+
+    include ./common.inc;
+    baz {
+        include ./common.inc;
+    }
+
+Now option `foo` is available both at the top and block `baz` contexts, as well as block `bar`.
+
+Blocks
+------
 
 Blocks purpose is to logically group a set of options or other blocks.
 
@@ -199,7 +226,7 @@ There is no limit on nesting blocks:
         }
     }
 
-*NB* We use strings for IP addresses. But with bundled [`Config::BINDish::INET`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish/INET.md) extension one can have it like `gw 172.1.2.1;`. But this paper tries to stick to the barebones module as much as possible.
+*NB* We use strings for IP addresses. But with bundled [`Config::BINDish::INET`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/INET.md) extension one can have it like `gw 172.1.2.1;`. But this paper tries to stick to the barebones module as much as possible.
 
 So far the examples written as if the parser works in relaxed mode. In strict mode the rule of *mandatory semi-colon* applies and a block must always be terminated with `;`:
 
@@ -234,7 +261,28 @@ Yet, a block could be limited to be a value-only one. In this case the above exa
 
 - where they can appear - whether they require a name or/and a class - what value type(s) can be used within the block
 
-### Hybrid mode
+Directives
+----------
+
+`Config::BINDish` supports special directives similar to what they use in C. Currently the only implemented directive is `#line`:
+
+    #line 13 "mock-file.conf" Here go a comment
+
+The meaning of the directive is the same as in C: it makes the grammar to pretend that lines below the directive are located in file *mock-file.conf* starting with its line 13. If the directive is followed by something like this:
+
+    #
+    opt 1 2 3;
+
+then when a error is reported it will point at line 14 in *mock-file.conf*.
+
+Note that the file name part of `#line` can either be omitted or use any valid option value. For example, with [`Config::BINDish::INET`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/INET.md) one can do something like:
+
+    #line 1 https://configs.local/common/std.inc
+
+It would then be only a matter of overriding [`Config::BINDish::Grammar`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/Grammar.md) `include-source` method to provide support for URLs.
+
+Hybrid mode
+-----------
 
 It is possible for a grammar to run in relaxed mode but still have some options and/or blocks pre-declared. These pre-declarations are always respected by the parser. This mode of operation when some options/blocks are constrained while others are ok to be free-form is called *hybrid mode*.
 
@@ -253,7 +301,7 @@ where they end is totally up to them!
 SEE ALSO
 ========
 
-[Config::BINDish](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.2/docs/md/Config/BINDish.md)
+[Config::BINDish](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish.md)
 
 AUTHOR
 ======

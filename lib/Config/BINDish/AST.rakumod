@@ -1,25 +1,56 @@
 v6.d;
 use Config::BINDish::Grammar;
 use Config::BINDish::X;
+use AttrX::Mooish;
 
-role Config::BINDish::AST::Parent {...};
+class Config::BINDish::AST::Node {...}
+class Config::BINDish::AST::Stmts {...}
 class Config::BINDish::AST::Block {...}
 class Config::BINDish::AST::Option {...}
 class Config::BINDish::AST::Value {...}
 
 class Config::BINDish::AST {
-    has Config::BINDish::AST::Parent $.parent;
-
-    submethod TWEAK {
-        # Record the innermost node we belong to.
-        $!parent //=  $_ with $*CFG-INNER-PARENT;
-    }
+    has Config::BINDish::AST::Node $!parent is built;
+    has SetHash:D $!labels is built = SetHash.new;
 
     my %ast-types;
 
+    method dup(::?CLASS:D: *%twiddles) {
+        self.new:
+            :labels($!labels.clone),
+            :$!parent,
+            |%twiddles
+    }
+
     method gist {!!!}
 
-    method set-parent( ::?CLASS:D: Config::BINDish::AST::Parent $!parent) { self }
+    method set-parent(::?CLASS:D: Config::BINDish::AST::Node $!parent) { self }
+
+    proto method parent(::?CLASS:D: |) {*}
+    multi method parent(::?CLASS:D:) { $!parent }
+    multi method parent(::?CLASS:D: Config::BINDish::AST:U \parent-type) {
+        my $candidate = self;
+        while $candidate.defined {
+            return $candidate if ($candidate = $candidate.parent) ~~ parent-type
+        }
+        Nil
+    }
+
+    proto method mark-as(::?CLASS:D: |) {*}
+    multi method mark-as(::?CLASS:D: Str:D $label --> ::?CLASS:D) {
+        $!labels.set: $label;
+        self
+    }
+    multi method mark-as(::?CLASS:D: *@labels --> ::?CLASS:D) {
+        $!labels ∪= @labels;
+        self
+    }
+
+    method labels(::?CLASS:D:) {
+        $!labels.keys
+    }
+
+    method is-marked(::?CLASS:D: Str:D $label) { $!labels{$label} }
 
     method ast-name(::?CLASS:D:) {
         my $name = self.^name;
@@ -28,7 +59,10 @@ class Config::BINDish::AST {
     }
 
     method dump(::?CLASS:D: Int:D :$level = 0) {
-        say (self.ast-name ~ ": " ~ self.gist).indent($level * 4);
+        (self.ast-name
+         ~ '{'
+         ~ $!labels.keys.join(",")
+         ~ "}: " ~ self.gist).indent($level * 4);
     }
 
     method register-type(Str:D $type-name, Mu \ast-type) {
@@ -51,6 +85,9 @@ class Config::BINDish::AST {
         }
         $top;
     }
+
+    # This method is invoked whenever an AST node is dropped.
+    method dismiss {}
 }
 
 role Config::BINDish::AST::Container {
@@ -75,6 +112,14 @@ role Config::BINDish::AST::Container {
         $!type-name = %profile<type-name> if %profile<type-name>:exists;
     }
 
+    method dup(::?ROLE:D: *%twiddles) {
+        my %p = :$!type-name;
+        unless %twiddles<payload>:exists {
+            %p<payload> = .^isa(Config::BINDish::AST) ?? .dup !! .clone with $!payload;
+        }
+        callwith |%p, |%twiddles
+    }
+
     method node-name { self.^shortname }
 
     multi method COERCE(Config::BINDish::Grammar::Value:D $val --> ::?ROLE:D) {
@@ -95,13 +140,13 @@ role Config::BINDish::AST::Container {
         $val ~~ $!payload
     }
 
-    method gist(::?CLASS:D: Bool :$detailed) {
+    method gist(::?CLASS:D: Bool :$detailed = True) {
         my $q = $!payload ~~ Stringy && $!type-name ne 'keyword'
             ?? ($!type-name eq 'dq-string'
                 ?? '"'
                 !! "'")
             !! "";
-        my $str = $q ~ $!payload.gist ~ $q;
+        my $str = $q ~ $!payload.gist(:$detailed) ~ $q;
         ($detailed ?? "[" ~ $!type-name ~ " of " ~ $!payload.^name ~ "] " !! "") ~ $str
     }
 }
@@ -119,31 +164,81 @@ BEGIN {
     }
 }
 
-role Config::BINDish::AST::Decl {
-    has Config::BINDish::AST::Container:D $.keyword is required;
-}
-
 class Config::BINDish::AST::NOP is Config::BINDish::AST {
     method gist(::?CLASS:D: ) {'*nop*'}
 }
 
-role Config::BINDish::AST::Parent {
-    has Config::BINDish::AST:D @.children;
+class Config::BINDish::AST::Node is Config::BINDish::AST {
+    has Config::BINDish::AST:D @!children is built;
+    has $!children-by-label is mooish( :lazy, :clearer);
 
     method dump(::?CLASS:D: Int:D :$level = 0) {
-        callsame;
+        my @dumps.push: callsame;
         for @!children -> $child {
-            $child.dump(:level($level+1));
+            @dumps.push: $child.dump(:level($level+1));
         }
+        @dumps.join("\n");
+    }
+
+    method build-children-by-label {
+        my %chld;
+        for @!children -> $child {
+            for $child.labels -> $label {
+                %chld{$label} //= SetHash.new;
+                %chld{$label}.set: $child;
+            }
+        }
+        %chld
+    }
+
+    method dup(::?CLASS:D: *%) {
+        my $copy = callsame;
+        unless $*CFG-FLATTENING {
+            for @!children -> $child {
+                $copy.add: $child.dup;
+            }
+        }
+        $copy
     }
 
     proto method add(::?CLASS:D: Config::BINDish::AST:D $) {*}
     multi method add(::?CLASS:D: Config::BINDish::AST:D $child --> Config::BINDish::AST:D) {
+        self!clear-children-by-label;
         @!children.push: $child;
-        $child.set-parent(self)
+        $child.set-parent(self);
+        self
+    }
+    multi method add(::?CLASS:D: Config::BINDish::AST::Stmts:D $stmts --> Config::BINDish::AST:D) {
+        for $stmts.children {
+            self.add: $_;
+        }
+        $stmts.dismiss;
+        self
+    }
+    multi method add(::?CLASS:D: Config::BINDish::AST::NOP:D $nop --> Config::BINDish::AST:D) {
+        $nop.dismiss;
+        self
     }
     multi method add(::?CLASS:D: Str:D $node-type, |c --> Config::BINDish::AST:D) {
         self.add: Config::BINDish::AST.new-ast: $node-type, |c;
+    }
+
+    proto method children(|) {*}
+    multi method children(::?CLASS:D:) { @!children }
+    multi method children(::?CLASS:D: Str:D $label) {
+        $!children-by-label{$label}:exists
+            ?? $!children-by-label{$label}.keys
+            !! Nil
+    }
+
+    method child(::?CLASS:D: Str:D $label) {
+        with $!children-by-label{$label} {
+            fail Config::BINDish::X::OneTooMany.new(:what<children>)
+                if .elems > 1;
+            return Nil unless .elems;
+            return .keys.head
+        }
+        Nil
     }
 
     proto method find-all(::?CLASS:D: |) {*}
@@ -152,7 +247,7 @@ role Config::BINDish::AST::Parent {
             my sub iterate(@children) {
                 for @children -> $child {
                     take $child if &matcher( $child );
-                    if !$local && $child ~~ ::?ROLE {
+                    if !$local && $child ~~ ::?CLASS {
                         iterate $child.children;
                     }
                 }
@@ -169,12 +264,13 @@ role Config::BINDish::AST::Parent {
         }, :$local
     }
     multi method find-all(::?CLASS:D: :$option!, Bool :$local --> Seq:D) {
-        self.find-all: {
-                       .^isa(Config::BINDish::AST::Option)
-                       && .keyword ~~ $option
-                   }, :$local
+        self.find-all: { .^isa(Config::BINDish::AST::Option)
+                         && .keyword ~~ $option
+                       }, :$local
     }
+}
 
+role Config::BINDish::AST::Blockish {
     my proto sub ensure-single(|) {*}
     multi ensure-single(@b, :$block!, *%p) {
         given +@b {
@@ -231,7 +327,7 @@ role Config::BINDish::AST::Parent {
     }
 
     method values(::?CLASS:D: Bool :$raw) {
-        self.find-all({ .^isa(Config::BINDish::AST::Value) })
+        self.find-all({ .^isa(Config::BINDish::AST::Value) && .is-marked('standalone') })
             .map: { $raw ?? $_ !! .payload }
     }
 
@@ -277,27 +373,48 @@ role Config::BINDish::AST::Parent {
 
         traverse(self, $path)
     }
+
 }
 
-class Config::BINDish::AST::Value does Config::BINDish::AST::Container is Config::BINDish::AST {}
+class Config::BINDish::AST::Value
+    does Config::BINDish::AST::Container
+    is Config::BINDish::AST {}
+
+# Inlinable statements container. I.e. children of this parent are considered as children of the enclosing parent.
+class Config::BINDish::AST::Stmts
+    is Config::BINDish::AST::Node
+{
+    method gist(::?CLASS:D:) { "Stmts" }
+
+    method set-parent(::?CLASS:D: $parent) {
+        Config::BINDish::X::StmtsAdopted.new(:$parent).throw
+    }
+
+    method dismiss {
+        # At his point all children should've been moved onto parent.
+        # Make sure we don't mangle with them accidentally.
+        @.children = [];
+    }
+}
 
 class Config::BINDish::AST::Block
-    is Config::BINDish::AST
-    does Config::BINDish::AST::Parent
-    does Config::BINDish::AST::Decl
+    does Config::BINDish::AST::Blockish
+    is Config::BINDish::AST::Node
 {
-    has Config::BINDish::AST::Container $.name;
-    has Config::BINDish::AST::Container $.class;
+    has Config::BINDish::AST $!keyword;
+    has Config::BINDish::AST $!name;
+    has Config::BINDish::AST $!class;
     # Whether block should merge/overwrite duplicate entries or keep them apart.
     has Bool:D $.flat = $*CFG-FLAT-BLOCKS // False;
 
-    method set-name(::?CLASS:D: Config::BINDish::AST::Container:D $!name --> ::?CLASS:D) {
-        $!name.set-parent(self);
-        self
+    method keyword(::?CLASS:D:) {
+        $!keyword //= self.child('block-type');
     }
-    method set-class(::?CLASS:D: Config::BINDish::AST::Container:D $!class --> ::?CLASS:D) {
-        $!class.set-parent(self);
-        self
+    method name(::?CLASS:D:) {
+        $!name //= self.child('block-name')
+    }
+    method class(::?CLASS:D:) {
+        $!class //= self.child('block-class')
     }
 
     method gist(::?CLASS:D:) {
@@ -315,7 +432,7 @@ class Config::BINDish::AST::Block
         %p<class> = ~$_ with $block.class;
         my $existing = self.block(~$block.keyword, |%p, :local);
         if $existing {
-            for $block.children -> $child {
+            for $block.children.grep(* ~~ Config::BINDish::AST::Option | Config::BINDish::AST::Blockish) -> $child {
                 $existing.add: $child
             }
             return $existing
@@ -335,14 +452,15 @@ class Config::BINDish::AST::Block
     }
 
     method flatten(::?CLASS:D: --> ::?CLASS:D) {
-        my $cloned = self.clone(:children([]), :flat);
+        my $copy = do {
+            my $*CFG-FLATTENING = True;
+            self.dup(:flat);
+        };
         # Re-add children under flattening rule.
-        for @.children -> $child {
-            $cloned.add: $child ~~ ::?CLASS
-                ?? $child.flatten
-                !! $child.clone;
+        for self.children -> $child {
+            $copy.add( $child ~~ ::?CLASS ?? $child.flatten !! $child.dup );
         }
-        $cloned
+        return $copy
     }
 }
 
@@ -356,13 +474,17 @@ class Config::BINDish::AST::TOP
 }
 
 class Config::BINDish::AST::Option
-    is Config::BINDish::AST
-    does Config::BINDish::AST::Decl
+    is Config::BINDish::AST::Node
 {
-    has Config::BINDish::AST::Container:D $.value is required;
+    has Config::BINDish::AST::Container $!keyword;
+    has Config::BINDish::AST::Container $!value;
+
+    method keyword(::?CLASS:D:) { $!keyword //= self.child('keyword') }
+    method name(::?CLASS:D:) { $!keyword //= self.child('option-name') }
+    method value(::?CLASS:D:) { $!value //= self.child('option-value') }
 
     method gist(::?CLASS:D:) {
-        $!keyword.gist ~ " " ~ $!value.gist(:detailed) ~ ";"
+        self.keyword.gist(:!detailed) ~ " " ~ self.value.gist(:!detailed) ~ ";"
     }
 }
 

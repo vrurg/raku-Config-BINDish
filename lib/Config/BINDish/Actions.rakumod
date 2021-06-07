@@ -4,10 +4,10 @@ unit class Config::BINDish::Actions;
 use Config::BINDish::AST;
 use Config::BINDish::X;
 
-method TOP($/) {
-    my $top = self.inner-parent;
-    if $<statement-list><statements> {
-        for $<statement-list><statements> -> $stmt {
+method TOP($/, |c) {
+    my $top = $*CFG-TOP;
+    if $<body><statement-list><statements> {
+        for $<body><statement-list><statements> -> $stmt {
             $top.add: $stmt.ast;
         }
     }
@@ -15,55 +15,58 @@ method TOP($/) {
 }
 
 method enter-TOP($) {
-    $*CFG-TOP = self.enter-parent: Config::BINDish::AST.new-ast('TOP');
+    # If the source parsed is included from another config then we must produce just a list of statements.
+    $*CFG-TOP = self.enter-parent:
+                    Config::BINDish::AST.new-ast:
+                        $*CFG-AS-INCLUDE ?? 'Stmts' !! 'TOP'
 }
 
 method statement:sym<value>($/) {
-    make $<value>.ast
+    make $<value>.ast.mark-as("standalone")
 }
 
 method statement:sym<comment>($/) {
-    make $/.chunks[0].value.ast;
+    make $/.caps[0].value.ast;
+}
+
+method enter-option($/) {
+    self.enter-parent:
+        my $opt = Config::BINDish::AST.new-ast('Option');
+    make $opt;
 }
 
 method statement:sym<option>($/) {
-    my $value;
+    my $opt := self.inner-parent;
+    $opt.add: $<option-name>.made.mark-as('option-name');
+    my $val;
     with $<option-value> {
-        $value = .made;
+        $val = .made;
     }
     else {
-        $value = Config::BINDish::AST.new-ast('Value',
-                                              :type(Bool),
-                                              :type-name<bool>,
-                                              :payload);
+        $val = Config::BINDish::AST.new-ast('Value', :payload, :type-name<bool>).mark-as('implicit');
     }
-    my $opt = Config::BINDish::AST.new-ast('Option',
-                                           :keyword($<option-name>.made),
-                                           :$value);
+    $opt.add: $val.mark-as('option-value');
     make $opt;
 }
 
 method statement:sym<block>($/) {
-    my $block = $<block-body>.ast;
-    with $<block-name> {
-        $block.set-name(.made);
-    }
-    with $<block-class> {
-        $block.set-class(.made);
-    }
-    make $block;
+    make self.inner-parent;
 }
 
 method statement:sym<empty>($/) {
     make Config::BINDish::AST.new-ast('NOP');
 }
 
+method statement:sym<include>($/) {
+    make $*CFG-INC-STMTS.ast.mark-as('included');
+}
+
 method dq-string($/) {
-    make Config::BINDish::AST.new-ast('Value', :payload($<string>.chunks.map(*.value).join), :type-name<dq-string>);
+    make Config::BINDish::AST.new-ast('Value', :payload($<string>.caps.map(*.value).join), :type-name<dq-string>);
 }
 
 method sq-string($/) {
-    make Config::BINDish::AST.new-ast('Value', :payload($<string>.chunks.map(*.value).join), :type-name<sq-string>);
+    make Config::BINDish::AST.new-ast('Value', :payload($<string>.caps.map(*.value).join), :type-name<sq-string>);
 }
 
 our %multipliers = K => 1024, M => 1024², G => 1024³, T => 1024⁴, P => 1024⁵;
@@ -90,7 +93,8 @@ method value:sym<string>($/) {
 }
 
 method value:sym<keyword>($/) {
-    make Config::BINDish::AST.new-ast('Value', :payload(Str($*CFG-VALUE.payload)), :type-name<keyword>);
+    make $<keyword>.ast;
+#    make Config::BINDish::AST.new-ast('Value', :payload(Str($*CFG-VALUE.payload)), :type-name<keyword>);
 }
 
 method value:sym<rat>($/) {
@@ -152,15 +156,21 @@ method CPP-comment($/) {
 }
 
 method UNIX-comment($/) {
-    make Config::BINDish::AST.new-ast('Comment',
-                                      :family<UNIX>,
-                                      :body(~$<comment-body>));
+    with $<comment-body> {
+        make Config::BINDish::AST.new-ast('Comment',
+                                          :family<UNIX>,
+                                          :body( ~$_ ));
+    }
+    else {
+        make Config::BINDish::AST.new-ast: 'NOP'
+    }
 }
 
 method keyword($/) {
     make Config::BINDish::AST.new-ast('Value',
                                       :type-name<keyword>,
-                                      :payload(Str($*CFG-KEYWORD.payload)))
+                                      :payload(~$<kwd>))
+        .mark-as('keyword')
 }
 
 method block-class($/) {
@@ -172,12 +182,18 @@ method block-name($/) {
 }
 
 method block-head($/) {
-    make $<block-type>.made
+    my $parent = self.inner-parent;
+    $parent.add: $<block-type>.made.mark-as('block-type');
+    with $<block-name> {
+        $parent.add: .ast.mark-as('block-name');
+        $parent.add: .ast.mark-as('block-class') with $<block-class>;
+    }
 }
 
-method enter-block($) {
-    self.enter-parent: Config::BINDish::AST.new-ast('Block',
-                                                    :keyword(self.make-container($*CFG-BLOCK-TYPE)));
+method enter-block($/) {
+    self.enter-parent:
+        my $blk = Config::BINDish::AST.new-ast('Block');
+    make $blk;
 }
 
 method block-body($/) {
@@ -188,8 +204,6 @@ method block-body($/) {
             $block.add: $st.ast;
         }
     }
-
-    make $block;
 }
 
 # --- Utility methods
@@ -198,14 +212,14 @@ method make-container(Config::BINDish::Grammar::Value:D $gval) {
     Config::BINDish::AST::Value($gval)
 }
 
-proto method enter-parent(| --> Config::BINDish::AST::Parent:D) {*}
-multi method enter-parent(Config::BINDish::AST::Parent:D $inner --> Config::BINDish::AST::Parent:D) {
+proto method enter-parent(| --> Config::BINDish::AST::Node:D) {*}
+multi method enter-parent(Config::BINDish::AST::Node:D $inner --> Config::BINDish::AST::Node:D) {
     $*CFG-INNER-PARENT = $inner;
 }
-multi method enter-parent(Config::BINDish::AST::Parent:U $inner, |c --> Config::BINDish::AST::Parent:D) {
+multi method enter-parent(Config::BINDish::AST::Node:U $inner, |c --> Config::BINDish::AST::Node:D) {
     $*CFG-INNER-PARENT = $inner.WHAT.new(|c)
 }
 
 method inner-parent {
-    $*CFG-INNER-PARENT // X::NoInnerParent.new.throw
+    $*CFG-INNER-PARENT // fail X::NoInnerParent.new
 }

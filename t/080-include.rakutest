@@ -1,0 +1,37 @@
+use Test::Async <Config::BINDish::Test Base>;
+use Config::BINDish;
+use Config::BINDish::Expandable;
+
+plan 8;
+
+my $dir = $?FILE.IO.parent(1);
+chdir $dir;
+
+my $cfg = Config::BINDish.new;
+ok $cfg.read(:file<080-main.config>), "config read";
+
+my $top = $cfg.top;
+
+is $top.get(:block<bar> => 'size'), 13, "option from include is found";
+
+is $top.get(:block<foo> => 'path'),
+   "/usr/local/share/bindish/some",
+   "outside block can extend with option from included file";
+
+ok $top.get(:block<bar> => :subblock => 'included'), "a subblock from include is accessible";
+
+is $top.get(:block<bar> => 'foo'), 'control: 42', "control expansion";
+
+is $top.get(:block<bar> => 'bar-opt'),
+   "The Answer is 42",
+   "an option from include has access to enclosing block";
+
+is $top.get(:block<bar> => :subblock => 'path'),
+   "/usr/local/share/bindish/data/my.data",
+   "an option from included subblock has access to a top-level block";
+
+is $top.get(:block<bar> => :subblock => 'relative'),
+   "somehow related to 3.1415926",
+   "relative macro access enclosing block";
+
+done-testing;

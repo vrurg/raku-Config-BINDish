@@ -32,7 +32,7 @@ BK_FILES=$(shell find . -name '*.bk')
 CLEAN_DIRS=$(PRECOMP_DIRS) $(BK_FILES) .test-repo
 
 # Doc variables
-DOC_SRC_DIR=src/docs
+DOC_SRC_DIR=doc-src
 DOCS_DIR=docs
 MD_DIR=$(DOCS_DIR)/md
 HTML_DIR=$(DOCS_DIR)/html
@@ -125,10 +125,10 @@ checkbuild:
 
 depends: meta depends-install
 
-depends-install:
+depends-install: meta6_mod
 	@echo "===> Installing dependencies"
-	@zef install META6 Pod::To::Markdown Async::Workers
-	@zef --deps-only install .
+	@zef install Pod::To::Markdown Async::Workers
+	@zef --deps-only --test-depends install .
 
 version: doc meta clean
 #	@git add . && git commit -m 'Minor: version bump'

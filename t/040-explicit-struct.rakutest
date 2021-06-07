@@ -239,11 +239,13 @@ subtest "Value validation" => {
                                     CFG
              }, "keyword list block"
         {
-            is-cfg-stmt-list $cfg.match,
+            is-cfg-stmt-list $cfg.match<body>,
                              %(
                                  statements => 0 => %(
-                                     block-head => block-type => "blist",
-                                     block-name => value => dq-string => string => "keywords",
+                                     block-head => %(
+                                         block-type => "blist",
+                                         block-name => value => dq-string => string => "keywords",
+                                     ),
                                      block-body => token-statements(
                                          message => "block values list",
                                          stmt-count => 3,
@@ -258,14 +260,15 @@ subtest "Value validation" => {
 
             my $blist = $cfg.top.block('blist', :name<keywords>);
             my @expected = <foo bar baz>;
-
-            for ^3 -> $idx {
-                my $child = $blist.children[$idx];
+            my $idx = 0;
+            while @expected {
+                my $child = $blist.children[$idx++];
+                next unless $child.is-marked('standalone');
                 subtest "block child value $idx", :instant, {
                     plan 3;
                     isa-ok $child, Config::BINDish::AST::Value, "is a AST::Value";
                     is $child.type-name, 'keyword', "is a keyword";
-                    is $child.payload, @expected[$idx], "keyword value";
+                    is $child.payload, @expected.shift, "keyword value";
                 }
             }
         }

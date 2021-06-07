@@ -1,5 +1,5 @@
 {
-  "api": "0.0.2",
+  "api": "0.0.3",
   "auth": "zef:vrurg",
   "authors": [
     "Vadim Belman <vrurg@lflat.org>"
@@ -37,7 +37,8 @@
     "CONFIG"
   ],
   "test-depends": [
-    "Test::Async"
+    "Test::Async:ver<0.1.2>",
+    "App::Prove6"
   ],
-  "version": "0.0.2"
+  "version": "0.0.3"
 }

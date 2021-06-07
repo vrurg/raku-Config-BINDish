@@ -133,6 +133,9 @@ class Strictness {
     multi method COERCE(Bool:D $default) { self.new: :syntax($default), :options($default), :blocks($default) }
 }
 
+# Where we read from
+has $!file is built;
+has Int:D $.line-delta = 0;
 has Bool:D $.flat = False;
 has Strictness:D() $.strict = False;
 # All block types.
@@ -143,8 +146,7 @@ has OptionProps() %.opt-props;
 has %.blocks;
 has %.options;
 
-# Context stack. Normally a new context is created on per-parent basis.
-has @.contexts;
+has %.reserved-opts = :include;
 
 proto method set-value(|) {*}
 multi method set-value(Mu $type is raw, *%tinfo where *.elems == 1 --> Value:D) {
@@ -153,6 +155,16 @@ multi method set-value(Mu $type is raw, *%tinfo where *.elems == 1 --> Value:D) 
 }
 multi method set-value(Value:D $val --> Value:D) {
     $*CFG-VALUE = $val
+}
+
+method set-line-relative(Int:D $l, Int:D :$to = self.line(:absolute)) {
+    return $*CFG-GRAMMAR.set-line-relative($l, :$to) unless self === $*CFG-GRAMMAR;
+    $!line-delta = $to - $l + 1;
+}
+
+method set-file($file) {
+    return $*CFG-GRAMMAR.set-file($file) unless self === $*CFG-GRAMMAR;
+    $!file = $file;
 }
 
 submethod TWEAK(|) {
@@ -214,32 +226,28 @@ multi method declare-options(*%options) {
     samewith(%options)
 }
 
-method cfg-ctx {
-    self === $*CFG-GRAMMAR ?? @!contexts[*-1] !! $*CFG-GRAMMAR.cfg-ctx
+method file {
+    (!$*CFG-GRAMMAR || self === $*CFG-GRAMMAR) ?? $!file !! $*CFG-GRAMMAR.file
 }
 
-method push-ctx(|c(*%profile) --> Context:D)
+method line(:$absolute) {
+    self.prematch.chomp.split(/\n/).elems - ($absolute ?? 0 !! $*CFG-GRAMMAR.line-delta)
+}
+
+method enter-ctx(|c(*%profile) --> Context:D)
 {
-    return $*CFG-GRAMMAR.push-ctx(|c) unless self === $*CFG-GRAMMAR;
-    my Context $parent;
-    $parent = @!contexts[*-1] if @!contexts;
+    self.panic: Config::BINDish::X::Parse::ContextOverwrite, :ctx($_) with $*CFG-CTX;
+    my Context $parent = $_ with $*CFG-PARENT-CTX;
     # Make code like easier by allowing :props to be an undefined value.
     %profile<props>:delete without %profile<props>;
-    @!contexts.push: my $cur = Context.new(|%profile, :$parent);
-    $cur
-}
-
-method pop-ctx(--> Context:D) {
-    return $*CFG-GRAMMAR.pop-ctx unless self === $*CFG-GRAMMAR;
-    Config::BINDish::X::CtxStack::Exhausted.new.throw if @!contexts[*-1].type eq 'TOP';
-    @!contexts.pop
+    $*CFG-CTX = Context.new(|%profile, :$parent);
 }
 
 method block-ok(Str:D $type --> Bool:D) {
     my %blocks = $*CFG-GRAMMAR.blk-props;
     return True unless %blocks;
     with %blocks{$type} {
-        return self.cfg-ctx ~~ $_
+        return $*CFG-PARENT-CTX ~~ $_
     }
     False
 }
@@ -248,22 +256,15 @@ method option-ok(Str:D $keyword --> Bool:D) {
     my %options = $*CFG-GRAMMAR.opt-props;
     return True unless %options;
     with %options{$keyword} {
-        return self.cfg-ctx ~~ $_
+        return $*CFG-CTX ~~ $_
     }
     False
 }
 
-method enter-option {
-    self.push-ctx: :type<OPTION>,
-                   :props( $*CFG-GRAMMAR.opt-props{Str($*CFG-KEYWORD)} ),
-                   :keyword( $*CFG-KEYWORD )
-}
-
-method leave-option {
-    self.pop-ctx
-}
+method leave-option { }
 
 method backtrack-option {
+    my $*CFG-BACKTRACK-OPTION = True;
     self.leave-option
 }
 
@@ -271,15 +272,16 @@ method validate-option {
     my ::?CLASS:D $grammar = $*CFG-GRAMMAR;
     my %options = $grammar.opt-props;
     if %options {
-        my $ctx = self.cfg-ctx.cur-block-ctx;
+        my $ctx = $*CFG-CTX;
+        my $blk-ctx = $ctx.cur-block-ctx;
         my $keyword = Str($*CFG-KEYWORD.payload);
         my $props = %options{$keyword};
         if $props {
-            self.panic: X::Parse::Context, :what<option>, :keyword($*CFG-KEYWORD), :$ctx
-                unless self.option-ok($keyword) && !$ctx.props.value-only;
+            self.panic: X::Parse::Context, :what<option>, :keyword($*CFG-KEYWORD), :ctx($blk-ctx)
+                unless self.option-ok($keyword) && !$blk-ctx.props.value-only;
             my $value = $*CFG-VALUE // Value.new: :type(Bool), :type-name('bool'), :payload<True>;
             unless $value ~~ $props {
-                self.panic: X::Parse::ValueType, :what<option>, :keyword($*CFG-KEYWORD), :ctx(self.cfg-ctx), :$value
+                self.panic: X::Parse::ValueType, :what<option>, :keyword($*CFG-KEYWORD), :$ctx, :$value
             }
         }
         elsif $grammar.strict.options {
@@ -290,15 +292,14 @@ method validate-option {
 }
 
 method validate-block {
-    my $ctx = self.cfg-ctx;
     my $grammar = $*CFG-GRAMMAR;
+    my $ctx = $*CFG-CTX;
     my Str:D() $block-type = $*CFG-BLOCK-TYPE.payload;
-    my StatementProps $props;
+    my StatementProps $props = $ctx.props;
     my %blocks = $*CFG-GRAMMAR.blk-props;
     if %blocks {
         with %blocks{$block-type} {
-            $props = $_;
-            self.panic: X::Parse::Context, :what<block>, :keyword($*CFG-BLOCK-TYPE), :$ctx
+            self.panic: X::Parse::Context, :what<block>, :keyword($*CFG-BLOCK-TYPE), :ctx($*CFG-PARENT-CTX)
                 unless self.block-ok($block-type);
             with $props.named {
                 self.panic: X::Parse::MissingPart, :what<name>, :block-spec($block-type)
@@ -325,11 +326,10 @@ method validate-block {
             self.panic: X::Parse::Unknown, :what('block type'), :keyword($block-type)
         }
     }
-    self.push-ctx: :type<BLOCK>, :keyword( $*CFG-BLOCK-TYPE ), :name( $*CFG-BLOCK-NAME ), :$props;
 }
 
 method validate-value {
-    my $ctx = self.cfg-ctx;
+    my $ctx = $*CFG-CTX;
     my $props = $ctx.props;
     if $props && $props ~~ ContainerProps {
         unless (my $value = $*CFG-VALUE) ~~ $props {
@@ -338,7 +338,12 @@ method validate-value {
     }
 }
 
-method leave-block { self.pop-ctx }
+method leave-block { }
+
+method backtrack-block {
+    my $*CFG-BACKTRACK-BLOCK = True;
+    self.leave-block;
+}
 
 proto method panic(|) {*}
 multi method panic(Str:D $msg) {
@@ -348,22 +353,52 @@ multi method panic(Config::BINDish::X::Parse:U \ex, Str $msg?, *%p) {
     ex.new(:cursor(self), |(:$msg with $msg), |%p).throw
 }
 
+# Method must return configuration source to be included with `include` directive as a text chunk.
+method include-source(IO:D(Str:D) $file, Match:D $cursor --> Str:D) {
+    unless $file.e {
+        fail X::FileNotFound.new(file => ~$file, :$cursor)
+    }
+    unless $file.r {
+        fail X::FileOp.new(file => ~$file, :op('read from'), :$cursor)
+    }
+    $file.slurp
+}
+
 # ---------------- GRAMMAR RULES ----------------
-rule TOP {
+
+token TOP(Bool :$as-include) {
+    :my $*CFG-AS-INCLUDE = ?$as-include;
     :my $*CFG-GRAMMAR = self;
     :my $*CFG-FLAT-BLOCKS = self.flat;
-    :my $*CFG-INNER-PARENT;
     :my $*CFG-TOP;
-    <.enter-TOP>
-    {
-        self.push-ctx: :type<TOP>,
-                       :props(BlockProps.new),
-                       :keyword(Value.new: :payload<TOP>, :type(Str), :type-name<keyword>);
-    }
-    <statement-list>
+    :my $*CFG-INNER-PARENT;
+    [
+        <?{ $as-include }>
+        $<body>=<.as-include>
+      ]
+    | [
+        <?{ !$as-include }>
+        $<body>=<.as-main>
+      ]
 }
 
 token enter-TOP { <?> }
+
+rule as-include {
+    <.enter-TOP>
+    <statement-list>
+}
+
+rule as-main {
+    :my $*CFG-CTX;
+    <.enter-TOP>
+    {
+        self.enter-ctx: :type<TOP>,
+                        :props(BlockProps.new),
+                        :keyword(Value.new: :payload<TOP>, :type(Str), :type-name<keyword>);
+    }
+    <statement-list>
+}
 
 rule statement-list {
     <?>
@@ -375,6 +410,26 @@ rule statement-list {
 }
 
 proto token statement {*}
+
+multi rule statement:sym<include> {
+    :my $*CFG-VALUE;
+    :my $*CFG-INC-STMTS;
+    $<err-pos>=include <value> <?before <.statement-terminator>> <statement-terminate>
+    {
+        my $grammar = $*CFG-GRAMMAR;
+        $*CFG-INC-STMTS = $*CFG-GRAMMAR.WHAT.parse:
+            self.include-source(Str($<value>.ast), $<err-pos>),
+            :file(~$<value>),
+            actions => $.actions.WHAT,
+            strict => $grammar.strict,
+            flat => $grammar.flat,
+            blocks => $grammar.blocks,
+            options => $grammar.options,
+            args => \(:as-include),
+        ;
+    }
+}
+
 multi token statement:sym<comment> {
         | <C-comment>
         | <CPP-comment>
@@ -391,17 +446,19 @@ multi rule statement:sym<value> {
 multi rule statement:sym<option> {
     :my Value $*CFG-KEYWORD;
     :my Value $*CFG-VALUE;
-    $<err-pos>=<?>
-    $<option-name>=<.keyword>
-    { self.enter-option }
+    :my Context:D $*CFG-PARENT-CTX = $*CFG-CTX;
+    :temp $*CFG-CTX = Nil;
+    :temp $*CFG-INNER-PARENT;
+    $<err-pos>=$<option-name>=<.keyword>
+    <.enter-option>
+    <?{ !$*CFG-GRAMMAR.reserved-opts{~$<option-name>} }>
     [
-    [ $<option-value>=<.maybe-specific-value("option")>
-    ]?
+        $<option-value>=<.maybe-specific-value("option")>?
         <?before <.statement-terminator>>
         <statement-terminate>
         <?{ # Inside a value-only block we skip boolean-only option because it will be re-parsed as a keyword.
             # But options with a value must cause a panic.
-            my $ctx = self.cfg-ctx.cur-block-ctx;
+            my $ctx = $*CFG-CTX.cur-block-ctx;
             my $ok = True;
             if $ctx.props andthen .value-only {
                 $<err-pos>.panic( X::Parse::Context,
@@ -414,7 +471,7 @@ multi rule statement:sym<option> {
         }>
         { $<err-pos>.validate-option }
     ]
-    | <?{
+    || <?{
         self.backtrack-option with $*CFG-KEYWORD;
         False
     }>
@@ -425,11 +482,12 @@ multi rule statement:sym<block> {
     :my Value $*CFG-BLOCK-NAME;
     :my Value $*CFG-BLOCK-CLASS;
     :my $*CFG-BLOCK-ERR-POS;
+    :my Context:D $*CFG-PARENT-CTX = $*CFG-CTX;
+    :temp $*CFG-CTX = Nil;
+    :temp $*CFG-INNER-PARENT;
     $<err-pos>=<?> { $*CFG-BLOCK-ERR-POS = $<err-pos> }
     <block-head>
-    [ <block-name> <block-class>? ]?
-    <?before '{'>
-    <block-body>
+    [ <block-body> || <?{ self.backtrack-block; False }> ]
 }
 
 multi rule statement:sym<empty> {
@@ -463,9 +521,21 @@ token bad-statement {
 #    [ .*? [ ';' || $$ || '}' ] ] <.panic: "Unrecognized statement">
 }
 
-token block-head {
+token enter-option {
+    <?>
+    {
+        self.enter-ctx: :type<OPTION>,
+                        :props( $*CFG-GRAMMAR.opt-props{Str($*CFG-KEYWORD)} ),
+                        :keyword( $*CFG-KEYWORD )
+    }
+}
+
+rule block-head {
     :my Value $*CFG-KEYWORD;
     $<block-type>=<.keyword> { $*CFG-BLOCK-TYPE = $*CFG-KEYWORD }
+    [ <block-name> <block-class>? ]?
+    <?before '{'>
+    <.enter-block>
 }
 
 token block-name {
@@ -481,17 +551,23 @@ token block-class {
 }
 
 token block-body {
-    :temp $*CFG-INNER-PARENT;
     [ '{' <.ws> ] ~ [ <.ws> '}' <.statement-terminate> ]
-    [
-        { $*CFG-BLOCK-ERR-POS.validate-block }
-        <.enter-block>
-        <statement-list>
-    ]
+    <statement-list>
     { self.leave-block }
 }
 
-token enter-block { <?> }
+token enter-block {
+    <?>
+    {
+        my $block-type = $*CFG-BLOCK-TYPE;
+        my StatementProps $props = $*CFG-GRAMMAR.blk-props{ ~$block-type };
+        self.enter-ctx: :type<BLOCK>,
+                        :keyword( $block-type ),
+                        :name( $*CFG-BLOCK-NAME ),
+                        :$props;
+        $*CFG-BLOCK-ERR-POS.validate-block;
+    }
+}
 
 token C-comment {
     '/*' ~ '*/' $<comment-body>=.*?
@@ -502,12 +578,17 @@ token CPP-comment {
 }
 
 token UNIX-comment {
-    '#' $<comment-body>=.*? $$
+    [ ^^ '#line' <.ws>
+        $<line>=\d+ { self.set-line-relative: Int($<line>) }
+        [ <.ws>
+          \" ~ \" $<file>=<.qstring('"')> { $*CFG-GRAMMAR.set-file($<file>.caps.map(*.value).join) } ]?
+        \s*? $$ ]
+    || [ '#' $<comment-body>=.*? $$ ]
 }
 
 token keyword {
     <.wb> $<kwd>=[ <.alpha> [ \w | '-' ]* ] <.wb>
-    { $*CFG-KEYWORD = Value.new: :type(Str), :type-name<keyword>, :payload($<kwd>) }
+    { $*CFG-KEYWORD = Value.new: :type(Str), :type-name<keyword>, :payload($/) }
 }
 
 token bool-true {
@@ -552,7 +633,7 @@ token num_suffix {
 }
 
 method maybe-specific-value(Str:D $what) {
-    my $ctx = self.cfg-ctx;
+    my $ctx = $*CFG-CTX;
     if $ctx.props ~~ ContainerProps && $ctx.props.value-sym {
         for $ctx.props.value-sym<> -> $sym {
             # Make it possible for value parsers to know they're expected.
@@ -572,9 +653,10 @@ multi token value:sym<string> {
 }
 
 multi token value:sym<keyword> {
-    <?{ self.cfg-ctx.type eq 'OPTION'
-    || (self.cfg-ctx.cur-block-ctx.props andthen .value-only) }>
-    :my Value:D $*CFG-KEYWORD;
+    <?{ (my $ctx = $*CFG-CTX) and
+        (($ctx.type eq 'OPTION')
+         || ($ctx.cur-block-ctx.props andthen .value-only)) }>
+    :my Value $*CFG-KEYWORD;
     <keyword> { $*CFG-GRAMMAR.set-value: Str, :keyword($*CFG-KEYWORD.payload) }
 }
 

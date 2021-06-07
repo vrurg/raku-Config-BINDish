@@ -1,0 +1,88 @@
+=begin pod
+=head1 NAME
+
+C<class Config::BINDish::AST::Node> - a parent node interface and implementation
+
+=head1 DESCRIPTION
+
+This role is responsible for holding and manipulating children nodes. It is also provides the primary interface of
+seeking and obtaining data withing AST tree.
+
+=head1 METHODS
+
+=head3 C<dump(Int:D :$level = 0)>
+
+Dumps the subtree held under C<self>.
+
+=head3 C<multi add(Config::BINDish::AST:D $child --> Config::BINDish::AST:D)>
+
+Adds a new C<$child> object to the children. 
+
+Returns C<self>.
+
+=head3 C<multi add(Config::BINDish::AST::Stmts:D $child --> Config::BINDish::AST:D)>
+
+This candidate pulls all
+L<C<Config::BINDish::AST::Stmts>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/AST/Stmts.md>
+children and re-plants them under C<self>. When all children moved method C<dismiss> is invoked on C<$child>.
+
+Returns C<self>.
+
+=head3 C<multi add(Str:D $node-type, |profile --> Config::BINDish::AST:D)>
+
+Creates a new node of C<$node-name> name. Then see the previous candidate.
+
+The C<profile> capture is passed to the new node constructor.
+
+=head3 C<multi children()>
+
+Returns all children objects.
+
+=head3 C<multi children(Str:D $label)>
+
+Returns all children marked with C<$label>.
+
+=head3 C<child(Str:D $label)>
+
+Returns a single child marked with C<$label>. If there are multiple children with the label then a
+L<C<Failure>|https://docs.raku.org/type/Failure> returned wrapped around C<Config::BINDish::X::OneTooMany>.
+
+=head3 C<<multi find-all(&matcher, Bool :$local --> Seq:D)>>
+
+This method iterates over children and lazily gathers those for which C<&matcher($child)> is I<True>. Unless C<$local>
+is set the method also iterates children recursively.
+
+=head3 C<<multi find-all(:$block!, :$name, :$class, Bool :$local --> Seq:D)>>
+
+This candidate is kind of a shortcat to find all blocks of type C<$block> and, optionally, with C<$name> and C<$class>
+specified. For example:
+
+    $cfg-bindish.top.find-all(:block<network>)
+
+will return a lazy L<C<Seq>|https://docs.raku.org/type/Seq> of all C<network> blocks. Or:
+
+    $cfg-bindish.top.find-all(:block<network>, :name(/^office <.wb>/))
+
+will return all C<network> blocks where names start with I<office> word.
+
+=head3 C<<multi find-all(:$option!, Bool :$local --> Seq:D)>>
+
+Another shortcut candidate to find all options declared with C<$option>. For example:
+
+    $cfg-bindish.top.find-all(:option(/'-gw' $/))
+
+will return a lazy L<C<Seq>|https://docs.raku.org/type/Seq> of all options in the configuration whose name ends with I<-gw>. Note that the sequence
+will contain objects of
+L<C<Config::BINDish::AST::Option>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/AST/Option.md>
+type, not their values.
+
+=head1 SEE ALSO
+
+L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish.md>,
+L<C<Config::BINDish::AST>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/AST.md>
+
+=head1 AUTHOR
+
+Vadim Belman <vrurg@cpan.org>
+
+=end pod

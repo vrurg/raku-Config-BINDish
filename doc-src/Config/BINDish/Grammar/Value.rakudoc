@@ -1,0 +1,31 @@
+
+=begin pod
+=CLASS
+
+C<Config::BINDish::Grammar::Value> - grammar representation of a value
+
+=ATTRIBUTES
+
+=head3 L<C<Match:D>|https://docs.raku.org/type/Match>C< | >L<C<Str:D>|https://docs.raku.org/type/Str>C< $.payload>
+
+The actual value representation. Most of the time it would be a L<C<Match>|https://docs.raku.org/type/Match> obtained from parsed down source. But
+some values might be represented by strings if they're some kind of defaults.
+
+=head3 L<C<Str:D>|https://docs.raku.org/type/Str> C<$.type-name>
+
+Value type name.
+
+=head3 L<C<Mu>|https://docs.raku.org/type/Mu> C<$.type>
+
+Value type object.
+
+=head1 SEE ALSO
+
+L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish.md>,
+L<C<Config::BINDish::Grammar>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/Grammar.md>,
+L<C<Config::BINDish::Grammar::TypeStringify>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/Grammar/TypeStringify.md>,
+L<C<Config::BINDish::Grammar::ContainerProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/Grammar/ContainerProps.md>
+
+=AUTHOR Vadim Belman <vrurg@cpan.org>
+
+=end pod

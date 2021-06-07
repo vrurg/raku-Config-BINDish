@@ -4,17 +4,23 @@ class Config::BINDish::X is Exception is export {
 
 role Config::BINDish::X::Parse is Config::BINDish::X {
     has Match:D $.cursor is required;
+    has $.file;
+    has Int $.line;
 
-    method line {
-        $!cursor.prematch.chomp.split(/\n/).elems;
+    submethod TWEAK {
+        $!file = $!cursor.file;
+        $!line = $!cursor.line;
     }
 
     method wrap-message($msg) {
-        my $pre = $!cursor.prematch.chomp.split(/\n/).reverse.grep(*.chars).head // "";
+        my $pre = $!cursor.prematch.split(/\n/).tail // "";
         my $post = ($!cursor.postmatch.split(/\n/).head // "").chomp;
-        "===SORRY!=== Error while parsing configuration file\n" ~
-        $msg ~ "\n"
-        ~ ("at line " ~ self.line).indent(2)
+        my $source = "";
+        $source = "file " ~ $_ ~ " " with $!file;
+
+        "===SORRY!=== Error while parsing configuration\n"
+        ~ $msg ~ "\n"
+        ~ ($source ~ "at line " ~ $!line).indent(2)
         ~ "\n" ~ $pre ~ "⏏" ~ $post ~ "\n"
     }
 }
@@ -22,14 +28,14 @@ role Config::BINDish::X::Parse is Config::BINDish::X {
 role Config::BINDish::X::Contextish {
     has Str:D $.what is required;
     has $.keyword is required;
-    has $.ctx is required;
+    has Any:D $.ctx is required;
 }
 
 class Config::BINDish::X::Parse::General does Config::BINDish::X::Parse {
     has Str:D $.msg is required;
 
     method message {
-        self.wrap-message($!msg)
+        self.wrap-message($!msg);
     }
 }
 
@@ -170,8 +176,36 @@ class Config::BINDish::X::AST::DuplicateType is Config::BINDish::X {
     }
 }
 
-class Config::BINDish::X::CtxStack::Exhausted is Config::BINDish::X {
+class Config::BINDish::X::Parse::ContextOverwrite is Config::BINDish::X::Parse {
+    has $.ctx;
     method message {
-        "Attempted to pop the topmost grammar context"
+        "Attempt to re-enter a context twice detected; current context: " ~ $.ctx.description
+    }
+}
+
+class Config::BINDish::X::FileNotFound is Config::BINDish::X {
+    has $.file is required;
+    method message {
+        "File '" ~ $!file ~ "' not found"
+    }
+}
+
+class Config::BINDish::X::FileOp is Config::BINDish::X {
+    has $.file is required;
+    has Str:D $.op is required;
+    method message {
+        "Cannot " ~ $.op ~ " file " ~ $.file
+    }
+}
+
+class Config::BINDish::X::StmtsAdopted {
+    has $.parent is required;
+    method message { "Stmts AST node cannot have a parent, adoption attempted by " ~ $!parent.gist }
+}
+
+class Config::BINDish::X::OneTooMany is Config::BINDish::X {
+    has Str:D $.what is required;
+    method message {
+        "Too many " ~ $!what ~ " found, 0 or 1 expected"
     }
 }

@@ -133,7 +133,7 @@ method run-grammar-tests(Mu \grmr, *@tests) is test-tool(:!wrap) {
             }
             else {
                 with %struct<top> {
-                    self.is-cfg-stmt-list: $match, %struct<top>, $message;
+                    self.is-cfg-stmt-list: $match<body>, %struct<top>, $message;
                 }
                 else {
                     self.flunk: $message;

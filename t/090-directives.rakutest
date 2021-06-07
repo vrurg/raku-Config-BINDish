@@ -1,0 +1,21 @@
+use Test::Async;
+use Config::BINDish;
+use Config::BINDish::X;
+
+my $cfg = Config::BINDish.new;
+
+throws-like {
+                $cfg.read: string => q:to/CFG/;
+                            block "foo" {
+                                opt1 42;
+                            }
+                            #line 101 "mock-file.cfg" some more comment
+                            # Now the parse error must report line 102 in mock-file.cfg
+                            opt2 1 ss;
+                            CFG
+            },
+            Config::BINDish::X::Parse::General,
+            "parsing failure reports as directed",
+            message => /'Unrecognized statement' \n '  file mock-file.cfg at line 102'/;
+
+done-testing;

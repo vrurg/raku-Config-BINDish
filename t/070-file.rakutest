@@ -8,7 +8,7 @@ ok ?$cfg.read(file => $?FILE.IO.parent(1).add('070-test.config')), "config file 
 
 ok $cfg.file.defined, "source file recorded";
 
-is-cfg-stmt-list $cfg.match,
+is-cfg-stmt-list $cfg.match<body>,
                  %( statements => %(
                         0 => UNIX-comment => comment-body => " Test config",
                         1 => %(

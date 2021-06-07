@@ -47,7 +47,7 @@ is-deeply @panic-order, ['Ext2', 'Ext1'], "overridden methods are invoked in the
 
 # Note that the same test in 010-grammar.rakutest causes the standard grammar to throw.
 my $match = $cfg.grammar.parse: q<block { option $foo }>, :!strict;
-is-cfg-stmt-list $match,
+is-cfg-stmt-list $match<body>,
                  %( statements => 0 => %(
                      block-head => block-type => 'block',
                      block-body => token-statements(
@@ -84,7 +84,7 @@ try $cfg.grammar.parse: '{}';
 is-deeply @panic-order, ['Ext3', 'Ext2', 'Ext1'], "extension added with a method can override methods too";
 
 $match = $cfg.grammar.parse: q<block { option bar }>, :!strict;
-is-cfg-stmt-list $match,
+is-cfg-stmt-list $match<body>,
                  %( statements => 0 => %(
                      block-head => block-type => 'block',
                      block-body => token-statements(

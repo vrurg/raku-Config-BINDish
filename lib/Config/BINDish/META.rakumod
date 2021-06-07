@@ -13,7 +13,8 @@ our sub META6 {
         'IP::Addr',
     ],
     test-depends   => [
-        'Test::Async',
+        'Test::Async:ver<0.1.2>',
+        'App::Prove6'
     ],
     # build-depends  => <META6 p6doc Pod::To::Markdown>,
     tags           => <CONFIG>,

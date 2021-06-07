@@ -1,7 +1,7 @@
 use v6.d;
 use NQPHLL:from<NQP>;
 use nqp;
-unit class Config::BINDish:ver<0.0.2>:api<0.0.2>;
+unit class Config::BINDish:ver<0.0.3>:api<0.0.3>;
 
 BEGIN {
     Config::BINDish.HOW does role ExtensibleHOW {
@@ -118,7 +118,8 @@ method extend-actions( +@ext ) {
 }
 
 method build-grammar is raw {
-    # Reverse makes extensions declared late to override those declared earlier. In MRO first in the order is first invoked.
+    # Reverse makes extensions declared later to override those declared earlier. In MRO the first in the order
+    # is the first invoked.
     Metamodel::Primitives.parameterize_type: grammar-cache,
                                              |@!grammar-extensions.reverse,
                                              |::?CLASS.HOW.grammar-extensions.reverse;
@@ -139,6 +140,7 @@ multi method read( ::?CLASS:U: |c ) {
 }
 multi method read( ::?CLASS:D: IO:D( Str:D ) :$!file, |c ) {
     $.grammar.parse: $!file.slurp,
+                     :$!file,
                      :$.actions,
                      :$!strict,
                      :$!flat,
@@ -157,24 +159,24 @@ multi method read( ::?CLASS:D: Str:D :$string, |c ) {
 }
 
 # Experimental
-proto sub infix:«then»( Config::BINDish::AST::Parent:D, $ )
+proto sub infix:«then»( Config::BINDish::AST::Node:D, $ )
     is assoc<left>
     is looser( &infix:«=>» )
     is export {*}
-multi sub infix:«then»( Config::BINDish::AST::Parent:D $node,
+multi sub infix:«then»( Config::BINDish::AST::Node:D $node,
                         Pair:D $blk ( :key($type), :value( ( $name, $class ) )
                         where $blk.value ~~ Positional )
-    --> Config::BINDish::AST::Parent:D )
+    --> Config::BINDish::AST::Node:D )
 {
     $node.block: $type, :$name, |( :$class with $class );
 }
-multi sub infix:«then»( Config::BINDish::AST::Parent:D $node,
+multi sub infix:«then»( Config::BINDish::AST::Node:D $node,
                         Pair:D $blk ( :key($type),
-                                      :value($name) ) --> Config::BINDish::AST::Parent:D )
+                                      :value($name) ) --> Config::BINDish::AST::Node:D )
 {
     $node.block: $type, |( :$name if $name && $name !~~ Bool )
 }
-multi sub infix:«then»( Config::BINDish::AST::Parent:D $node, Str:D $opt )
+multi sub infix:«then»( Config::BINDish::AST::Node:D $node, Str:D $opt )
 {
     $node.value: $opt
 }
