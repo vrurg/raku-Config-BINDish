@@ -66,6 +66,10 @@ Current block or option context.
 
 Parent block context.
 
+### `$*CFG-AS-INCLUDE`
+
+If set to *True* then it means that the current grammar is parsing included source.
+
 ### `$*CFG-FLAT-BLOCKS`
 
 Set to `$.flat` attribute value.
@@ -113,6 +117,10 @@ This variable is set to a [`Match`](https://docs.raku.org/type/Match) object poi
 ### `$*CFG-SPECIFIC-VALUE-SYM`
 
 Set by the grammar whenever a specific value type is expected. See more details in [value-sym](#value-sym) section below.
+
+### `$*CFG-BACKTRACK-OPTION`, `$*CFG-BACKTRACK-BLOCK`
+
+These variables are set by corresponding `backtrack-*` method to indicate the context in which `leave-*` methods are called. In other words, if `!$*CFG-BACKTRACK-OPTION` is *True* then an option has been successfully parsed.
 
 METHODS
 =======
