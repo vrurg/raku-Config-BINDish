@@ -14,11 +14,12 @@ role Grammar is BINDish-grammar {
     }
 
     token ipv4-variants {
-        <ipv4-cidr> | <ipv4>
+        [ <ipv4-cidr> | <ipv4> ]
     }
 
     token ipv4 {
         <ipv4-octet> ** 4 % '.'
+        { $*CFG-GRAMMAR.set-value: IP::Addr, :ipv4($/) }
     }
 
     token ipv4-octet {
@@ -27,6 +28,7 @@ role Grammar is BINDish-grammar {
 
     token ipv4-cidr {
         <ipv4> '/' <ipv4-mask>
+        { $*CFG-GRAMMAR.set-value: IP::Addr, :ipv4-cidr($/) }
     }
 
     token ipv4-mask {
@@ -39,17 +41,20 @@ role Grammar is BINDish-grammar {
     }
 
     token ipv6 {
-        <ipv6-full>
+        [ <ipv6-full>
         | <ipv6-mapped>
-        | <ipv6-compressed>
+        | <ipv6-compressed> ]
+        { $*CFG-GRAMMAR.set-value: IP::Addr, :ipv6($/) }
     }
 
     token ipv6-cidr {
         <ipv6> '/' <ipv6-prefix-len>
+        { $*CFG-GRAMMAR.set-value: IP::Addr, :ipv6-cidr($/) }
     }
 
     token ipv6-scoped {
         <ipv6> '%' $<scope>=( \S+ )
+        { $*CFG-GRAMMAR.set-value: IP::Addr, :ipv6-scoped($/) }
     }
 
     token ipv6-full {

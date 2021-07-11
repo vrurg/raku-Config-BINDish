@@ -4,58 +4,101 @@ use Config::BINDish;
 use Config::BINDish::INET;
 use IP::Addr;
 
-plan 25;
+plan 2;
 
-my $cfg = Config::BINDish.new;
+subtest "Basic" => {
+    plan 25;
+    my $cfg = Config::BINDish.new;
 
-$cfg.read: string => q:to/CFG/, :!strict;
-addr4 192.168.0.1;
-network-a4 10.13.0.0/16;
-network-b4 10.42.1.0/255.255.255.0;
-network6 2001:db8:85a3::8a2e:370:7334/49;
+    $cfg.read: string => q:to/CFG/, :!strict;
+    addr4 192.168.0.1;
+    network-a4 10.13.0.0/16;
+    network-b4 10.42.1.0/255.255.255.0;
+    network6 2001:db8:85a3::8a2e:370:7334/49;
 
-url-a https://localhost;
-url-b https://docs.raku.org/language/grammar_tutorial;
-url-c ftp://ftp.freebsd.org;
+    url-a https://localhost;
+    url-b https://docs.raku.org/language/grammar_tutorial;
+    url-c ftp://ftp.freebsd.org;
 
-network 192.168.1.0/24 {
-    default-gw 192.168.1.100;
-    fallback-gw 192.168.1.101;
+    network 192.168.1.0/24 {
+        default-gw 192.168.1.100;
+        fallback-gw 192.168.1.101;
+    }
+    CFG
+
+    my $top = $cfg.top;
+
+    my %IPs =
+        addr4 => '192.168.0.1',
+        network-a4 => '10.13.0.0/16',
+        network-b4 => '10.42.1.0/24',
+        network6 => '2001:db8:85a3::8a2e:370:7334/49',
+        ;
+
+    for %IPs.sort -> (:key($opt), :$value) {
+        isa-ok $top.value($opt), IP::Addr, "$opt: IP address is parsed into IP::Addr";
+        my $IPver = $opt.substr(*-1);
+        is $top.option($opt).value.type-name, 'IPv' ~ $IPver, "$opt: option type name is IPv$IPver";
+        is $top.value($opt).gist, $value, "$opt: IP address value";
+    }
+
+    my %URLs =
+        url-a => 'https://localhost',
+        url-b => 'https://docs.raku.org/language/grammar_tutorial',
+        url-c => 'ftp://ftp.freebsd.org';
+
+    for %URLs.sort -> (:key($opt), :$value) {
+        isa-ok $top.value($opt), Str, "$opt: URL is parsed into Str";
+        is $top.option($opt).value.type-name, "URL", "$opt: option type name is 'URL'";
+        is $top.value($opt), $value, "$opt: URL value";
+    }
+
+    my $network = $top.block('network', :name<192.168.1.0/24>);
+
+    ok $network.defined, "block 'network' is found";
+    is $network.name.type-name, 'IPv4', "network block type-name is IPv4";
+    isa-ok $network.name.payload, IP::Addr, "network block payload type is IP::Addr";
+    is '192.168.1.101', ~$network.value('fallback-gw'), "a network block option value";
 }
-CFG
 
-my $top = $cfg.top;
+subtest "Explicit Struct" => {
+    plan 3;
+    my $cfg = Config::BINDish.new: blocks => ( :net4 => {},
+                                               :net6 => {} ),
+                                   options => ( :ip4<ip> => { :in<net4>, :type-name<ipv4> },
+                                                :ip6<ip> => { :in<net6>, type-name => any <ipv6 ipv6-scoped> },
+                                   );
 
-my %IPs =
-    addr4 => '192.168.0.1',
-    network-a4 => '10.13.0.0/16',
-    network-b4 => '10.42.1.0/24',
-    network6 => '2001:db8:85a3::8a2e:370:7334/49',
-    ;
+    lives-ok {
+        $cfg.read: string => q:to/CFG/;
+                                net4 {
+                                    ip 192.168.42.13;
+                                }
+                                net6 {
+                                    ip 2001:db8:85a3::8a2e:370:7334;
+                                }
+                                CFG
+    }, "parsing a valid config doesn't throw";
 
-for %IPs.sort -> (:key($opt), :$value) {
-    isa-ok $top.value($opt), IP::Addr, "$opt: IP address is parsed into IP::Addr";
-    my $IPver = $opt.substr(*-1);
-    is $top.option($opt).value.type-name, 'IPv' ~ $IPver, "$opt: option type name is IPv$IPver";
-    is $top.value($opt).gist, $value, "$opt: IP address value";
+    throws-like { $cfg.read: string => q:to/CFG/;
+                                        net6 {
+                                            ip 13.13.13.13;
+                                        }
+                                        CFG
+                },
+                Config::BINDish::X::Parse::ValueType,
+                "can't use ipv4 when ipv6 is expected",
+                :message(/"Option 'ip' expects a " .*? ipv6 <.wb> .*? "value but got <ipv4>"/);
+
+    throws-like { $cfg.read: string => q:to/CFG/;
+                                        net4 {
+                                            ip 2001:db8:85a3::8a2e:370:7334;
+                                        }
+                                        CFG
+                },
+                Config::BINDish::X::Parse::ValueType,
+                "can't use ipv4 when ipv6 is expected",
+                :message(/"Option 'ip' expects a <ipv4> value but got <ipv6>"/);
 }
-
-my %URLs =
-    url-a => 'https://localhost',
-    url-b => 'https://docs.raku.org/language/grammar_tutorial',
-    url-c => 'ftp://ftp.freebsd.org';
-
-for %URLs.sort -> (:key($opt), :$value) {
-    isa-ok $top.value($opt), Str, "$opt: URL is parsed into Str";
-    is $top.option($opt).value.type-name, "URL", "$opt: option type name is 'URL'";
-    is $top.value($opt), $value, "$opt: URL value";
-}
-
-my $network = $top.block('network', :name<192.168.1.0/24>);
-
-ok $network.defined, "block 'network' is found";
-is $network.name.type-name, 'IPv4', "network block type-name is IPv4";
-isa-ok $network.name.payload, IP::Addr, "network block payload type is IP::Addr";
-is '192.168.1.101', ~$network.value('fallback-gw'), "a network block option value";
 
 done-testing;
