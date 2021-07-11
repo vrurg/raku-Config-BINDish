@@ -38,13 +38,15 @@ class Value does TypeStringify {
     has Mu $.type is required;
     has Payload:D $.payload is required handles @coercers;
 
+    has Mu $.coerced is mooish(:lazy);
+
     method gist(::?CLASS:D:) {
         my $val = Str($!payload);
         my $quote = $!type-name eq 'dq-string' ?? '"' !! "'";
         $!type ~~ Stringy ?? $quote ~ $val ~ $quote !! $val
     }
 
-    method coerced(::?CLASS:D:) {
+    method build-coerced(::?CLASS:D: --> Mu) {
         -> ::T { T($!payload) }.($!type)
     }
 }
