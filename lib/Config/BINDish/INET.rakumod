@@ -11,6 +11,7 @@ role Grammar is BINDish-grammar {
 
     token value:sym<URL> {
         \w+ '://' \w+ \S*? <?before <.statement-terminator>>
+        { $*CFG-GRAMMAR.set-value: Str, :URL($/) }
     }
 
     token ipv4-variants {
