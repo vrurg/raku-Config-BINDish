@@ -1,0 +1,33 @@
+use Test::Async;
+use Config::BINDish;
+use Config::BINDish::X;
+
+plan 3;
+
+my $cfg = Config::BINDish.new:
+            extend-grammar => role {
+                submethod setup-BINDish {
+                    self.reserve-keywords: option => <foo bar>,
+                                           block => <bar>;
+                }
+            };
+
+lives-ok {
+    $cfg.read: string => q:to/CFG/;
+                            foo "Foo" {
+                                baz "ok";
+                            }
+                            CFG
+}, "block with the same name as a reserved option is accepted";
+
+throws-like { $cfg.read: string => 'foo 666'; },
+            Config::BINDish::X::Parse::General,
+            "use of reserved option name throws",
+            message => { .contains('Unrecognized statement') && .contains('foo 666') };
+
+throws-like { $cfg.read: string => 'bar "no way" { }'; },
+            Config::BINDish::X::Parse::General,
+            "use of reserved block name throws",
+            message => { .contains('Unrecognized statement') && .contains('bar "no way"') };
+
+done-testing;

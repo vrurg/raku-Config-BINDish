@@ -128,7 +128,7 @@ method run-grammar-tests(Mu \grmr, *@tests) is test-tool(:!wrap) {
             }
             with $ex {
                 .rethrow unless $_ ~~ Config::BINDish::X::Parse;
-                self.proclaim: False, $message, { :comments( $ex.message ), caller => self.tool-caller.frame };
+                self.proclaim: False, $message, { :comments( $ex.message ), caller => self.tool-caller };
                 # ~ "\n" ~ $ex.message;
             }
             else {

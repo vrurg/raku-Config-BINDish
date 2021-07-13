@@ -37,7 +37,7 @@ DISCLAIMER
 
 This module is very much experimental in the sense of the API it provides. The grammar is expected to be more stable, yet no warranties can be given at the moment.
 
-Also, all the documentation here is created in write-only mode. No proof-reading has been done yet. All kinds and levels of ugliness are anticipated! My apologies for the situation, hope to get some spare hours to fix it some day.
+Also, all the documentation here is created in write-only mode. No proof-reading has been done so far. All kinds and levels of ugliness and errors are anticipated! My apologies for the situation, hope to get some spare hours to fix it some day in the future.
 
 PREFACE
 =======
@@ -93,23 +93,33 @@ Very roughly, the configuration format supported by the module can be described 
     <block-type> ::= <keyword>
     <block-name> ::= <value>
     <block-class> ::= <keyword>
-    <value> ::= <bool> | <string> | <int> | <num> | <rat> | <file-path>
+    <keyword> ::= <alpha> [ <alphanumeric> | '-' ]*
+    <value> ::= <bool> | <string> | <int> | <num> | <rat> | <file-path> | <keyword>
 
-Depending on strict mode chosen, the terminating semi-colon can be either optional or mandatory. Also, block types and options can be either free-form or restricted to a certain set of allowed keyword.
+Here is a sample config:
 
-Note how `block-name` is declaread as a `value`. It means that any valid option value can serve as the block name. For example:
+    top-level-option "global value";
+    pi 3.1415926;
+    category "1" {
+        description "something meaningful";
+        public; // Option is set to True value
+        products {
+            "item 1"; "item 2"; "item 3";
+        };
+    }
+
+A config can be parse in either strict or relaxed mode. Depending on chosen mode, the terminating semi-colon can be either optional or mandatory. For the above sample in strict mode the `category` block declaration would be an error because its closing `}` is not followed with `;`. Contrary, in relaxed mode one can safely remove the ending semi-colon after `products` as as well as after `"item3"` too.
+
+More information about strictness modes can be found in [`Config::BINDish::Grammar::Strictness`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/Strictness.md)
+
+Note how term `block-name` in the grammar is declared as a `value`. It means that any valid option value can serve as the block name. For example:
 
     block 3.14 { }
 
-Or, with [`Config::BINDish::INET`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/INET.md) loaded it could even be:
+Or, with [`Config::BINDish::INET`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/INET.md) loaded it could even be:
 
     network 192.168.1.0/24 {
     }
-
-Parsing Modes
--------------
-
-A config file can be parsed in "strict" or "relaxed" mode, depending on what user needs. In strict mode certain restrictions are applied. This could help prevent accidental errors in a config.
 
 Comments
 --------
@@ -122,10 +132,10 @@ Similarly to the original BIND 9 format, `Config::BINDish` supports C, C++, and 
      */
     # Unix
 
-Comments are considered statements on their own. This limits where a comment can be placed. For example, one can't put a comment inside an option or a block declaration:
+Comments are considered statements on their own. This limits where a comment can be placed. For example, it's not possible to have a comment inside an option or a block declaration:
 
     pi /* not ok between option keyword and value! */ 3.1415926; # but it's ok post-option
-    server /* not here! */ 1 { // But here
+    server /* not allowed here! */ 1 { // But here
         /*
          * or here
          * where we can make it a comprehensive description
@@ -163,14 +173,10 @@ An option can also be limited as to where it can appear. For example, if a `reso
 
 Moreover, if strict mode is set for options the parser will only allow pre-declared ones.
 
-Reserved Options
-----------------
+Including Configs
+-----------------
 
-An option name can be reserved for parser's special use. For now there is only one reserved option – `include`.
-
-### `include <source>`
-
-This option allows configuration from `<source>` to be injected into the location where `include` is used. For example, we have a file *common.inc*:
+With `include <source>` statement a configuration from `<source>` is injected into the location where the `include` is used. For example, we have a file *common.inc*:
 
     foo 42;
     bar {
@@ -226,7 +232,7 @@ There is no limit on nesting blocks:
         }
     }
 
-*NB* We use strings for IP addresses. But with bundled [`Config::BINDish::INET`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/INET.md) extension one can have it like `gw 172.1.2.1;`. But this paper tries to stick to the barebones module as much as possible.
+*NB* We use strings for IP addresses. But with bundled [`Config::BINDish::INET`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/INET.md) extension one can have it like `gw 172.1.2.1;`. But this paper tries to stick to the barebones module as much as possible.
 
 So far the examples written as if the parser works in relaxed mode. In strict mode the rule of *mandatory semi-colon* applies and a block must always be terminated with `;`:
 
@@ -264,7 +270,7 @@ Yet, a block could be limited to be a value-only one. In this case the above exa
 Directives
 ----------
 
-`Config::BINDish` supports special directives similar to what they use in C. Currently the only implemented directive is `#line`:
+`Config::BINDish` supports special directives similar to what C is using. Currently the only implemented directive is `#line`:
 
     #line 13 "mock-file.conf" Here go a comment
 
@@ -275,11 +281,11 @@ The meaning of the directive is the same as in C: it makes the grammar to preten
 
 then when a error is reported it will point at line 14 in *mock-file.conf*.
 
-Note that the file name part of `#line` can either be omitted or use any valid option value. For example, with [`Config::BINDish::INET`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/INET.md) one can do something like:
+Note that the file name part of `#line` can either be omitted or use any valid option value. For example, with [`Config::BINDish::INET`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/INET.md) one can do something like:
 
     #line 1 https://configs.local/common/std.inc
 
-It would then be only a matter of overriding [`Config::BINDish::Grammar`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/Grammar.md) `include-source` method to provide support for URLs.
+It would then be only a matter of overriding [`Config::BINDish::Grammar`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar.md) `include-source` method to provide support for URLs.
 
 Hybrid mode
 -----------
@@ -301,7 +307,7 @@ where they end is totally up to them!
 SEE ALSO
 ========
 
-[Config::BINDish](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish.md)
+[Config::BINDish](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish.md)
 
 AUTHOR
 ======

@@ -1,0 +1,78 @@
+
+=begin pod
+=head1 NAME
+
+C<Config::BINDish::Grammar::Context> - parsing context representation
+
+=head1 DESCRIPTION
+
+Instance of this class represents information about the current parsing context.
+
+=head1 ATTRIBUTES
+
+=head3 L<C<Str:D>|https://docs.raku.org/type/Str> C<$.type>
+
+The type of the current context. The core grammar knows about I<block> and C<option> contexts. But an extension can
+define its own type.
+
+=head3  C<$.id>
+
+ID of the current context statement, if it has one.
+
+=head3 L<C<Config::BINDish::Grammar::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/Value.md> C<$.keyword>
+
+Keyword used to create context. For example, for a block context created with
+
+    foo { }
+
+this attribute will be set to a C<Value> where C<payload> attribute is a L<C<Match>|https://docs.raku.org/type/Match>
+against I<foo> part of the block.
+
+=head3 L<C<Config::BINDish::Grammar::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/Value.md> C<$.name>
+
+Name of the current context. Currently can only be set for named block contexts.
+
+=head3 C<Config::BINDish::Grammar::Context> C<$.parent>
+
+Parent context. Undefined for C<.TOP>.
+
+=head3 L<C<Config::BINDish::Grammar::StatementProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/StatementProps.md> C<$.props>
+
+Properties of the context statement if it is pre-declared.
+
+=head3  C<$.relations>
+
+A hash of keywords of pre-declared statements which are valid in the current block context. See C<prop-relations>
+attribute of
+L<C<Config::BINDish::Grammar>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar.md>.
+
+=head1 METHODS
+
+=head3 C«cur-block-ctx(--> Config::BINDish::Grammar::Context)»
+
+Returns self if current context is a block; or the innermost enclosing block context.
+
+=head3 C<is-TOP()>
+
+Returns I<True> if current block context belongs to C<.TOP>.
+
+=head3 C<description()>
+
+Returns a string, in a human-readable form, describing the current context.
+
+=head3 C<ACCEPTS(StatementProps:D $props)>
+
+Returns I<True> if a pre-declared statement can be used in the enclosing block context.
+
+=head1 SEE ALSO
+
+L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish.md>,
+L<C<Config::BINDish::Grammar>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar.md>,
+L<C<Config::BINDish::Grammar::BlockProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/BlockProps.md>,
+L<C<Config::BINDish::Grammar::OptionProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/OptionProps.md>
+
+=head1 AUTHOR
+
+Vadim Belman <vrurg@cpan.org>
+
+=end pod

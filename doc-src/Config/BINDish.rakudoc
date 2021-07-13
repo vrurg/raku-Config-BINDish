@@ -43,8 +43,8 @@ simply I<BINDish>.
 BINDish configuration parser can be augmented with 3rd-party extensions. Every extension is implemented as a role which
 will be used to build the final grammar or actions classes (see L<C<Grammar>|https://docs.raku.org/type/Grammar>). The
 classes are based upon
-L<C<Config::BINDish::Grammar>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/Grammar.md> and
-L<C<Config::BINDish::Actions>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/Actions.md>
+L<C<Config::BINDish::Grammar>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar.md> and
+L<C<Config::BINDish::Actions>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Actions.md>
 respectively. Here is the steps C<Config::BINDish> does to build them:
 
 =item An empty class is created which will serve as the final version
@@ -99,24 +99,27 @@ Why is the above called I<1.5 ways>? Because the constructor eventually uses the
 C<:extend-*> named attributes.
 
 See also
-L<C<Config::BINDish::Grammar>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/Grammar.md> and
-L<C<Config::BINDish::Actions>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/Actions.md>.
+L<C<Config::BINDish::Grammar>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar.md> and
+L<C<Config::BINDish::Actions>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Actions.md>.
 
 =head1 ATTRIBUTES
 
-=head2 L<C<Config::BINDish::Grammar::Strictness>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/Grammar/Strictness.md> C<$.strict>
+=head2 L<C<Config::BINDish::Grammar::Strictness>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/Strictness.md> C<$.strict>
 
-The default grammar strictness mode. See L<C<Config::BINDish::Grammar::Strictness>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/Grammar/Strictness.md> documentation for details.
+The default grammar strictness mode. See L<C<Config::BINDish::Grammar::Strictness>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/Strictness.md> documentation for details.
 
-=head2 C<%.blocks>, C<%.options>
+=head2 L<C<Pair:D>|https://docs.raku.org/type/Pair> C<@.blocks>, L<C<Pair:D>|https://docs.raku.org/type/Pair> C<@.options>
 
-These two attributes contain user-defined structure of the config file. More information about them can be found in
-L<Config::BINDish::Grammar|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/Grammar.md> documentation, methods C<declare-blocks> and C<declare-options>.
+These two attributes contain user-defined (pre-declared) structure of the config file. More information about them can be found in
+L<Config::BINDish::Grammar|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar.md>
+documentation, in
+L<Pre-declaration|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar.md#Pre-declaration>
+section.
 
 =head2 C<$.grammar>, C<$.actions>
 
 The final grammar and actions class versions with all registered extensions applied. Both attributes are I<lazy> and
-C<clearable> in terms of L<C<AttrX::Mooish>|https://modules.raku.org/dist/AttrX::Mooish:cpan:VRURG>. It means that the
+C<clearable> in terms of L<C<AttrX::Mooish>|https://modules.raku.org/dist/AttrX::Mooish>. It means that the
 following is possible:
 
     say $cfg.grammar.^name; # Config::BINDish::Grammar...
@@ -131,15 +134,15 @@ for the file name.
 
 =head2 L<C<Bool>|https://docs.raku.org/type/Bool> C<$.flat = False>
 
-If set to C<True> then L<C<Config::BINDish::Actions>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/Actions.md>
+If set to C<True> then L<C<Config::BINDish::Actions>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Actions.md>
 will act in flattening mode.
 
 =head2 C<$.top>
 
 The top node produced by the grammar actions. I.e. it is the result of C<<$<TOP>.ast>> of the
 L<C<Match>|https://docs.raku.org/type/Match> object produced by grammar's C<parse> method. For
-L<C<Config::BINDish::Actions>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/Actions.md> it would be an instance of
-L<C<Config::BINDish::AST>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/AST.md>.
+L<C<Config::BINDish::Actions>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Actions.md> it would be an instance of
+L<C<Config::BINDish::AST>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST.md>.
 But an extension can produce something to its taste which wouldn't be an AST whatsoever. The only requirement imposed
 on the object stored by the attribute is to provide C<get> method.
 
@@ -158,7 +161,7 @@ C<$.grammar> or C<$.actions> attributes, respectively. Both return C<self> to al
 
 =head2 C<build-grammar()>, C<build-actions()>
 
-Methods used by L<C<AttrX::Mooish>|https://modules.raku.org/dist/AttrX::Mooish:cpan:VRURG> to lazily initialize
+Methods used by L<C<AttrX::Mooish>|https://modules.raku.org/dist/AttrX::Mooish> to lazily initialize
 C<$.grammar> and C<$.actions> attributes respectively.
 
 C<multi method read(Config::BINDish:U: |args)>
@@ -177,7 +180,7 @@ attribute.
 =head3 C<multi get(...)>
 
 Method is handled by C<$.top> attribute. See
-L<C<Config::BINDish::AST::Parent>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/AST/Parent.md>
+L<C<Config::BINDish::AST::Parent>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST/Parent.md>
 for detailed method description.
 
 =head1 SEE ALSO

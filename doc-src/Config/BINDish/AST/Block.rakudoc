@@ -1,13 +1,13 @@
 =begin pod
-=head1 NAME
+=head1 CLASS
 
 C<class Config::BINDish::AST::Block> - representation of a configuration block
 
 =head1 DESCRIPTION
 
-Is L<C<Config::BINDish::AST::Node>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/AST/Node.md>.
+Is L<C<Config::BINDish::AST::Node>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST/Node.md>.
 
-Does L<C<Config::BINDish::AST::Blockish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/AST/Blockish.md>.
+Does L<C<Config::BINDish::AST::Blockish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST/Blockish.md>.
 
 =head1 ATTRIBUTES
 
@@ -60,8 +60,8 @@ Returns a flattened copy of the block.
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish.md>,
-L<C<Config::BINDish::AST>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/AST.md>
+L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish.md>,
+L<C<Config::BINDish::AST>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST.md>
 
 =head1 AUTHOR
 

@@ -44,18 +44,26 @@ Otherwise it has to be like this:
 
 This attribute determines if all options have to be explicitly pre-declared.
 
-See method `declare-options` in [`Config::BINDish::Grammar`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/Grammar.md).
+See method `declare-options` in [`Config::BINDish::Grammar`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar.md).
 
 ### [`Bool:D`](https://docs.raku.org/type/Bool) `$.blocks = False`
 
 This attribute determines if all block types have to be explicitly pre-declared.
 
-See method `declare-blocks` in [`Config::BINDish::Grammar`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/Grammar.md).
+See method `declare-blocks` in [`Config::BINDish::Grammar`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar.md).
+
+### [`Bool:D`](https://docs.raku.org/type/Bool) `$.warnings = True`
+
+If set the the grammar will issue warnings when it suspects a problem. For example, a warning will be printed if a hash is used to initialize grammar's `%.options` or `%.blocks` attributes:
+
+    Config::BINDish.new: options => { :op1<op> => { ... } };
+
+Because by default Raku uses hashes with [`Str`](https://docs.raku.org/type/Str) keys, `:op1<op>` will be coerced and instead a [`Pair`](https://docs.raku.org/type/Pair), representing option `op` ID and keyword, the grammar will find a string *"op1\top"* which is an invalid keyword.
 
 SEE ALSO
 ========
 
-[`Config::BINDish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish.md), [`Config::BINDish::Grammar`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/Grammar.md)
+[`Config::BINDish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish.md), [`Config::BINDish::Grammar`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar.md)
 
 AUTHOR
 ======

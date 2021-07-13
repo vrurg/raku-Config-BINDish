@@ -1,4 +1,4 @@
-NAME
+ROLE
 ====
 
 `role Config::BINDish::AST::Blockish` - interface of a generic block class
@@ -13,11 +13,11 @@ METHODS
 
 ### `multi find(:$block!, :$name, :$class, Bool :$local --> Config::BINDish::AST::Block)`
 
-Similar to `find-all(:$block!, ...)` candidate but makes makes sure that only one block entry is found. It either returns the block instance found, or [`Nil`](https://docs.raku.org/type/Nil), or throws with [`Config::BINDish::X::Block::Ambiguous`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/X/Block/Ambiguous.md) if more than one candidate found.
+Similar to `find-all(:$block!, ...)` candidate but makes makes sure that only one block entry is found. It either returns the block instance found, or [`Nil`](https://docs.raku.org/type/Nil), or throws with [`Config::BINDish::X::Block::Ambiguous`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/X/Block/Ambiguous.md) if more than one candidate found.
 
 ### `multi find(:$option!, Bool :$local --> Config::BINDish::AST::Option)`
 
-Similar to the candidate for `:$block!`, but for options. Returns [`Config::BINDish::AST::Option`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/AST/Option.md). Throws with [`Config::BINDish::X::Option::Ambiguous`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/X/Option/Ambiguous.md).
+Similar to the candidate for `:$block!`, but for options. Returns [`Config::BINDish::AST::Option`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST/Option.md). Throws with [`Config::BINDish::X::Option::Ambiguous`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/X/Option/Ambiguous.md).
 
 ### `block($block, *%p)`
 
@@ -47,7 +47,7 @@ Returns block's standalone values. For example, for the following example it wil
         1; 2; 3;
     }
 
-If `$raw` named argument is used then instead of payloads the method will return instances of [`Config::BINDish::AST::Value`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/AST/Value.md).
+If `$raw` named argument is used then instead of payloads the method will return instances of [`Config::BINDish::AST::Value`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST/Value.md).
 
 Method `get`
 ------------
@@ -56,7 +56,7 @@ This is an umbrella method which provides a few ways of accessing configuration 
 
 ### `multi get(Str:D $option, Bool :$raw, Bool :$local = True)`
 
-By default returns `$option` value. With `:raw` argument will return corresponding [`Config::BINDish::AST::Option`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/AST/Option.md) object. With `:!local` will search for the option recursively.
+By default returns `$option` value. With `:raw` argument will return corresponding [`Config::BINDish::AST::Option`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST/Option.md) object. With `:!local` will search for the option recursively.
 
     $block.get("foo");        # Option "foo" value
 
@@ -120,7 +120,7 @@ Let's use an example from tests:
 
     top-opt 3.1415926;
 
-Assuming that `$cfg` is our [`Config::BINDish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish.md) instance, and by noting that method `get` is available on it via `$.top` attribute, we can have the following:
+Assuming that `$cfg` is our [`Config::BINDish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish.md) instance, and by noting that method `get` is available on it via `$.top` attribute, we can have the following:
 
     $cfg.get: :multi => "opt"; # Get option "opt" from the nameless block multi, i.e. results in "just multi"
     $cfg.get: :multi("1") =>
@@ -131,7 +131,7 @@ Assuming that `$cfg` is our [`Config::BINDish`](https://github.com/vrurg/raku-Co
 SEE ALSO
 ========
 
-[`Config::BINDish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish.md), [`Config::BINDish::AST`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/AST.md)
+[`Config::BINDish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish.md), [`Config::BINDish::AST`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST.md)
 
 AUTHOR
 ======

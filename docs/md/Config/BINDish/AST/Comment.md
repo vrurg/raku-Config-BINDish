@@ -1,12 +1,12 @@
-NAME
-====
+CLASS
+=====
 
 `class Config::BINDish::AST::Comment` - a comment
 
 DESCRIPTION
 ===========
 
-Is [`Config::BINDish::AST`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/AST.md).
+Is [`Config::BINDish::AST`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST.md).
 
 ATTRIBUTES
 ==========
@@ -22,7 +22,7 @@ The actual content of the comment.
 SEE ALSO
 ========
 
-[`Config::BINDish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish.md), [`Config::BINDish::AST`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/AST.md)
+[`Config::BINDish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish.md), [`Config::BINDish::AST`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST.md)
 
 AUTHOR
 ======

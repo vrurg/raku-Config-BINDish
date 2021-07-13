@@ -209,3 +209,23 @@ class Config::BINDish::X::OneTooMany is Config::BINDish::X {
         "Too many " ~ $!what ~ " found, 0 or 1 expected"
     }
 }
+
+class Config::BINDish::X::DuplicateID is Config::BINDish::X {
+    has Any:D $.props is required;
+    has Str:D $.keyword is required;
+    has Str:D $.what is required; # Kind of entity: block or option
+
+    method message {
+        $!what.tc ~ "s '" ~ $!keyword ~ "' and '" ~ $!props.keyword
+        ~ "' are both using same ID '" ~ $!props.id ~ "'"
+    }
+}
+
+class Config::BINDish::X::DuplicateKeyword is Config::BINDish::X {
+    has $.keyword is required;
+    has $.in is required; # a BlockProps
+    has $.what is required;
+    method message {
+        "Another declaration of $!what '$!keyword' already exists for block '" ~ $!in.keyword ~ "'"
+    }
+}

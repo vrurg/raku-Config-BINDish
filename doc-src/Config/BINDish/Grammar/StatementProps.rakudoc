@@ -1,0 +1,40 @@
+
+=begin pod
+=head1 ROLE
+
+C<Config::BINDish::Grammar::StatementProps> - standard statement properties
+
+=head1 DESCRIPTION
+
+This role defines properties common to all pre-declarable statements.
+
+=head1 ATTRIBUTES
+
+=head3 L<C<SetHash:D()>|https://docs.raku.org/type/SetHash> C<$.in>
+
+Set of block IDs in which a statement can be used.
+
+=head3 L<C<Bool:D>|https://docs.raku.org/type/Bool> C<$.autovivified>
+
+When I<True> this statement declaration was autovivified by the parser. This can happen, for example, when an option
+has a block referenced in its C<$.in> and the block is not explicitly declared.
+
+=head1 METHODS
+
+=head3 C<ACCEPTS(Config::BINDish::Grammar::Context:D $ctx)>
+
+Checks if this statement can be used in context C<$ctx> by locating the nearest enclosing block context and verifying
+if the block is mentioned in statement's C<$.in> set. Always matches if C<$.in> is empty.
+
+=head1 SEE ALSO
+
+L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish.md>,
+L<C<Config::BINDish::Grammar>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar.md>,
+L<C<Config::BINDish::Grammar::BlockProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/BlockProps.md>,
+L<C<Config::BINDish::Grammar::OptionProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/OptionProps.md>
+
+=head1 AUTHOR
+
+Vadim Belman <vrurg@cpan.org>
+
+=end pod

@@ -3,7 +3,7 @@ use Test::Async <Config::BINDish::Test Base>;
 use Config::BINDish::Grammar;
 use Config::BINDish::X;
 
-plan 3, :!parallel;
+plan 3, :parallel;
 
 subtest "Grammar Basics", {
     my @tests =
@@ -518,7 +518,7 @@ subtest "Grammar Basics", {
 }
 
 subtest "Errors" => {
-    plan 7;
+    plan 8;
 
     throws-like { Config::BINDish::Grammar.parse: '{}'; },
                 Config::BINDish::X::Parse::General,
@@ -535,12 +535,17 @@ subtest "Errors" => {
                 "bad hex number",
                 message => /:s Bad number/;
 
-    throws-like { Config::BINDish::Grammar.parse: 'block {}', :strict },
+    throws-like { Config::BINDish::Grammar.parse: 'keyword-ends-with-dash-'; },
+                Config::BINDish::X::Parse::General,
+                "a keyword must not end with a dash",
+                message => /:s Unrecognized statement/;
+
+    throws-like { Config::BINDish::Grammar.parse: 'block {}', strict => :syntax },
                 Config::BINDish::X::Parse::General,
                 "block needs a terminator in strict mode",
                 message => /:s Missing semicolon/;
 
-    throws-like { Config::BINDish::Grammar.parse: 'block { option };', :strict },
+    throws-like { Config::BINDish::Grammar.parse: 'block { option };', strict => {:syntax} },
                 Config::BINDish::X::Parse::General,
                 "option needs a terminator in strict mode",
                 message => /:s Missing semicolon/;
@@ -551,7 +556,7 @@ subtest "Errors" => {
                 message => /:s Unrecognized statement/;
 
     throws-like { Config::BINDish::Grammar.parse:
-                    q:to/CFG/
+                        q:to/CFG/
                         block {
                             val 1;
                             opt "foo";
@@ -567,29 +572,29 @@ subtest "Errors" => {
 subtest "Explicit Structure" => {
     plan 12;
 
-    my %blocks = block => {:top-only, :named},
-                 subblock => {:in<block>, :named},
-                 parent-block => { :top-only, },
+    my @blocks = :block => {:in<.TOP>, :named},
+                 :subblock => {:in<block>, :named},
+                 parent-block => {:in<.TOP>},
                  ;
-    my %options = count => { :type(Int) },
-                  description => { :top-only, :type(Str) },
+    my @options = count => { :type(Int) },
+                  description => { :in<.TOP>, :type(Str) },
                   subopt => { :in<subblock>, :type-name<int>  },
                   ;
-    my $cfg = q:to/CFG/;
-                description "mixed pre-declared and undeclared elements";
-                free-form-option;
-                count 1;
-                block 'top one' {
-                    count 2;
-                    subblock "inner one" {
-                        subopt 42;
-                        other-option "is ok too";
-                    }
-                }
-                foo "undeclared" { }
-                CFG
+    my $cfg-source = q:to/CFG/;
+                        description "mixed pre-declared and undeclared elements";
+                        free-form-option;
+                        count 1;
+                        block 'top one' {
+                            count 2;
+                            subblock "inner one" {
+                                subopt 42;
+                                other-option "is ok too";
+                            }
+                        }
+                        foo "undeclared" { }
+                        CFG
 
-    my $match = Config::BINDish::Grammar.parse: $cfg, :%blocks, :%options, :!strict;
+    my $match = Config::BINDish::Grammar.parse: $cfg-source, :@blocks, :@options, :!strict;
     is-cfg-stmt-list $match<body>,
                      %(
                         statements => %(
@@ -647,19 +652,20 @@ subtest "Explicit Structure" => {
                      "predefined elements can be mixed with free-form ones in non-strict mode";
 
     throws-like {
-                    $ = Config::BINDish::Grammar.parse: "bad-option 1;", :%options, :strict;
+                    Config::BINDish::Grammar.parse("bad-option 1;", :@options, :strict).sink;
                 },
                 Config::BINDish::X::Parse::Unknown,
                 "undeclared option in strict mode throws",
                 message => /:s Unknown option/;
     throws-like {
-                    $ = Config::BINDish::Grammar.parse: q<foo 'bar' { };>, :%blocks, :strict;
+                    Config::BINDish::Grammar.parse(q<foo 'bar' { };>, :@blocks, :strict).sink;
                 },
                 Config::BINDish::X::Parse::Unknown,
                 "undeclared block in strict mode throws",
                 message => /:s Unknown block type/;
+
     throws-like {
-                    $ = Config::BINDish::Grammar.parse: q<subblock 'not here' { };>, :%blocks, :strict;
+                    Config::BINDish::Grammar.parse(q<subblock 'not here' { };>, :@blocks, :strict).sink;
                 },
                 Config::BINDish::X::Parse::Context,
                 "a subblock at the top level in strict mode throws",
@@ -668,35 +674,35 @@ subtest "Explicit Structure" => {
     for True, False -> $strict {
         my $mode = ($strict ?? 'strict' !! 'non-strict') ~ " mode";
         throws-like {
-                        $ = Config::BINDish::Grammar.parse: q<parent-block { subblock 'not here' { }; };>,
-                                                            :%blocks,
-                                                            :$strict;
+                        Config::BINDish::Grammar.parse(q<parent-block { subblock 'not here' { }; };>,
+                                                       :@blocks,
+                                                       :$strict).sink;
                     },
                     Config::BINDish::X::Parse::Context,
                     "a subblock under wrong parent block in $mode throws",
                     message => /:s Block .* cannot be used in block \'parent\-block\'/;
         throws-like {
-                        $ = Config::BINDish::Grammar.parse: q<parent-block { block 'not here' { }; };>,
-                                                            :%blocks,
-                                                            :$strict;
+                        Config::BINDish::Grammar.parse(q<parent-block { block 'not here' { }; };>,
+                                                       :@blocks,
+                                                       :$strict).sink;
                     },
                     Config::BINDish::X::Parse::Context,
                     "a top-level block under a parent block in $mode throws",
                     message => /Block .* "cannot be used in block"/;
         throws-like {
-                        $ = Config::BINDish::Grammar.parse: q<parent-block { subopt 13; };>,
-                                                            :%blocks,
-                                                            :%options,
-                                                            :$strict;
+                        Config::BINDish::Grammar.parse(q<parent-block { subopt 13; };>,
+                                                       :@blocks,
+                                                       :@options,
+                                                       :$strict).sink;
                     },
                     Config::BINDish::X::Parse::Context,
                     "a option in a wronh block in $mode throws",
                     message => /:s Option .* cannot be used in block/;
         throws-like {
-                        $ = Config::BINDish::Grammar.parse: q<parent-block { description 'any'; };>,
-                                                            :%blocks,
-                                                            :%options,
-                                                            :$strict;
+                        Config::BINDish::Grammar.parse(q<parent-block { description 'any'; };>,
+                                                       :@blocks,
+                                                       :@options,
+                                                       :$strict).sink;
                     },
                     Config::BINDish::X::Parse::Context,
                     "a top-level option can't be used in a block in $mode",

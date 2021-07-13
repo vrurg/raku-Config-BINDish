@@ -1,0 +1,42 @@
+=begin pod
+=head1 NAME
+
+C<Config::BINDish::Grammar::BlockProps> - block statement properties
+
+=head1 DESCRIPTION
+
+Does
+L<C<Config::BINDish::Grammar::StatementProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/StatementProps.md>,
+L<C<Config::BINDish::Grammar::ContainerProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/ContainerProps.md>,
+L<C<Config::BINDish::Grammar::DeclarationProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/DeclarationProps.md>.
+
+=head1 ATTRIBUTES
+
+=head3 L<C<Bool>|https://docs.raku.org/type/Bool> C<$.named>
+
+If I<True> then block must have a name.
+
+=head3 L<C<Bool>|https://docs.raku.org/type/Bool> C<$.classified>
+
+If I<True> then block must have a class. Only makes sense when C<$.named> is I<True>.
+
+=head3 L<C<Bool>|https://docs.raku.org/type/Bool> C<$.value-only>
+
+If I<True> then block can only contain values. For example:
+
+    acl "local-net" allowed {
+        192.168.42.0/24; 192.168.13.0/24;
+        default-gw 192.168.1.1; # Context error, option cannot be used here
+    }
+
+=head1 SEE ALSO
+
+L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish.md>,
+L<C<Config::BINDish::Grammar>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar.md>,
+L<C<Config::BINDish::Grammar::OptionProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/OptionProps.md>
+
+=head1 AUTHOR
+
+Vadim Belman <vrurg@cpan.org>
+
+=end pod

@@ -1,14 +1,14 @@
-NAME
-====
+CLASS
+=====
 
 `class Config::BINDish::AST::Block` - representation of a configuration block
 
 DESCRIPTION
 ===========
 
-Is [`Config::BINDish::AST::Node`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/AST/Node.md).
+Is [`Config::BINDish::AST::Node`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST/Node.md).
 
-Does [`Config::BINDish::AST::Blockish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/AST/Blockish.md).
+Does [`Config::BINDish::AST::Blockish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST/Blockish.md).
 
 ATTRIBUTES
 ==========
@@ -62,7 +62,7 @@ Returns a flattened copy of the block.
 SEE ALSO
 ========
 
-[`Config::BINDish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish.md), [`Config::BINDish::AST`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.3/docs/md/Config/BINDish/AST.md)
+[`Config::BINDish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish.md), [`Config::BINDish::AST`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST.md)
 
 AUTHOR
 ======

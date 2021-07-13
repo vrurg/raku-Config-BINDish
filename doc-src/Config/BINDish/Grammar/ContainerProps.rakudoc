@@ -1,0 +1,50 @@
+
+=begin pod
+=head1 ROLE
+
+C<Config::BINDish::Grammar::ContainerProps> - common properties of container statements
+
+=head1 DESCRIPTION
+
+Does L<C<Config::BINDish::Grammar::TypeStringify>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/TypeStringify.md>.
+
+A container statement is the one which can contain a value. The only two pre-declarable kind of statements currently
+supported: options and blocks – are both containers.
+
+=head1 ATTRIBUTES
+
+=head3 C<List(Str)> C<$.value-sym>
+
+List of sym names of C<value> token, allowed for this kind of container. For example, if we want an option C<foo> to
+only accept numeric values then this list must contain C<int>, C<num>, and C<rat>. In this case the grammar will only
+attempt to match option value using tokens C«value:sym<int>», C«value:sym<num>», and C«value:sym<rat>», respectively.
+
+=head3 Mu C<$.type>
+
+Must be a type object, which is the type this container is constrained to. Can be a
+L<C<Junction>|https://docs.raku.org/type/Junction> in which case the type of possible container value is matched against the junction. For example:
+C<Num | Rat> would restrict the container to only L<C<Num>|https://docs.raku.org/type/Num> or L<C<Rat>|https://docs.raku.org/type/Rat> values.
+
+=head3  C<$.type-name>
+
+Contains allowed type name for this container. For example, to restrict a container to keywords only C<$.type> must
+be set to L<C<Str>|https://docs.raku.org/type/Str>, and type name set to I<"keyword">.
+
+=head1 METHODS
+
+=head3 C<ACCEPTS(>L<C<Config::BINDish::Grammar::Value:D>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/Value.md>C< $val)>
+
+Returns I<True> if C<$val> matches this container constraints on data type and type name.
+
+=head1 SEE ALSO
+
+L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish.md>,
+L<C<Config::BINDish::Grammar>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar.md>,
+L<C<Config::BINDish::Grammar::BlockProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/BlockProps.md>,
+L<C<Config::BINDish::Grammar::OptionProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/OptionProps.md>
+
+=head1 AUTHOR
+
+Vadim Belman <vrurg@cpan.org>
+
+=end pod

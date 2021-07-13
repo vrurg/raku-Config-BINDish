@@ -5,7 +5,7 @@ use Config::BINDish::Grammar;
 use Config::BINDish::AST;
 use Config::BINDish::X;
 
-plan 6;
+plan 8, :parallel;
 
 # The purpose of this test suite is to make sure that in strict mode only pre-declared constructs are allowed.
 my $custom-set-invoked = False;
@@ -14,12 +14,12 @@ role CustomExt is BINDish-grammar {
     submethod setup-BINDish {
         $custom-set-invoked = True;
         self.declare-blocks:
-            my-top => { :top-only },
-            my-top-named => { :top-only, :named },
+            :my-top => { :in<.TOP> },
+            :my-top-named => { :in<.TOP>, :named },
             my-sub => { :in<my-top> },
         ;
         self.declare-options:
-            op-top => { :top-only, :type(Str) },
+            op-top => { :in<.TOP>, :type(Str) },
             op-sub => { :in<my-top-named>, :type-name<bool> },
             op-any => {},
             op-numish => { value-sym => <int num rat> },
@@ -28,14 +28,14 @@ role CustomExt is BINDish-grammar {
 
 my $cfg = Config::BINDish.new:
         :strict{:blocks, :options},
-        blocks => %(
-            general => { :top-only, :!named },
-            subsystem => { :top-only, :named },
-            paths => { :in<general subsystem>, :named, :type(Str), :value-only },
+        blocks => (
+            :general => { :in<.TOP>, :!named },
+            :subsystem => { :in<.TOP>, :named },
+            :paths => { :in<general subsystem>, :named, :type(Str), :value-only },
             blist => { :named, :!classified, :type-name<keyword>, :value-only },
             lookup => { :value-sym<string file-path>, :value-only },
         ),
-        options => %(
+        options => (
             base => { :in<paths>, type => Str },
             max => { :in<general>, type => Int },
             multi-type => { :in<general>, type => Int | Rat },
@@ -232,7 +232,8 @@ subtest "Value validation" => {
     subtest "keyword list in a value-only block", :instant, {
         plan 5;
 
-        if lives-ok { $cfg.read: string => q:to/CFG/;
+        if lives-ok {
+                        $cfg.read: string => q:to/CFG/;
                                     blist "keywords" {
                                         foo; bar; baz;
                                     }
@@ -345,23 +346,232 @@ subtest "Competing Value Types" => {
 
     for <string dq-string>, <whatever whatever> -> ($sym, $type-name) {
         subtest "value type is $sym" => {
-            plan 4;
+            plan 5;
             my $cfg = Config::BINDish.new:
                 :strict{:blocks, :options},
                 extend-grammar => [BadValueType],
                 extend-actions => [BVTActions],
-                options => %( foo => { :type(Str), value-sym => ($sym) } );
+                options => ( foo => { :type(Str), value-sym => ($sym) } );
             lives-ok {
                          $cfg.read: string => q:to/CFG/;
                                 foo "*";
                                 CFG
             }, "parsed with option being a $sym";
+            ok ?$cfg.match, "parse is successfull";
+            abort-testing unless ?$cfg.match;
             my $option = $cfg.get("foo", :raw);
             ok $option.defined, "option object is present";
             isa-ok $option.value.payload, Str, "option's value is Str";
             is $option.value.type-name, $type-name, "option's value type name is $type-name";
         }
     }
+}
+
+subtest "Advanced Nesting" => {
+    plan 3;
+
+    subtest "Different Option Types" => {
+        plan 6;
+
+        my $cfg = Config::BINDish.new:
+            :strict{:options},
+            options => (
+                :ids<id> => { :in<resource>, :type(Str) },
+                :idn<id> => { :in<sequential>, :type(Int) },
+            );
+
+        lives-ok {
+            $cfg.read: string => q:to/CFG/;
+                                    resource {
+                                        id "answer-0042";
+                                    }
+                                    sequential {
+                                        id 13;
+                                    }
+                                    CFG
+        }, "parsed didn't throw";
+
+        ok ?$cfg.match, "parse is successfull";
+
+        my $id = $cfg.get(:resource => "id");
+        is $id, "answer-0042", "option 'id' value in 'resource'";
+        $id = $cfg.get(:sequential => "id");
+        is $id, 13, "option 'id' value in 'sequential'";
+
+        throws-like {
+                $cfg.read: string => q:to/CFG/;
+                                        foo {
+                                            id 1;
+                                        }
+                                        CFG
+            },
+            Config::BINDish::X::Parse::Context,
+            "multi-variant option in a wrong block throws";
+
+        throws-like {
+                $cfg.read: string => q:to/CFG/;
+                                        resource {
+                                            id 1;
+                                        }
+                                        CFG
+            },
+            Config::BINDish::X::Parse::ValueType,
+            "multi-variant option with incorrect value type";
+    }
+
+    subtest "Different blocks" => {
+        plan 6;
+        my $cfg = Config::BINDish.new:
+            :strict{:blocks, :options},
+            blocks => (
+                :params1 => { :in<.TOP> },
+                :params2 => { :in<.TOP> },
+                :params3 => { },
+                :det1<details> => { :in<params1>, },
+                :det2<details> => { :in<params2>, },
+            ),
+            options => (
+                :th1<threshold> => { :in<det1>, :type(Rat) },
+                :th2<threshold> => { :in<det2>, :type(Int) },
+            );
+
+        lives-ok {
+            $cfg.read: string => q:to/CFG/;
+                                    params1 {
+                                        details {
+                                            threshold 3.1415926;
+                                        }
+                                    }
+                                    params2 {
+                                        details {
+                                            threshold 42;
+                                        }
+                                    }
+                                    CFG
+        },
+        "parse didn't throw";
+
+        ok ?$cfg.match, "parse is successfull";
+
+        my $thrshld = $cfg.get(:params1 => :details => "threshold");
+        is $thrshld, 3.1415926, "option 'threshold' value in 'details' in 'params1'";
+        $thrshld = $cfg.get(:params2 => :details => "threshold");
+        is $thrshld, 42, "option 'threshold' value in 'details' in 'params2'";
+
+        throws-like {
+                        $cfg.read: string => q:to/CFG/;
+                                    params3 {
+                                        details {
+                                            threshold 3.1415926;
+                                        }
+                                    }
+                                    CFG
+                    },
+                    Config::BINDish::X::Parse::Context,
+                    "use of pre-declared block in a wrong block throws";
+
+        throws-like {
+                        $cfg.read: string => q:to/CFG/;
+                                    params2 {
+                                        details {
+                                            threshold 3.1415926;
+                                        }
+                                    }
+                                    CFG
+                    },
+                    Config::BINDish::X::Parse::ValueType,
+                    "wrong option value type in a multi-variant block throws";
+    }
+
+    subtest "Errors" => {
+        plan 4;
+
+        my $cfg = Config::BINDish.new:
+            blocks => (
+                :params1 => { :in<.TOP> },
+                :params2 => { :in<.TOP> },
+                :det1<details> => { :in<params1>, },
+                :det2<details> => { :in<params1>, },
+            );
+
+        throws-like {
+                        $cfg.read: string => 'params1 { }';
+                    },
+                    Config::BINDish::X::DuplicateKeyword,
+                    "pre-declaring same-named blocks in the same parent block throws";
+
+        $cfg = Config::BINDish.new:
+            blocks => (
+                :params => { :in<.TOP> },
+            ),
+            options => (
+                :opt1<opt> => { :in<params> },
+                :opt2<opt> => { :in<params> },
+            );
+        throws-like {
+                        $cfg.read: string => 'params { }';
+                    },
+                    Config::BINDish::X::DuplicateKeyword,
+                    "pre-declaring options with the same name in the same parent block throws";
+
+        $cfg = Config::BINDish.new:
+            blocks => ( :params => { :in<.TOP> }, ),
+            options => ( :opt<opt1> => { :in<params> },
+                         :opt<opt2> => { :in<params> },
+            );
+        throws-like {
+                        $cfg.read: string => 'params { }';
+                    },
+                    Config::BINDish::X::DuplicateID,
+                    "pre-declaring options with the same ID throws";
+
+        $cfg = Config::BINDish.new:
+            blocks => ( params => { :in<.TOP> },
+                        :dup<foo> => { :in<params> },
+                        :dup<bar> => { :in<params> },
+            );
+        throws-like {
+                        $cfg.read: string => 'params { }';
+                    },
+                    Config::BINDish::X::DuplicateID,
+                    "pre-declaring blocks with the same ID throws";
+    }
+}
+
+subtest "Auto-vivification" => -> \suite {
+    plan 8;
+    # Using setup-BINDish to test autovivification becase direct access to grammar's `declare-*` is needed and this
+    # submethod is the guaranteed location which is invoked always and provides us with a grammar instance, not its
+    # typeobject, as we would get on $cfg.
+    my $cfg = Config::BINDish.new:
+        extend-grammar => my role {
+            submethod setup-BINDish {
+                self.declare-option: "opt", :in<params>;
+                suite.ok: (my $props = self.prop-relations<.ANYWHERE><block><params>).defined,
+                          "block is declared";
+                suite.ok: $props.autovivified, "block was autovivified";
+                suite.lives-ok: {
+                                    self.declare-block: :id<params>, :keyword, props => { :in<.TOP> };
+                                }, "re-declaration of autovivified block doesn't fail";
+                suite.ok: self.prop-relations<.TOP><block><params>:exists,
+                          "re-declared block resides on .TOP";
+                suite.nok: self.prop-relations<.ANYWHERE><block><params>:exists,
+                           "re-declared block is not anymore on .ANYWHERE";
+                if (suite.ok(self.prop-relations<.TOP><block><params>:exists,
+                             "the new block declaration is now on .TOP"))
+                {
+                    suite.nok: self.prop-relations<.TOP><block><params>.autovivified,
+                               "the new block declaration is not autovivified";
+                }
+                else {
+                    skip "can't test for autovivification on missing block declaration";
+                }
+                suite.throws-like: {
+                                       self.declare-block: <params>, <params>;
+                                   }, Config::BINDish::X::DuplicateID, "second manual re-declaration throws";
+            }
+        };
+    $cfg.read: string => "";
 }
 
 done-testing;

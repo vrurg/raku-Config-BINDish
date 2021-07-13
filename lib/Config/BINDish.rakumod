@@ -1,7 +1,7 @@
 use v6.d;
 use NQPHLL:from<NQP>;
 use nqp;
-unit class Config::BINDish:ver<0.0.3>:api<0.0.3>;
+unit class Config::BINDish:ver<0.0.4>:api<0.0.4>;
 
 BEGIN {
     Config::BINDish.HOW does role ExtensibleHOW {
@@ -77,13 +77,13 @@ my class ParametericCacheHOW {
 my \grammar-cache = ParametericCacheHOW.new_type(Config::BINDish::Grammar);
 my \actions-cache = ParametericCacheHOW.new_type(Config::BINDish::Actions);
 
-has Config::BINDish::Grammar::Strictness:D(  ) $.strict = False;
+has Config::BINDish::Grammar::Strictness:D() $.strict = False;
 
 has Mu @.grammar-extensions;
 has Mu @.actions-extensions;
 # User-defined configuration structure. See Grammar's declare-blocks and declare-options
-has %.blocks;
-has %.options;
+has Pair:D @.blocks;
+has Pair:D @.options;
 # It makes no sense to override the grammar because it's the core of this all. Only extensions are allowed.
 has Config::BINDish::Grammar $.grammar is mooish( :lazy, :clearer ) is built( False );
 has Config::BINDish::Actions $.actions is mooish( :lazy, :clearer );
@@ -144,8 +144,8 @@ multi method read( ::?CLASS:D: IO:D( Str:D ) :$!file, |c ) {
                      :$.actions,
                      :$!strict,
                      :$!flat,
-                     :%!blocks,
-                     :%!options,
+                     :@!blocks,
+                     :@!options,
                      |c
 }
 multi method read( ::?CLASS:D: Str:D :$string, |c ) {
@@ -153,8 +153,8 @@ multi method read( ::?CLASS:D: Str:D :$string, |c ) {
                      :$.actions,
                      :$!strict,
                      :$!flat,
-                     :%!blocks,
-                     :%!options,
+                     :@!blocks,
+                     :@!options,
                      |c
 }
 

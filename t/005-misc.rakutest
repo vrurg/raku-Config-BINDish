@@ -8,7 +8,7 @@ plan 1;
 my $std-methods = set(Grammar.^methods.map: *.name);
 my $bindish-methods = set Config::BINDish::Grammar.^methods(:local).map: *.name;
 # Methods overriden intentionally. I.e. here we know what we do.
-my $allowed-intersection = set <BUILDALL>;
+my $allowed-intersection = set <BUILDALL BUILD>;
 
 is-deeply (($std-methods ∩ $bindish-methods) (-) $allowed-intersection),
           set(),

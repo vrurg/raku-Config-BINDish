@@ -5,6 +5,7 @@ use v6.d;
 use nqp;
 unit grammar Config::BINDish::Grammar;
 use Config::BINDish::X;
+use AttrX::Mooish;
 
 our @coercers;
 BEGIN {
@@ -25,7 +26,7 @@ role TypeStringify {
     method type-as-str(--> Str:D) {
         my @parts;
         with $.type-name {
-            @parts.push: $_ ~~ Stringy ?? '<' ~ $_ ~ '>' !! .gist
+            @parts.push: .^does(Stringy) ?? '<' ~ $_ ~ '>' !! .gist
         }
         @parts.push: $.type.gist unless $.type<> =:= Mu;
         @parts.join(" of ")
@@ -55,7 +56,10 @@ role StatementProps {
     # If non-empty then this statement can only be contained by blocks listed here.
     has SetHash:D() $.in = ();
     # If statement can only be declared at the top level
+    # DEPRECATED To be removed. Replaced with uniform :in<.TOP> format
     has Bool:D $.top-only = False;
+    # If a statement declaration has been auto-created on demand.
+    has Bool:D $.autovivified = False;
 
     multi method COERCE(%profile) {
         self.new: |%profile
@@ -63,8 +67,8 @@ role StatementProps {
 
     multi method ACCEPTS(Context:D $ctx) {
         my $cur-block = $ctx.cur-block-ctx;
-        return $cur-block.type eq 'TOP' if $!top-only;
-        $!in ?? ( $cur-block.keyword && Str($cur-block.keyword.payload) ∈ $!in) !! True
+        return $cur-block.is-TOP if $!top-only;
+        $!in ?? ( $cur-block.id ∈ $!in) !! True
     }
 }
 
@@ -83,9 +87,23 @@ role ContainerProps does TypeStringify {
     }
 }
 
-class OptionProps does StatementProps does ContainerProps {}
+role DeclarationProps {
+    # Each declaration should have an ID unique among other declarations of its kind
+    has Any:D $.id is required;
+    # Keyword used to declare an entity.
+    has Str:D $.keyword is required;
+}
 
-class BlockProps does StatementProps does ContainerProps {
+class OptionProps
+    does StatementProps
+    does ContainerProps
+    does DeclarationProps {}
+
+class BlockProps
+    does StatementProps
+    does ContainerProps
+    does DeclarationProps
+{
     # Block must be named or is optional if not set
     has Bool $.named;
     # Block must have a class or is optional if not set
@@ -95,13 +113,25 @@ class BlockProps does StatementProps does ContainerProps {
 }
 
 class Context {
-    # Type of statement (keyword).
+    # Context type. "block", "option", or something extension-defined
+    has Str:D $.type is required;
+    # ID of the current statement properties. $!type defines the key where to search for the ID on %!props.
+    has $.id;
+    # Statement type (keyword)
     has Value $.keyword;
     has Value $.name;
-    # Context type. "TOP", "BLOCK", "OPTION", or a user-defined
-    has Str:D $.type is required;
-    has StatementProps $.props;
     has ::?CLASS $.parent;
+    has StatementProps $.props is mooish(:lazy);
+    has $.relations is mooish(:lazy);
+
+    method build-props {
+        $*CFG-GRAMMAR.props{$!type}{$!id}
+    }
+
+    method build-relations {
+        return Nil unless self.props ~~ BlockProps;
+        $*CFG-GRAMMAR.prop-relations{$!id}
+    }
 
     method parent(::?CLASS:D: Int:D $count = 0 --> ::?CLASS:D) {
         return $!parent unless $count;
@@ -109,19 +139,30 @@ class Context {
     }
 
     method cur-block-ctx(::?CLASS:D: --> Context) {
-        return self if $!type eq 'TOP' | 'BLOCK';
+        return self if self.props ~~ BlockProps;
         $!parent.cur-block-ctx
+    }
+
+    method is-TOP {
+        ($!type eq 'block') && ($!id eq '.TOP')
     }
 
     method description(::?CLASS:D:) {
         given $!type {
-            when 'TOP'    { 'global context' }
-            when 'BLOCK'  { "block '" ~ $!keyword.payload ~ ($!name.defined ?? " " ~ $!name.gist !! "") ~ "'" }
-            when 'OPTION' { "option '" ~ $!keyword.payload ~ "'" }
+            when 'block'  {
+                $!id eq '.TOP'
+                    ?? 'global context'
+                    !! "block '" ~ $!keyword.coerced ~ ($!name.defined ?? " " ~ $!name.gist !! "") ~ "'"
+            }
+            when 'option' { "option '" ~ $!keyword.coerced ~ "'" }
             default {
                 die "Internal: looks like " ~ $_ ~ " context hasn't been given a description!"
             }
         }
+    }
+
+    multi method ACCEPTS(StatementProps:D $props) {
+        ? (!$props.in || (self.cur-block-ctx andthen .id ∈ $props.in))
     }
 }
 
@@ -129,10 +170,11 @@ class Strictness {
     has Bool:D $.syntax = False;
     has Bool:D $.options = False;
     has Bool:D $.blocks = False;
+    has Bool:D $.warnings = True;
     multi method COERCE(Hash:D $p) { self.new: |$p }
     multi method COERCE(Pair:D $p) { self.new: |$p }
     multi method COERCE(Positional:D $l where { ? all .map(* ~~ Pair) }) { self.new: |%$l }
-    multi method COERCE(Bool:D $default) { self.new: :syntax($default), :options($default), :blocks($default) }
+    multi method COERCE(Bool:D $default) { self.new: |%(<syntax options blocks warnings> X=> $default) }
 }
 
 # Where we read from
@@ -140,15 +182,38 @@ has $!file is built;
 has Int:D $.line-delta = 0;
 has Bool:D $.flat = False;
 has Strictness:D() $.strict = False;
-# All block types.
-has BlockProps() %.blk-props;
-# Allowed top-level keywords.
-has OptionProps() %.opt-props;
+# Keys expected in %.props. The order matters for registry building.
+has @.prop-keys is mooish(:lazy);
+# Pre-declared statement properties. First level keys are statements types: "block" or "option". Second level are IDs
+has Hash[StatementProps:D] %.props is mooish(:lazy);
+# Registered keywords as SetHash, per statement type (first level key)
+has SetHash %.keywords is mooish(:lazy);
+# This is a registry where for each block ID (first level key) a hash of bound keywords is stored as the third level
+# key. Values are keyword's DeclarationProps. Second level keys are values from @.prop-keys.
+has %.prop-relations is mooish(:lazy, :clearer);
 # User-defined blocks and options, set-only.
-has %.blocks;
-has %.options;
+has Pair:D @.blocks;
+has Pair:D @.options;
 
-has %.reserved-opts = :include;
+has SetHash:D %!reserved-keywords is mooish(:lazy);
+
+proto method reserve-keywords(|) {*}
+multi method reserve-keywords(Str:D $what, @keywords) {
+    %!reserved-keywords{$what}.set: @keywords
+}
+multi method reserve-keywords(*%p) {
+    for %p.kv -> $what, $keywords {
+        samewith $what, $keywords.list;
+    }
+}
+
+proto method is-reserved(|) {*}
+multi method is-reserved(Str:D $what, Str:D $keyword --> Bool:D) {
+    ? %!reserved-keywords{$what}{$keyword}
+}
+multi method is-reserved(*%p where *.elems == 1) {
+    samewith |%p.kv
+}
 
 proto method set-value(|) {*}
 multi method set-value(Mu $type is raw, *%tinfo where *.elems == 1 --> Value:D) {
@@ -170,6 +235,12 @@ method set-file($file) {
 }
 
 submethod TWEAK(|) {
+    self.reserve-keywords: option => <include use>,
+                           block => <include use>;
+    # Reserve id ".TOP" but allow user to override it
+    self.declare-block: :id<.TOP>, :keyword<.TOP>, :autovivified;
+    # Reserve id .ANYWHERE
+    self.declare-block: :id<.ANYWHERE>, :keyword<.ANYWHERE>;
     # Walk over grammar's MRO and invoke setup methods.
     # To prevent duplicate iteration over submethods defined in v6.c/v6.d roles
     # record submethod objects we've already invoked.
@@ -186,9 +257,97 @@ submethod TWEAK(|) {
     }
 }
 
+method build-prop-keys {
+    <block option>
+}
+
+method build-props {
+    @!prop-keys.map({ $_ => Hash[StatementProps:D].new }).Hash
+}
+
+method build-keywords {
+    @!prop-keys.map({ $_ => SetHash.new })
+}
+
+method build-reserved-keywords {
+    @!prop-keys.map: * => SetHash.new
+}
+
+method build-prop-relations {
+    my %relations;
+    my $ANYWHERE = %!props<block><.ANYWHERE>;
+
+    for @!prop-keys -> $type {
+        # Check all `in`-references and auto-vivify undeclared blocks
+        for %!props{$type}.kv -> $id, $prop {
+            if $!strict.warnings && $id ~~ Str && $id.index("\t").defined {
+                self.warn: "===WARNING!=== Suspcious $type id '$id' contains a TAB in pre-declaration. "
+                     ~ "Perhaps you should consider using a list as "
+                     ~ $type ~ "s initializer?";
+            }
+            if $prop.top-only {
+                self.warn: "Deprecated option 'top-only' is used for '"
+                           ~ $prop.keyword
+                           ~ "' with ID '" ~ $prop.id ~ "'. "
+                           ~ "Consider replacing it with `:in<.TOP>`.";
+                $prop.in<.TOP> = True;
+            }
+            for $prop.in.keys -> $in-id {
+                unless %!props<block>{$in-id} {
+                    # If `in` referencing an unknown block then we consider it the case where ID is block type
+                    self.declare-block: $in-id, $in-id, %( :autovivified ), :!cleanup;
+                }
+            }
+        }
+    }
+
+    for @!prop-keys -> $type {
+        my $ids = SetHash.new: %!props{$type}.keys;
+
+        my sub add-prop($prop) {
+            my $id = $prop.id;
+            my $keyword = $prop.keyword;
+            if $prop ~~ BlockProps {
+                %relations{$id}{$type} := Hash[DeclarationProps:D].new unless %relations{$id}{$type}:exists;
+            }
+
+            my sub add-relation($in-prop) {
+                Config::BINDish::X::DuplicateKeyword.new(:$keyword, :what($type), :in( $in-prop )).throw
+                    if %relations{$in-prop.id}{$type}{$keyword}:exists;
+                %relations{$in-prop.id}{$type}{$keyword} = $prop;
+            }
+
+            # If a pre-declaration doesn't specify blocks where it is valid then make it a global declaration
+            if $prop.in {
+                for $prop.in.keys -> $in-id {
+                    my $in-prop = %!props<block>{$in-id};
+                    add-prop($in-prop) unless %relations{$in-id}:exists;
+                    add-relation($in-prop);
+                }
+            }
+            else {
+                add-relation($ANYWHERE);
+            }
+            $ids.unset: $id;
+        }
+
+        for %!props{$type}.values -> $prop {
+            next unless $prop.id ∈ $ids;
+            add-prop($prop);
+        }
+    }
+    %relations
+}
+
+method warn(*@msg --> Nil) {
+    note "===WARNING!=== " ~ @msg.map(*.gist).join("") if $!strict.warnings;
+}
+
 submethod setup-BINDish {
-    self.declare-blocks: %!blocks;
-    self.declare-options: %!options;
+    self.declare-blocks: self.blocks;
+    self.declare-options: self.options;
+    # Kick-start rebuild of the prop relations attribute
+    %!prop-relations.sink;
 #    self.declare-blocks:
 #        block => { :top-only },
 #        subblock => { in => <block> },
@@ -204,28 +363,91 @@ submethod setup-BINDish {
 #        ;
 }
 
-proto method declare-blocks(|) {*}
-multi method declare-blocks(%blocks) {
-    for %blocks.kv -> $name, %props {
-        die "Re-declaration of block '$name'"
-            with %!blk-props{$name};
-        %!blk-props{$name} = BlockProps.new: |%props;
+proto method statement-props(Str:D) is raw {*}
+multi method statement-props('option') is raw { OptionProps }
+multi method statement-props('block') is raw { BlockProps }
+
+my subset Keyword of Any:D where Str | { $_ ~~ Bool && .so };
+method declare-statement(Str:D $what,
+                         Any:D :$id = self.autogen-id,
+                         Keyword :$keyword is copy,
+                         :%props,
+                         Bool :$cleanup = True
+    --> StatementProps:D)
+{
+    with %!props{$what}{$id} {
+        Config::BINDish::X::DuplicateID.new(:props($_), :$keyword, :$what).throw
+            unless .autovivified
     }
-}
-multi method declare-blocks(*%blocks) {
-    samewith(%blocks);
+    self.clear-prop-relations if $cleanup;
+    $keyword = $id if $keyword ~~ Bool;
+    %!keywords{$what}.set: $keyword;
+    %!props{$what}{$id} = self.statement-props($what).new: |%props, :$id, :$keyword
 }
 
-proto method declare-options(|) {*}
-multi method declare-options(%options) {
-    for %options.kv -> $name, %props {
-        die "Re-declaration of option '" ~ $name ~ "'"
-            with %!opt-props{$name};
-        %!opt-props{$name} = OptionProps.new: |%props;
+proto method declare-block(|) {*}
+multi method declare-block(Any:D $id, Str:D $keyword, %props, Bool :$cleanup = True --> BlockProps:D) {
+    self.declare-block: :$id, :$keyword, :%props, :$cleanup
+}
+multi method declare-block(Pair:D (:key($id), :value($keyword)), %props, Bool :$cleanup = True --> BlockProps:D) {
+    self.declare-block: :$id, :$keyword, :%props, :$cleanup
+}
+multi method declare-block(Str:D $keyword, %props, Bool :$cleanup = True --> BlockProps:D) {
+    self.declare-block: :$keyword, :%props, :$cleanup
+}
+multi method declare-block(Str:D $keyword, Bool :$cleanup = True, *%props --> BlockProps:D) {
+    self.declare-block: :$keyword, :%props, :$cleanup
+}
+multi method declare-block(Any:D $id, Str:D $keyword, Bool :$cleanup = True, *%props --> BlockProps:D) {
+    self.declare-block: :$id, :$keyword, :%props, :$cleanup
+}
+multi method declare-block(*%params) {
+    self.declare-statement: 'block', |%params
+}
+
+proto method declare-blocks(| --> Nil) {*}
+multi method declare-blocks(@blocks, Bool :$cleanup = True --> Nil) {
+    # $id here is a generic term because it can be either a $keyword or a $id => $keyword pair
+    for @blocks -> Pair:D (:key($id), :value(%props)) {
+        self.declare-block: $id, %props, :$cleanup
     }
 }
-multi method declare-options(*%options) {
-    samewith(%options)
+multi method declare-blocks(*@list where { all .map(* ~~ Pair:D) }, Bool :$cleanup = True, *%named --> Nil) {
+    samewith (|@list, |(%named.pairs)), :$cleanup
+}
+multi method declare-blocks(%blocks, Bool :$cleanup = True --> Nil) {
+    samewith %blocks.pairs
+}
+
+proto method declare-option(|) {*}
+multi method declare-option(Any:D $id, Str:D $keyword, %props, Bool :$cleanup = True --> OptionProps:D) {
+    self.declare-option: :$id, :$keyword, :%props, :$cleanup;
+}
+multi method declare-option(Pair:D (:key($id), :value($keyword)), %props, Bool :$cleanup = True --> OptionProps:D) {
+    self.declare-option: :$id, :$keyword, :%props, :$cleanup
+}
+multi method declare-option(Str:D $keyword, %props, Bool :$cleanup = True --> OptionProps:D) {
+    self.declare-option: :$keyword, :%props, :$cleanup
+}
+multi method declare-option(Str:D $keyword, Bool :$cleanup = True, *%props --> OptionProps:D) {
+    self.declare-option: :$keyword, :%props, :$cleanup
+}
+multi method declare-option(*%params --> OptionProps:D) {
+    self.declare-statement: 'option', |%params
+}
+
+proto method declare-options(| --> Nil) {*}
+multi method declare-options(@options, Bool :$cleanup = True --> Nil) {
+    # $id here is a generic term because it can be either a $keyword or a $id => $keyword pair
+    for @options -> Pair:D (:key($id), :value(%props)) {
+        self.declare-option: $id, %props, :$cleanup;
+    }
+}
+multi method declare-options(*@list where { all .map(* ~~ Pair:D) }, Bool :$cleanup = True, *%named --> Nil) {
+    samewith (|@list, |(%named.pairs)), :$cleanup
+}
+multi method declare-options(%options, Bool :$cleanup = True --> Nil) {
+    samewith %options.pairs, :$cleanup
 }
 
 method file {
@@ -236,31 +458,44 @@ method line(:$absolute) {
     self.prematch.chomp.split(/\n/).elems - ($absolute ?? 0 !! $*CFG-GRAMMAR.line-delta)
 }
 
-method enter-ctx(|c(*%profile) --> Context:D)
-{
+my atomicint $decl-id = 0;
+method autogen-id {
+    ".auto-" ~ ++⚛$decl-id
+}
+
+method enter-ctx(Value:D :$keyword, Str:D :$type, *%profile --> Context:D) {
     self.panic: Config::BINDish::X::Parse::ContextOverwrite, :ctx($_) with $*CFG-CTX;
-    my Context $parent = $_ with $*CFG-PARENT-CTX;
-    # Make code like easier by allowing :props to be an undefined value.
+    my $grammar = $*CFG-GRAMMAR;
+    my Context $parent-ctx = $_ with $*CFG-PARENT-CTX;
+    # Make calling code life easier by allowing :props to be an undefined value.
     %profile<props>:delete without %profile<props>;
-    $*CFG-CTX = Context.new(|%profile, :$parent);
-}
-
-method block-ok(Str:D $type --> Bool:D) {
-    my %blocks = $*CFG-GRAMMAR.blk-props;
-    return True unless %blocks;
-    with %blocks{$type} {
-        return $*CFG-PARENT-CTX ~~ $_
+    my %auto-profile;
+    unless %profile<id> {
+        # Try to determine ID based on type, keyword, and current parent
+        my $kwd = $keyword.coerced;
+        my $id;
+        my StatementProps $props;
+        if $kwd ∈ $grammar.keywords{$type} {
+            # We do have a pre-declaration for this keyword. Try to locate it's properties for finding out its ID
+            for $parent-ctx.cur-block-ctx.id, ".ANYWHERE" -> $parent-id {
+                with $grammar.prop-relations{$parent-id} andthen $_{$type} andthen $_{$kwd} {
+                    $props = $_;
+                }
+                last if $props;
+            }
+            self.panic: Config::BINDish::X::Parse::Context,
+                        :what($type),
+                        :$keyword,
+                        :ctx($parent-ctx) without $props;
+            $id = $props.id;
+        }
+        else {
+            # Use a fake ID for undeclared statements
+            $id = self.autogen-id;
+        }
+        %auto-profile = :$id, :$props;
     }
-    False
-}
-
-method option-ok(Str:D $keyword --> Bool:D) {
-    my %options = $*CFG-GRAMMAR.opt-props;
-    return True unless %options;
-    with %options{$keyword} {
-        return $*CFG-CTX ~~ $_
-    }
-    False
+    $*CFG-CTX = Context.new(:$keyword, :$type, |%auto-profile, |%profile, :parent($parent-ctx));
 }
 
 method leave-option { }
@@ -271,62 +506,58 @@ method backtrack-option {
 }
 
 method validate-option {
-    my ::?CLASS:D $grammar = $*CFG-GRAMMAR;
-    my %options = $grammar.opt-props;
-    if %options {
+    my $grammar = $*CFG-GRAMMAR;
+    my $keyword = $*CFG-KEYWORD.coerced;
+    if $keyword ∈ $grammar.keywords<option> {
         my $ctx = $*CFG-CTX;
         my $blk-ctx = $ctx.cur-block-ctx;
-        my $keyword = Str($*CFG-KEYWORD.payload);
-        my $props = %options{$keyword};
-        if $props {
-            self.panic: X::Parse::Context, :what<option>, :keyword($*CFG-KEYWORD), :ctx($blk-ctx)
-                unless self.option-ok($keyword) && !$blk-ctx.props.value-only;
-            my $value = $*CFG-VALUE // Value.new: :type(Bool), :type-name('bool'), :payload<True>;
-            unless $value ~~ $props {
-                self.panic: X::Parse::ValueType, :what<option>, :keyword($*CFG-KEYWORD), :$ctx, :$value
-            }
-        }
-        elsif $grammar.strict.options {
-            self.panic: X::Parse::Unknown, :what<option>, :$keyword
+        my StatementProps $props = $ctx.props;
+        self.panic: X::Parse::Context, :what<option>, :keyword($keyword), :ctx($blk-ctx)
+            unless $props.defined && $props ~~ $blk-ctx && !$blk-ctx.props.value-only;
+        my $value = $*CFG-VALUE // Value.new: :type(Bool), :type-name('bool'), :payload<True>;
+        unless $value ~~ $props {
+            self.panic: X::Parse::ValueType, :what<option>, :keyword($*CFG-KEYWORD), :$ctx, :$value
         }
     }
-    self.leave-option
+    elsif $grammar.strict.options {
+        self.panic: X::Parse::Unknown, :what<option>, :$keyword
+    }
 }
 
 method validate-block {
     my $grammar = $*CFG-GRAMMAR;
-    my $ctx = $*CFG-CTX;
-    my Str:D() $block-type = $*CFG-BLOCK-TYPE.payload;
-    my StatementProps $props = $ctx.props;
-    my %blocks = $*CFG-GRAMMAR.blk-props;
-    if %blocks {
-        with %blocks{$block-type} {
-            self.panic: X::Parse::Context, :what<block>, :keyword($*CFG-BLOCK-TYPE), :ctx($*CFG-PARENT-CTX)
-                unless self.block-ok($block-type);
-            with $props.named {
-                self.panic: X::Parse::MissingPart, :what<name>, :block-spec($block-type)
-                    unless !$_ || $*CFG-BLOCK-NAME.defined;
-                self.panic: X::Parse::ExtraPart, :what<name>, :block-spec($block-type)
-                    if !$_ && $*CFG-BLOCK-NAME.defined;
-            }
-            if $props.named {
-                with $props.classified {
-                    self.panic: X::Parse::MissingPart,
-                                :what<class>,
-                                :block-spec( $block-type ~
-                                             ~( $*CFG-BLOCK-NAME ?? " " ~ $*CFG-BLOCK-NAME.gist !! '' ) )
-                        unless !$_ || $*CFG-BLOCK-CLASS.defined;
-                    self.panic: X::Parse::ExtraPart,
-                                :what<class>,
-                                :block-spec( $block-type ~
-                                             ~( $*CFG-BLOCK-NAME ?? " " ~ $*CFG-BLOCK-NAME.gist !! '' ) )
-                        if !$_ && $*CFG-BLOCK-CLASS.defined;
-                }
+    my $keyword = $*CFG-BLOCK-TYPE.coerced;
+    if $keyword ∈ $grammar.keywords<block> {
+        my $ctx = $*CFG-CTX;
+        my $parent-ctx = $*CFG-PARENT-CTX;
+        # No need to check for $props because if there is pre-declared block type then there is a props object for it.
+        # But with :D we make sure the assertion is not broken.
+        my StatementProps $props = $ctx.props;
+        self.panic: X::Parse::Context, :what<block>, :$keyword, :ctx($parent-ctx)
+            unless $props.defined && ($parent-ctx ~~ $props);
+        with $props.named {
+            self.panic: X::Parse::MissingPart, :what<name>, :block-spec($keyword)
+                unless !$_ || $*CFG-BLOCK-NAME.defined;
+            self.panic: X::Parse::ExtraPart, :what<name>, :block-spec($keyword)
+                if !$_ && $*CFG-BLOCK-NAME.defined;
+        }
+        if $props.named {
+            with $props.classified {
+                self.panic: X::Parse::MissingPart,
+                            :what<class>,
+                            :block-spec( $keyword ~
+                                         ~( $*CFG-BLOCK-NAME ?? " " ~ $*CFG-BLOCK-NAME.gist !! '' ) )
+                    unless !$_ || $*CFG-BLOCK-CLASS.defined;
+                self.panic: X::Parse::ExtraPart,
+                            :what<class>,
+                            :block-spec( $keyword ~
+                                         ~( $*CFG-BLOCK-NAME ?? " " ~ $*CFG-BLOCK-NAME.gist !! '' ) )
+                    if !$_ && $*CFG-BLOCK-CLASS.defined;
             }
         }
-        elsif $grammar.strict.blocks {
-            self.panic: X::Parse::Unknown, :what('block type'), :keyword($block-type)
-        }
+    }
+    elsif $grammar.strict.blocks {
+        self.panic: X::Parse::Unknown, :what('block type'), :keyword($keyword)
     }
 }
 
@@ -372,7 +603,8 @@ token TOP(Bool :$as-include) {
     :my $*CFG-AS-INCLUDE = ?$as-include;
     :my $*CFG-GRAMMAR = self;
     :my $*CFG-FLAT-BLOCKS = self.flat;
-    :my $*CFG-TOP;
+    :my $*CFG-TOP; # The top AST node. Used by Actions
+    :my $*CFG-TOP-CTX;
     :my $*CFG-INNER-PARENT;
     [
         <?{ $as-include }>
@@ -395,9 +627,11 @@ rule as-main {
     :my $*CFG-CTX;
     <.enter-TOP>
     {
-        self.enter-ctx: :type<TOP>,
-                        :props(BlockProps.new),
-                        :keyword(Value.new: :payload<TOP>, :type(Str), :type-name<keyword>);
+        $*CFG-TOP-CTX = self.enter-ctx: :type<block>,
+                                        :id<.TOP>,
+                                        :keyword(Value.new: :payload<.TOP>,
+                                                            :type(Str),
+                                                            :type-name<keyword>);
     }
     <statement-list>
 }
@@ -416,7 +650,7 @@ proto token statement {*}
 multi rule statement:sym<include> {
     :my $*CFG-VALUE;
     :my $*CFG-INC-STMTS;
-    $<err-pos>=include <value> <?before <.statement-terminator>> <statement-terminate>
+    $<err-pos>=<?> include <value> <?before <.statement-terminator>> <statement-terminate>
     {
         my $grammar = $*CFG-GRAMMAR;
         $*CFG-INC-STMTS = $*CFG-GRAMMAR.WHAT.parse:
@@ -451,9 +685,13 @@ multi rule statement:sym<option> {
     :my Context:D $*CFG-PARENT-CTX = $*CFG-CTX;
     :temp $*CFG-CTX = Nil;
     :temp $*CFG-INNER-PARENT;
-    $<err-pos>=$<option-name>=<.keyword>
+    $<err-pos>=<?> $<option-name>=<.keyword>
+    <?{ ! $*CFG-GRAMMAR.is-reserved(option => $*CFG-KEYWORD.coerced) }>
+    {
+        $<err-pos>.enter-ctx: :type<option>,
+                        :keyword( $*CFG-KEYWORD )
+    }
     <.enter-option>
-    <?{ !$*CFG-GRAMMAR.reserved-opts{~$<option-name>} }>
     [
         $<option-value>=<.maybe-specific-value("option")>?
         <?before <.statement-terminator>>
@@ -471,7 +709,10 @@ multi rule statement:sym<option> {
             }
             $ok
         }>
-        { $<err-pos>.validate-option }
+        {
+            $<err-pos>.validate-option;
+            self.leave-option;
+        }
     ]
     || <?{
         self.backtrack-option with $*CFG-KEYWORD;
@@ -523,18 +764,13 @@ token bad-statement {
 #    [ .*? [ ';' || $$ || '}' ] ] <.panic: "Unrecognized statement">
 }
 
-token enter-option {
-    <?>
-    {
-        self.enter-ctx: :type<OPTION>,
-                        :props( $*CFG-GRAMMAR.opt-props{Str($*CFG-KEYWORD)} ),
-                        :keyword( $*CFG-KEYWORD )
-    }
-}
+token enter-option { <?> }
 
 rule block-head {
     :my Value $*CFG-KEYWORD;
-    $<block-type>=<.keyword> { $*CFG-BLOCK-TYPE = $*CFG-KEYWORD }
+    $<block-type>=<.keyword>
+    <?{ ! $*CFG-GRAMMAR.is-reserved(block => $*CFG-KEYWORD.coerced) }>
+    { $*CFG-BLOCK-TYPE = $*CFG-KEYWORD }
     [ <block-name> <block-class>? ]?
     <?before '{'>
     <.enter-block>
@@ -562,11 +798,10 @@ token enter-block {
     <?>
     {
         my $block-type = $*CFG-BLOCK-TYPE;
-        my StatementProps $props = $*CFG-GRAMMAR.blk-props{ ~$block-type };
-        self.enter-ctx: :type<BLOCK>,
+        self.enter-ctx: :type<block>,
                         :keyword( $block-type ),
                         :name( $*CFG-BLOCK-NAME ),
-                        :$props;
+                        ;
         $*CFG-BLOCK-ERR-POS.validate-block;
     }
 }
@@ -634,19 +869,23 @@ token num_suffix {
     <?after <xdigit>> <[KkMmGgTtPp]>
 }
 
-method maybe-specific-value(Str:D $what) {
+method maybe-specific-value(Str:D $what --> Mu) is raw {
     my $ctx = $*CFG-CTX;
-    if $ctx.props ~~ ContainerProps && $ctx.props.value-sym {
-        for $ctx.props.value-sym<> -> $sym {
-            # Make it possible for value parsers to know they're expected.
-            my $*CFG-SPECIFIC-VALUE-SYM = $sym;
-            with self."value:sym<$sym>"() {
-                return $_ if $_;
+    my $props = $ctx.props;
+    with $props {
+        if $props ~~ ContainerProps && $ctx.props.value-sym {
+            for $props.value-sym<> -> $sym {
+                # Make it possible for value parsers to know they're expected.
+                my $*CFG-SPECIFIC-VALUE-SYM = $sym;
+                with self."value:sym<$sym>"() {
+                    return $_ if $_;
+                }
             }
+            self.panic: X::Parse::SpecificValue, :$what, :$ctx, :keyword( $*CFG-KEYWORD )
         }
-        self.panic: X::Parse::SpecificValue, :$what, :$ctx, :keyword($*CFG-KEYWORD)
     }
-    return self.value
+    my $m := self.value;
+    $m
 }
 
 proto token value {*}
@@ -656,7 +895,7 @@ multi token value:sym<string> {
 
 multi token value:sym<keyword> {
     <?{ (my $ctx = $*CFG-CTX) and
-        (($ctx.type eq 'OPTION')
+        (($ctx.type eq 'option')
          || ($ctx.cur-block-ctx.props andthen .value-only)) }>
     :my Value $*CFG-KEYWORD;
     <keyword> { $*CFG-GRAMMAR.set-value: Str, :keyword($*CFG-KEYWORD.payload) }
