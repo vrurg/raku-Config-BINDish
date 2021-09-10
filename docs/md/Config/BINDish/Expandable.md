@@ -6,7 +6,7 @@ NAME
 DESCRIPTION
 ===========
 
-This module extends [`Config::BINDish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish.md) with strings which can include other option values. Only double-quoted string (i.e. those for which [`Config::BINDish::Grammar::Value`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/Value.md) and [`Config::BINDish::AST::Value`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST/Value.md) have type name set to *dq-string*) are expandable.
+This module extends [`Config::BINDish`](../BINDish.md) with strings which can include other option values. Only double-quoted string (i.e. those for which [`Config::BINDish::Grammar::Value`](Grammar/Value.md) and [`Config::BINDish::AST::Value`](AST/Value.md) have type name set to *dq-string*) are expandable.
 
 To incorporate a value into a string the following macro format is used:
 
@@ -73,7 +73,7 @@ Symbol escaping is traditionally done with a backslash:
 This Is A Value!
 ----------------
 
-*Actually, this is a [`Config::BINDish::AST::Container`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST/Container.md). And a [`Config::BINDish::AST::Node`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST/Node.md). But as long as we talk about option values, so – let it be a value then.*
+*Actually, this is a [`Config::BINDish::AST::Container`](AST/Container.md). And a [`Config::BINDish::AST::Node`](AST/Node.md). But as long as we talk about option values, so – let it be a value then.*
 
 Because expandable strings are normal values they can be used anywhere, where a value is accepted. We can do things like expanding a string within a macro:
 
@@ -93,7 +93,7 @@ This works because when a macro is expanded server name and class can be specifi
 SEE ALSO
 ========
 
-[`Config::BINDish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish.md), [`Config::BINDish::AST`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST.md)
+[`Config::BINDish`](../BINDish.md), [`Config::BINDish::AST`](AST.md)
 
 AUTHOR
 ======

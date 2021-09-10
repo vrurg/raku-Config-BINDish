@@ -6,7 +6,7 @@ C<Config::BINDish::Grammar::ContainerProps> - common properties of container sta
 
 =head1 DESCRIPTION
 
-Does L<C<Config::BINDish::Grammar::TypeStringify>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/TypeStringify.md>.
+Does L<C<Config::BINDish::Grammar::TypeStringify>|TypeStringify.md>.
 
 A container statement is the one which can contain a value. The only two pre-declarable kind of statements currently
 supported: options and blocks – are both containers.
@@ -32,16 +32,16 @@ be set to L<C<Str>|https://docs.raku.org/type/Str>, and type name set to I<"keyw
 
 =head1 METHODS
 
-=head3 C<ACCEPTS(>L<C<Config::BINDish::Grammar::Value:D>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/Value.md>C< $val)>
+=head3 C<ACCEPTS(>L<C<Config::BINDish::Grammar::Value:D>|Value.md>C< $val)>
 
 Returns I<True> if C<$val> matches this container constraints on data type and type name.
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish.md>,
-L<C<Config::BINDish::Grammar>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar.md>,
-L<C<Config::BINDish::Grammar::BlockProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/BlockProps.md>,
-L<C<Config::BINDish::Grammar::OptionProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/OptionProps.md>
+L<C<Config::BINDish>|../../BINDish.md>,
+L<C<Config::BINDish::Grammar>|../Grammar.md>,
+L<C<Config::BINDish::Grammar::BlockProps>|BlockProps.md>,
+L<C<Config::BINDish::Grammar::OptionProps>|OptionProps.md>
 
 =head1 AUTHOR
 

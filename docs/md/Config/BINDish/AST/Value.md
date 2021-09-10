@@ -6,14 +6,14 @@ CLASS
 DESCRIPTION
 ===========
 
-Does [`Config::BINDish::AST::Container`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST/Container.md).
+Does [`Config::BINDish::AST::Container`](Container.md).
 
-Is [`Config::BINDish::AST`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST.md).
+Is [`Config::BINDish::AST`](../AST.md).
 
 SEE ALSO
 ========
 
-[`Config::BINDish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish.md)
+[`Config::BINDish`](../../BINDish.md)
 
 AUTHOR
 ======

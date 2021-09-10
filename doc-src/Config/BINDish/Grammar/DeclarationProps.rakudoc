@@ -18,15 +18,15 @@ A unique identifier.
 
 A keyword associated with statement. Not necessarily unique as same keyword may be used in different block contexts
 and be mapped to different IDs. See
-L<C<Config::BINDish::Grammar::StatementProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/StatementProps.md>,
+L<C<Config::BINDish::Grammar::StatementProps>|StatementProps.md>,
 C<$.in> attribute.
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish.md>,
-L<C<Config::BINDish::Grammar>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar.md>,
-L<C<Config::BINDish::Grammar::BlockProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/BlockProps.md>,
-L<C<Config::BINDish::Grammar::OptionProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/OptionProps.md>
+L<C<Config::BINDish>|../../BINDish.md>,
+L<C<Config::BINDish::Grammar>|../Grammar.md>,
+L<C<Config::BINDish::Grammar::BlockProps>|BlockProps.md>,
+L<C<Config::BINDish::Grammar::OptionProps>|OptionProps.md>
 
 =head1 AUTHOR
 

@@ -15,16 +15,16 @@
 
 This is a major change in the module logic. Whereas the previous versions considered each pre-declared keyword unique
 per its type (i.e. per options or blocks) and per configuration, they can now be made unique per individual block. See
-L<C<Config::BINDish::Grammar>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar.md>
+L<C<Config::BINDish::Grammar>|Config/BINDish/Grammar.md>
 for more information.
 
 =item Added two implicitly pre-declared blocks: C<.TOP> and C<.ANYWHERE>
-=item L<C<Config::BINDish::Grammar::StatementProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/StatementProps.md>
+=item L<C<Config::BINDish::Grammar::StatementProps>|Config/BINDish/Grammar/StatementProps.md>
 attribute C<$.top-only> is deprecated;
 C«:in<.TOP>» must be used instead of C<:top-only> in a statement properties hash
-=item L<C<Config::BINDish::Grammar::Strictness>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/Strictness.md>
+=item L<C<Config::BINDish::Grammar::Strictness>|Config/BINDish/Grammar/Strictness.md>
 got one more mode: C<warnings>
-=item L<C<Config::BINDish::INET>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/INET.md> extension now sets C<$*CFG-VALUE>
+=item L<C<Config::BINDish::INET>|Config/BINDish/INET.md> extension now sets C<$*CFG-VALUE>
 =item Fixed some error reports
 =item Improved handling of context leaving
 

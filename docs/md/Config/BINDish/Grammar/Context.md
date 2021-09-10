@@ -19,7 +19,7 @@ The type of the current context. The core grammar knows about *block* and `optio
 
 ID of the current context statement, if it has one.
 
-### [`Config::BINDish::Grammar::Value`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/Value.md) `$.keyword`
+### [`Config::BINDish::Grammar::Value`](Value.md) `$.keyword`
 
 Keyword used to create context. For example, for a block context created with
 
@@ -27,7 +27,7 @@ Keyword used to create context. For example, for a block context created with
 
 this attribute will be set to a `Value` where `payload` attribute is a [`Match`](https://docs.raku.org/type/Match) against *foo* part of the block.
 
-### [`Config::BINDish::Grammar::Value`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/Value.md) `$.name`
+### [`Config::BINDish::Grammar::Value`](Value.md) `$.name`
 
 Name of the current context. Currently can only be set for named block contexts.
 
@@ -35,13 +35,13 @@ Name of the current context. Currently can only be set for named block contexts.
 
 Parent context. Undefined for `.TOP`.
 
-### [`Config::BINDish::Grammar::StatementProps`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/StatementProps.md) `$.props`
+### [`Config::BINDish::Grammar::StatementProps`](StatementProps.md) `$.props`
 
 Properties of the context statement if it is pre-declared.
 
 ### `$.relations`
 
-A hash of keywords of pre-declared statements which are valid in the current block context. See `prop-relations` attribute of [`Config::BINDish::Grammar`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar.md).
+A hash of keywords of pre-declared statements which are valid in the current block context. See `prop-relations` attribute of [`Config::BINDish::Grammar`](../Grammar.md).
 
 METHODS
 =======
@@ -65,7 +65,7 @@ Returns *True* if a pre-declared statement can be used in the enclosing block co
 SEE ALSO
 ========
 
-[`Config::BINDish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish.md), [`Config::BINDish::Grammar`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar.md), [`Config::BINDish::Grammar::BlockProps`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/BlockProps.md), [`Config::BINDish::Grammar::OptionProps`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/OptionProps.md)
+[`Config::BINDish`](../../BINDish.md), [`Config::BINDish::Grammar`](../Grammar.md), [`Config::BINDish::Grammar::BlockProps`](BlockProps.md), [`Config::BINDish::Grammar::OptionProps`](OptionProps.md)
 
 AUTHOR
 ======

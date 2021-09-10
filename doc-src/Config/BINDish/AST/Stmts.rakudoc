@@ -6,7 +6,7 @@ C<class Config::BINDish::AST::Stmts> - a transparent container of statements
 =head1 DESCRIPTION
 
 This class has barely any other use but to serve as a temporary container for a set of other
-L<C<Config::BINDish::AST>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST.md>
+L<C<Config::BINDish::AST>|../AST.md>
 objects until they find their final parent. Instances of this class are I<transparent> meaning that whenever such
 object is added to a node the operation will result in all children moved to the node and the C<AST::Stmts> object
 being discarded.

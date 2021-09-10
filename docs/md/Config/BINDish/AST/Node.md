@@ -23,7 +23,7 @@ Returns `self`.
 
 ### `multi add(Config::BINDish::AST::Stmts:D $child --` Config::BINDish::AST:D)>
 
-This candidate pulls all [`Config::BINDish::AST::Stmts`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST/Stmts.md) children and re-plants them under `self`. When all children moved method `dismiss` is invoked on `$child`.
+This candidate pulls all [`Config::BINDish::AST::Stmts`](Stmts.md) children and re-plants them under `self`. When all children moved method `dismiss` is invoked on `$child`.
 
 Returns `self`.
 
@@ -67,12 +67,12 @@ Another shortcut candidate to find all options declared with `$option`. For exam
 
     $cfg-bindish.top.find-all(:option(/'-gw' $/))
 
-will return a lazy [`Seq`](https://docs.raku.org/type/Seq) of all options in the configuration whose name ends with *-gw*. Note that the sequence will contain objects of [`Config::BINDish::AST::Option`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST/Option.md) type, not their values.
+will return a lazy [`Seq`](https://docs.raku.org/type/Seq) of all options in the configuration whose name ends with *-gw*. Note that the sequence will contain objects of [`Config::BINDish::AST::Option`](Option.md) type, not their values.
 
 SEE ALSO
 ========
 
-[`Config::BINDish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish.md), [`Config::BINDish::AST`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST.md)
+[`Config::BINDish`](../../BINDish.md), [`Config::BINDish::AST`](../AST.md)
 
 AUTHOR
 ======

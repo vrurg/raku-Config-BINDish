@@ -6,7 +6,7 @@ NAME
 DESCRIPTION
 ===========
 
-Does [`Config::BINDish::Grammar::StatementProps`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/StatementProps.md), [`Config::BINDish::Grammar::ContainerProps`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/ContainerProps.md), [`Config::BINDish::Grammar::DeclarationProps`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/DeclarationProps.md).
+Does [`Config::BINDish::Grammar::StatementProps`](StatementProps.md), [`Config::BINDish::Grammar::ContainerProps`](ContainerProps.md), [`Config::BINDish::Grammar::DeclarationProps`](DeclarationProps.md).
 
 ATTRIBUTES
 ==========
@@ -31,7 +31,7 @@ If *True* then block can only contain values. For example:
 SEE ALSO
 ========
 
-[`Config::BINDish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish.md), [`Config::BINDish::Grammar`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar.md), [`Config::BINDish::Grammar::OptionProps`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/OptionProps.md)
+[`Config::BINDish`](../../BINDish.md), [`Config::BINDish::Grammar`](../Grammar.md), [`Config::BINDish::Grammar::OptionProps`](OptionProps.md)
 
 AUTHOR
 ======

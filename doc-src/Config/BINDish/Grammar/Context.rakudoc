@@ -19,7 +19,7 @@ define its own type.
 
 ID of the current context statement, if it has one.
 
-=head3 L<C<Config::BINDish::Grammar::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/Value.md> C<$.keyword>
+=head3 L<C<Config::BINDish::Grammar::Value>|Value.md> C<$.keyword>
 
 Keyword used to create context. For example, for a block context created with
 
@@ -28,7 +28,7 @@ Keyword used to create context. For example, for a block context created with
 this attribute will be set to a C<Value> where C<payload> attribute is a L<C<Match>|https://docs.raku.org/type/Match>
 against I<foo> part of the block.
 
-=head3 L<C<Config::BINDish::Grammar::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/Value.md> C<$.name>
+=head3 L<C<Config::BINDish::Grammar::Value>|Value.md> C<$.name>
 
 Name of the current context. Currently can only be set for named block contexts.
 
@@ -36,7 +36,7 @@ Name of the current context. Currently can only be set for named block contexts.
 
 Parent context. Undefined for C<.TOP>.
 
-=head3 L<C<Config::BINDish::Grammar::StatementProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/StatementProps.md> C<$.props>
+=head3 L<C<Config::BINDish::Grammar::StatementProps>|StatementProps.md> C<$.props>
 
 Properties of the context statement if it is pre-declared.
 
@@ -44,7 +44,7 @@ Properties of the context statement if it is pre-declared.
 
 A hash of keywords of pre-declared statements which are valid in the current block context. See C<prop-relations>
 attribute of
-L<C<Config::BINDish::Grammar>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar.md>.
+L<C<Config::BINDish::Grammar>|../Grammar.md>.
 
 =head1 METHODS
 
@@ -66,10 +66,10 @@ Returns I<True> if a pre-declared statement can be used in the enclosing block c
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish.md>,
-L<C<Config::BINDish::Grammar>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar.md>,
-L<C<Config::BINDish::Grammar::BlockProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/BlockProps.md>,
-L<C<Config::BINDish::Grammar::OptionProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/OptionProps.md>
+L<C<Config::BINDish>|../../BINDish.md>,
+L<C<Config::BINDish::Grammar>|../Grammar.md>,
+L<C<Config::BINDish::Grammar::BlockProps>|BlockProps.md>,
+L<C<Config::BINDish::Grammar::OptionProps>|OptionProps.md>
 
 =head1 AUTHOR
 

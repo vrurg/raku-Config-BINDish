@@ -44,13 +44,13 @@ Otherwise it has to be like this:
 
 This attribute determines if all options have to be explicitly pre-declared.
 
-See method `declare-options` in [`Config::BINDish::Grammar`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar.md).
+See method `declare-options` in [`Config::BINDish::Grammar`](../Grammar.md).
 
 ### [`Bool:D`](https://docs.raku.org/type/Bool) `$.blocks = False`
 
 This attribute determines if all block types have to be explicitly pre-declared.
 
-See method `declare-blocks` in [`Config::BINDish::Grammar`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar.md).
+See method `declare-blocks` in [`Config::BINDish::Grammar`](../Grammar.md).
 
 ### [`Bool:D`](https://docs.raku.org/type/Bool) `$.warnings = True`
 
@@ -63,7 +63,7 @@ Because by default Raku uses hashes with [`Str`](https://docs.raku.org/type/Str)
 SEE ALSO
 ========
 
-[`Config::BINDish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish.md), [`Config::BINDish::Grammar`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar.md)
+[`Config::BINDish`](../../BINDish.md), [`Config::BINDish::Grammar`](../Grammar.md)
 
 AUTHOR
 ======

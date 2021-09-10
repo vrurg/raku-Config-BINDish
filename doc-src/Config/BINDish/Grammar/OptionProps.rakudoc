@@ -6,15 +6,15 @@ C<Config::BINDish::Grammar::OptionProps> - option statement properties
 =head1 DESCRIPTION
 
 Does
-L<C<Config::BINDish::Grammar::StatementProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/StatementProps.md>,
-L<C<Config::BINDish::Grammar::ContainerProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/ContainerProps.md>,
-L<C<Config::BINDish::Grammar::DeclarationProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/DeclarationProps.md>.
+L<C<Config::BINDish::Grammar::StatementProps>|StatementProps.md>,
+L<C<Config::BINDish::Grammar::ContainerProps>|ContainerProps.md>,
+L<C<Config::BINDish::Grammar::DeclarationProps>|DeclarationProps.md>.
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish.md>,
-L<C<Config::BINDish::Grammar>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar.md>,
-L<C<Config::BINDish::Grammar::BlockProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/BlockProps.md>
+L<C<Config::BINDish>|../../BINDish.md>,
+L<C<Config::BINDish::Grammar>|../Grammar.md>,
+L<C<Config::BINDish::Grammar::BlockProps>|BlockProps.md>
 
 =head1 AUTHOR
 

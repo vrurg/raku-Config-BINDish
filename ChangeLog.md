@@ -8,20 +8,28 @@ v0.0.5
 
   * Added support for default values
 
+  * Multi-option queries
+
+  * Request operator(s): `∷` and `::`
+
+  * Clarified `.get` API
+
+  * Minor technical cleanups
+
 v0.0.4
 ------
 
   * Added support for context-dependent declarations.
 
-This is a major change in the module logic. Whereas the previous versions considered each pre-declared keyword unique per its type (i.e. per options or blocks) and per configuration, they can now be made unique per individual block. See [`Config::BINDish::Grammar`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar.md) for more information.
+This is a major change in the module logic. Whereas the previous versions considered each pre-declared keyword unique per its type (i.e. per options or blocks) and per configuration, they can now be made unique per individual block. See [`Config::BINDish::Grammar`](Config/BINDish/Grammar.md) for more information.
 
   * Added two implicitly pre-declared blocks: `.TOP` and `.ANYWHERE`
 
-  * [`Config::BINDish::Grammar::StatementProps`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/StatementProps.md) attribute `$.top-only` is deprecated; `:in<.TOP>` must be used instead of `:top-only` in a statement properties hash
+  * [`Config::BINDish::Grammar::StatementProps`](Config/BINDish/Grammar/StatementProps.md) attribute `$.top-only` is deprecated; `:in<.TOP>` must be used instead of `:top-only` in a statement properties hash
 
-  * [`Config::BINDish::Grammar::Strictness`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/Strictness.md) got one more mode: `warnings`
+  * [`Config::BINDish::Grammar::Strictness`](Config/BINDish/Grammar/Strictness.md) got one more mode: `warnings`
 
-  * [`Config::BINDish::INET`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/INET.md) extension now sets `$*CFG-VALUE`
+  * [`Config::BINDish::INET`](Config/BINDish/INET.md) extension now sets `$*CFG-VALUE`
 
   * Fixed some error reports
 
