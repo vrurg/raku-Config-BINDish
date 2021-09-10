@@ -309,8 +309,8 @@ role Config::BINDish::AST::Blockish {
             :$option
     }
 
-    method block(::?CLASS:D: $block, *%p) {
-        self.find(:$block, |%p)
+    method block(::?CLASS:D: $block, :$local = False, *%p) {
+        self.find(:$block, :$local, |%p)
     }
 
     method blocks(::?CLASS:D: $block, *%p --> Seq:D) {
