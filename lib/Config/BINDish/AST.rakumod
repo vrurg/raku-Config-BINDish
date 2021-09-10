@@ -270,6 +270,13 @@ class Config::BINDish::AST::Node is Config::BINDish::AST {
 }
 
 role Config::BINDish::AST::Blockish {
+    has Str:D $.id is required;
+
+    method dup(::?CLASS:D: *%twiddles) {
+        my %p = (:$!id unless %twiddles<id>:exists);
+        callwith |%p, |%twiddles
+    }
+
     my proto sub ensure-single(|) {*}
     multi ensure-single(@b, :$block!, *%p) {
         given +@b {
@@ -477,10 +484,16 @@ class Config::BINDish::AST::Option
 {
     has Config::BINDish::AST::Container $!keyword;
     has Config::BINDish::AST::Container $!value;
+    has Str:D $.id is required;
 
     method keyword(::?CLASS:D:) { $!keyword //= self.child('keyword') }
     method name(::?CLASS:D:) { $!keyword //= self.child('option-name') }
     method value(::?CLASS:D:) { $!value //= self.child('option-value') }
+
+    method dup(::?CLASS:D: *%twiddles) {
+        my %p = (:$!id unless %twiddles<id>:exists);
+        callwith |%p, |%twiddles
+    }
 
     method gist(::?CLASS:D:) {
         self.keyword.gist(:!detailed) ~ " " ~ self.value.gist(:!detailed) ~ ";"
