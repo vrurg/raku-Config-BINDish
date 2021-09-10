@@ -229,3 +229,10 @@ class Config::BINDish::X::DuplicateKeyword is Config::BINDish::X {
         "Another declaration of $!what '$!keyword' already exists for block '" ~ $!in.keyword ~ "'"
     }
 }
+
+class Config::BINDish::X::Get::BadPathElement is Config::BINDish::X {
+    has Str:D $.what is required;
+    method message {
+        $!what.tc ~ " cannot be used as a block path element"
+    }
+}

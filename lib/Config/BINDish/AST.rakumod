@@ -337,47 +337,197 @@ role Config::BINDish::AST::Blockish {
             .map: { $raw ?? $_ !! .payload }
     }
 
+    my sub check-pelem($pelem) {
+        Config::BINDish::X::Get::BadPathElement.new(:what($pelem.^name)).throw
+            unless $pelem ~~ Pair | Str;
+        Config::BINDish::X::Get::BadPathElement.new(:what('A nested pair (' ~ $pelem.raku ~ ')')).throw
+            if $pelem ~~ Pair && $pelem.value ~~ Pair;
+    }
+
+    my proto traverse-default(|) {*}
+    multi traverse-default(%prop-relations,
+                           Any:D $block-id,
+                           Str:D $keyword,
+                           Bool:D :$block! where *.so,
+                           *%)
+    {
+        (%prop-relations{$block-id} andthen .<block> andthen .{$keyword}) // Nil
+    }
+    multi traverse-default(%prop-relations,
+                           Any:D $block-id,
+                           Pair:D $ (:key($keyword)),
+                           Bool:D :$block! where *.so,
+                           *%)
+    {
+        (%prop-relations{$block-id} andthen .<block> andthen .{$keyword}) // Nil
+    }
+    multi traverse-default(%prop-relations,
+                           Any:D $block-id,
+                           Str:D $keyword,
+                           Bool :$block where !*, :$raw,
+                           *%)
+    {
+        with (%prop-relations{$block-id} andthen .<option> andthen .{$keyword}) {
+            return $raw ?? $_ !! .default
+        }
+        Nil
+    }
+    multi traverse-default(%prop-relations,
+                           Any:D $block-id,
+                           Pair:D $ (:key($keyword)),
+                           Bool :$block where !*, :$raw,
+                           *%)
+    {
+        with (%prop-relations{$block-id} andthen .<option> andthen .{$keyword}) {
+            return $raw ?? $_ !! .default
+        }
+        Nil
+    }
+    multi traverse-default(%prop-relations, Any:D $block-id, @keywords, Bool :$block where !*, :$raw, *%) {
+        @keywords.map: { traverse-default(%prop-relations, $block-id, $_, :!block, :$raw) }
+    }
+    multi traverse-default(%prop-relations, Any:D $block-id,
+                           Pair:D $ (:key($keyword), :value($)) where *.key !~~ Pair,
+                           Bool:D :$block where *.so)
+    {
+        (%prop-relations{$block-id} andthen .<block> andthen .{$keyword}) // Nil
+    }
+    multi traverse-default(
+        %prop-relations, Any:D $block-id,
+        Pair:D $ (:key($keyword), :value($subpath)) where { .value ~~ Pair:D | Str:D | Bool:D | Positional:D },
+        *%c)
+    {
+        my $subblk = traverse-default(%prop-relations, $block-id, $keyword, :block);
+        return Nil without $subblk;
+        traverse-default(%prop-relations, $subblk.id, $subpath, |%c)
+    }
+    multi traverse-default(Config::BINDish::AST::Block:D $blk,
+                           Any:D $block-id is copy = $blk.id,
+                           Any:D :$keyword!,
+                           *%c)
+    {
+        traverse-default($blk.top-node.prop-relations, $block-id, $keyword, |%c)
+            // traverse-default($blk.top-node.prop-relations, '.ANYWHERE', $keyword, |%c)
+    }
+    multi traverse-default(Config::BINDish::AST::Block:D $blk,
+                           $block-id is copy = $blk.id,
+                           :@path,
+                           Int:D :$pos is copy,
+                           *%c)
+    {
+        my $elems = +@path - 1;
+        my $prop-relations = $blk.top-node.prop-relations;
+        while $pos < $elems {
+            check-pelem my $pelem = @path[$pos];
+            with traverse-default($prop-relations, $block-id, $pelem, |%c, :block)
+                // traverse-default($prop-relations, '.ANYWHERE', $pelem, |%c, :block)
+            {
+                $block-id = .id;
+                ++$pos;
+            }
+            else {
+                return Nil
+            }
+        }
+        traverse-default($prop-relations, $block-id, @path[$pos], |%c)
+            // traverse-default($prop-relations, '.ANYWHERE', @path[$pos], |%c)
+    }
+
+    my proto traverse(Config::BINDish::AST::Block:D, |) {*}
+    multi traverse(Config::BINDish::AST::Block:D $blk, Str:D $keyword, Bool:D :$block! where *.so) {
+        $blk.block($keyword, :local) // traverse-default($blk, :$keyword, :block)
+    }
+    multi traverse(Config::BINDish::AST::Block:D $blk, @path, Bool:D :$block! where *.so) {
+        Config::BINDish::X::Get::BadPathElement.new(:what(@path.^name)).throw
+    }
+    multi traverse(Config::BINDish::AST::Block:D $blk, Str:D $keyword, Bool :$block where !*, Bool :$raw, *%c) {
+        with $blk.option($keyword, |%c) {
+            return $raw ?? $_ !! .value.payload
+        }
+        traverse-default $blk, :$keyword, :!block, :$raw, |%c
+    }
+    multi traverse(Config::BINDish::AST::Block:D $blk, @keywords, Bool :$block where !*, Bool :$raw, *%c) {
+        @keywords.map: { traverse($blk, $_, :!block, :$raw, |%c) }
+    }
+    multi traverse(Config::BINDish::AST::Block:D $blk, &keywords, Bool :$block where !*, Bool :$raw, *%c) {
+        &keywords($blk).List.map: { traverse($blk, $_, :!block, :$raw, |%c) }
+    }
+    multi traverse(Config::BINDish::AST::Block:D $blk,
+                   Pair:D $path (:key($keyword), :value( ($name, $class) ))
+                        where { ($path.key !~~ Pair) && ($path.value ~~ Positional) },
+                   Bool:D :$block! where *.so)
+    {
+        $blk.block( $keyword, |(:$name unless $name ~~ Bool:D), |(:$class with $class), :local )
+            // traverse-default($blk, :$keyword, :block)
+    }
+    multi traverse(Config::BINDish::AST::Block:D $blk,
+                   Pair:D $path (:key($keyword), :value($name)) where { $path.key !~~ Pair && $path.value !~~ Pair },
+                   Bool:D :$block! where *.so)
+    {
+        $blk.block( $keyword, |(:$name unless $name ~~ Bool:D), :local )
+            // traverse-default($blk, :$keyword, :block)
+    }
+    multi traverse(Config::BINDish::AST::Block:D $blk,
+                   Pair:D $path ( :key($keyword), :value($subpath))
+                        where { $path.value ~~ Pair:D | Str:D | Bool:D | Positional:D | Code:D },
+                   Bool :$block,
+                   *%c)
+    {
+        my $subblk = traverse($blk, $keyword, :block);
+        return traverse-default($blk, $subblk.id, :keyword($subpath), :$block, |%c)
+            if $subblk ~~ Config::BINDish::Grammar::BlockProps;
+        return traverse($subblk, $subpath, :$block, |%c) with $subblk;
+        Nil
+    }
+    multi traverse(Config::BINDish::AST::Block:D $blk, :@path, Bool:D :$block, *%c) {
+        my $curblk = $blk;
+        my $pos = 0;
+        my $elems = +@path - 1;
+        while $curblk && $pos < $elems {
+            check-pelem my $pelem = @path[$pos];
+            with traverse($curblk, $pelem, :block) {
+                $curblk = $_;
+                ++$pos;
+            }
+            else {
+                last;
+            }
+        }
+        $curblk ~~ Config::BINDish::Grammar::BlockProps
+            ?? traverse-default($blk, $curblk.id, |%c, :$block, :@path, :$pos)
+            !! ($pos < $elems
+                ?? traverse-default($curblk, :@path, :$pos, |%c, :$block)
+                !! traverse($curblk, @path.tail, |%c, :$block))
+    }
+    multi traverse(Config::BINDish::AST::Block:D $blk, Bool:D $b where $b.so) { $blk }
+
     proto method get(::?CLASS:D: |) {*}
     multi method get(::?CLASS:D: Str:D $option, Bool :$raw, Bool :$local = True) {
-        $raw ?? self.option($option, :$local) !! self.value($option, :$local)
+        traverse(self, $option, :$raw, :$local)
     }
     multi method get(::?CLASS:D: Str:D :$option, Bool :$local = True) {
-        self.option($option, :$local)
+        traverse(self, $option, :$local, :raw)
     }
     multi method get(::?CLASS:D: Str:D :$value, Bool :$local = True) {
-        self.value($value, :$local)
+        traverse(self, $value, :!block, :$local)
+    }
+    multi method get(::?CLASS:D: Pair:D :$option, *%c) {
+        traverse(self, $option, |%c, :!block, :raw)
+    }
+    multi method get(::?CLASS:D: Pair:D :$value, *%c) {
+        traverse(self, $value, |%c, :!block, :!raw)
     }
     multi method get(::?CLASS:D: Str:D :$block, *%c) {
         self.block($block, |%c)
     }
-    multi method get(::CLASS:D: Pair:D $path where $path.value ~~ Pair:D | Str:D) {
-        my proto traverse(Config::BINDish::AST::Block:D, |) {*}
-        multi traverse(Config::BINDish::AST::Block:D $blk, Str:D $option, *%p) {
-            $blk.value: $option, |%p
-        }
-        multi traverse(Config::BINDish::AST::Block:D $blk, Str:D :$block) {
-            $blk.block: $block;
-        }
-        multi traverse(Config::BINDish::AST::Block:D $blk,
-                       Pair:D :$block (:key($btype), :value( ($name, $class?) ) ) where $block.value ~~ Positional)
-        {
-            $blk.block: $btype, :$name, |(:$class with $class)
-        }
-        multi traverse(Config::BINDish::AST::Block:D $blk,
-                       Pair:D :$block (:key($btype), :value($name)))
-        {
-            # Don't pass True as :name if block in the search path defined as :block-type
-            $blk.block: $btype, |(:$name unless $name.^isa: Bool)
-        }
-        multi traverse(Config::BINDish::AST::Block:D $blk,
-                       Pair:D $path (:key($block), :value($subpath)) where $path.value ~~ Pair:D | Str:D)
-        {
-            my $subblk = traverse($blk, :$block);
-            return Nil without $subblk;
-            traverse($subblk, $subpath)
-        }
-
-        traverse(self, $path)
+    multi method get(::?CLASS:D: Pair:D :$block, *%c) {
+        traverse(self, $block, |%c, :block)
+    }
+    multi method get(::CLASS:D: Pair:D $path, *%c) {
+        traverse(self, $path, |%c)
+    }
+    multi method get(::?CLASS:D: @path, *%c) {
+        traverse(self, |%c, :@path)
     }
 
 }

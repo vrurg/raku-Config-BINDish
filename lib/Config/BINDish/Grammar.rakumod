@@ -82,6 +82,8 @@ role ContainerProps does TypeStringify {
     # NOTE: These are kept separate from StatementProps because extensions may add non-container type statements.
     has $.type-name;
     has Mu $.type;
+    # Default value of a container
+    has Mu $.default is default(Nil);
 
     multi method ACCEPTS(Value:D $val) {
         (!$!type-name.defined || $val.type-name ~~ $!type-name)
@@ -112,6 +114,11 @@ class BlockProps
     has Bool $.classified;
     # Block can only contain values, no options or blocks allowed
     has Bool:D $.value-only = False;
+
+    method values {
+        return .List with $.default;
+        Empty
+    }
 }
 
 class Context {
@@ -410,8 +417,8 @@ multi method declare-block(*%params) {
 proto method declare-blocks(| --> Nil) {*}
 multi method declare-blocks(@blocks, Bool :$cleanup = True --> Nil) {
     # $id here is a generic term because it can be either a $keyword or a $id => $keyword pair
-    for @blocks -> Pair:D (:key($id), :value(%props)) {
-        self.declare-block: $id, %props, :$cleanup
+    for @blocks -> Pair:D (:key($id), Hash() :value($props)) {
+        self.declare-block: $id, $props, :$cleanup
     }
 }
 multi method declare-blocks(*@list where { all .map(* ~~ Pair:D) }, Bool :$cleanup = True, *%named --> Nil) {
@@ -441,8 +448,8 @@ multi method declare-option(*%params --> OptionProps:D) {
 proto method declare-options(| --> Nil) {*}
 multi method declare-options(@options, Bool :$cleanup = True --> Nil) {
     # $id here is a generic term because it can be either a $keyword or a $id => $keyword pair
-    for @options -> Pair:D (:key($id), :value(%props)) {
-        self.declare-option: $id, %props, :$cleanup;
+    for @options -> Pair:D (:key($id), Hash() :value($props)) {
+        self.declare-option: $id, $props, :$cleanup;
     }
 }
 multi method declare-options(*@list where { all .map(* ~~ Pair:D) }, Bool :$cleanup = True, *%named --> Nil) {
@@ -532,8 +539,6 @@ method validate-block {
     if $keyword ∈ $grammar.keywords<block> {
         my $ctx = $*CFG-CTX;
         my $parent-ctx = $*CFG-PARENT-CTX;
-        # No need to check for $props because if there is pre-declared block type then there is a props object for it.
-        # But with :D we make sure the assertion is not broken.
         my StatementProps $props = $ctx.props;
         self.panic: X::Parse::Context, :what<block>, :$keyword, :ctx($parent-ctx)
             unless $props.defined && ($parent-ctx ~~ $props);
@@ -627,7 +632,6 @@ rule as-include {
 
 rule as-main {
     :my $*CFG-CTX;
-    <.enter-TOP>
     {
         $*CFG-TOP-CTX = self.enter-ctx: :type<block>,
                                         :id<.TOP>,
@@ -635,6 +639,7 @@ rule as-main {
                                                             :type(Str),
                                                             :type-name<keyword>);
     }
+    <.enter-TOP>
     <statement-list>
 }
 
