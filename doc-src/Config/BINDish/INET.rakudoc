@@ -6,7 +6,7 @@ C<Config::BINDish::INET> - implement IP addresses as values
 =head1 DESCRIPTION
 
 This module extends
-L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish.md>
+L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish.md>
 with ability to parse IPv4/IPv6 IP addresses and networks; and with very generic form of URIs.
 
 For supported IP formats see L<C<IP::Addr>|https://modules.raku.org/dist/IP::Addr> module.
@@ -20,7 +20,7 @@ is a valid URI.
 =head2 This Is A Value!
 
 This extension creates a normal
-L<C<Config::BINDish::AST::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST/Value.md>.
+L<C<Config::BINDish::AST::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST/Value.md>.
 And as such it can be used anywhere where a value is allowed. Say, we can decalre a network block:
 
     network 192.168.1.0/24 {
@@ -56,8 +56,8 @@ Or you may want to iterate over all known networks. Then it would be:
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish.md>,
-L<C<Config::BINDish::AST>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST.md>
+L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish.md>,
+L<C<Config::BINDish::AST>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST.md>
 
 =head1 AUTHOR
 

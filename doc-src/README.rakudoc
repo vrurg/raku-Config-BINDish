@@ -108,7 +108,7 @@ Contrary, in relaxed mode one can safely remove the ending semi-colon after C<pr
 too.
 
 More information about strictness modes can be found in
-L<C<Config::BINDish::Grammar::Strictness>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/Strictness.md>
+L<C<Config::BINDish::Grammar::Strictness>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/Strictness.md>
 
 Note how term C<block-name> in the grammar is declared as a C<value>. It means that any valid option value can serve as
 the block name. For example:
@@ -116,7 +116,7 @@ the block name. For example:
     block 3.14 { }
 
 Or, with
-L<C<Config::BINDish::INET>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/INET.md>
+L<C<Config::BINDish::INET>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/INET.md>
 loaded it could even be:
 
     network 192.168.1.0/24 {
@@ -243,7 +243,7 @@ There is no limit on nesting blocks:
     }
 
 *NB* We use strings for IP addresses. But with bundled
-L<C<Config::BINDish::INET>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/INET.md>
+L<C<Config::BINDish::INET>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/INET.md>
 extension one can have it like C<gw 172.1.2.1;>. But this paper tries to stick to the barebones module as much as
 possible.
 
@@ -303,13 +303,13 @@ located in file I<mock-file.conf> starting with its line 13. If the directive is
 then when a error is reported it will point at line 14 in I<mock-file.conf>.
 
 Note that the file name part of C<#line> can either be omitted or use any valid option value. For example, with
-L<C<Config::BINDish::INET>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/INET.md>
+L<C<Config::BINDish::INET>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/INET.md>
 one can do something like:
 
     #line 1 https://configs.local/common/std.inc
 
 It would then be only a matter of overriding
-L<C<Config::BINDish::Grammar>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar.md>
+L<C<Config::BINDish::Grammar>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar.md>
 C<include-source> method to provide support for URLs.
 
 =head2 Hybrid mode
@@ -335,7 +335,7 @@ where they end is totally up to them!
 
 =head1 SEE ALSO
 
-L<Config::BINDish|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish.md>
+L<Config::BINDish|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish.md>
 
 =AUTHOR Vadim Belman <vrurg@cpan.org>
 =end pod

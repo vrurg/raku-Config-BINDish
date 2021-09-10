@@ -2,7 +2,7 @@ use v6.d;
 use NQPHLL:from<NQP>;
 use nqp;
 #use Config::BINDish::Ops;
-class Config::BINDish:ver<0.0.4>:api<0.0.4> {
+class Config::BINDish:ver<0.0.5>:api<0.0.5> {
 
     BEGIN {
         Config::BINDish.HOW does role ExtensibleHOW {

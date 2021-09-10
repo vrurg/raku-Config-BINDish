@@ -6,7 +6,7 @@ C<Config::BINDish::Grammar> - the central class of everything in C<Config::BINDi
 =head1 DESCRIPTION
 
 This class is responsible for the actual parsing of the configuration. It is not recommended for direct use.
-L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish.md>
+L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish.md>
 C<read> method must be used instead.
 
 The class inherits from the standard L<C<Grammar>|https://docs.raku.org/type/Grammar> class.
@@ -29,25 +29,25 @@ then the user expects a single block C<foo "bar"> representation to exists after
     foo "bar" { fubar 2; fubaz 3.14; }
 
 How the options are dealt with is the sole prerogative of the actions implementation.
-L<C<Config::BINDish::Actions>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Actions.md>
+L<C<Config::BINDish::Actions>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Actions.md>
 re-delegates handling of flattening to the underlying
-L<C<Config::BINDish::AST>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST.md> class.
+L<C<Config::BINDish::AST>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST.md> class.
 It, in turn, will overwrite earlier option declarations with latter ones. So, when one queries for C<fubar> the value
 returned will be I<2>.
 
 See L<$*CFG-FLAT-BLOCKS|#$*CFG-FLAT-BLOCKS>.
 
-=head3 L<C<Config::BINDish::Grammar::Strictness>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/Strictness.md> C<$.strict = False>
+=head3 L<C<Config::BINDish::Grammar::Strictness>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/Strictness.md> C<$.strict = False>
 
 Defines what strictness modes are activated. See
-L<C<Config::BINDish::Grammar::Strictness>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/Strictness.md>.
+L<C<Config::BINDish::Grammar::Strictness>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/Strictness.md>.
 
 =head3  C<@.prop-keys>
 
 I<Lazy>. Defines the types of statements supported by pre-declaration. Currently it is set to I<block> and I<option>.
 But extensions can add their own types via overriding C<build-prop-keys> method.
 
-=head3 L<C<Hash>|https://docs.raku.org/type/Hash>C<[>L<C<Config::BINDish::Grammar::StatementProps:D>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/StatementProps.md>C<]> C<%.props>
+=head3 L<C<Hash>|https://docs.raku.org/type/Hash>C<[>L<C<Config::BINDish::Grammar::StatementProps:D>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/StatementProps.md>C<]> C<%.props>
 
 I<Lazy>. Registry of all pre-declared statement properties. The first level keys of the hash are values in 
 C<@.prop-keys>, the second level keys are statement IDs.
@@ -83,7 +83,7 @@ C<location> options.
 List of user-defined blocks. Passed to C<declare-blocks> method at object construction time.
 
 See
-L<C<Config::BINDish::Grammar::BlockProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/BlockProps.md>
+L<C<Config::BINDish::Grammar::BlockProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/BlockProps.md>
 and L<#Pre-declaration> section for more information.
 
 =head3 L<C<Pair:D>|https://docs.raku.org/type/Pair> C<@.options>
@@ -91,7 +91,7 @@ and L<#Pre-declaration> section for more information.
 List of user-defined options. Passed to C<declare-options> method at object construction time.
 
 See
-L<C<Config::BINDish::Grammar::OptionProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/OptionProps.md>
+L<C<Config::BINDish::Grammar::OptionProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/OptionProps.md>
 and L<#Pre-declaration> section for more information.
 
 =head3  C<%.reserved-opts>
@@ -135,20 +135,20 @@ Set to C<$.flat> attribute value.
 =head3 C<$*CFG-INNER-PARENT>
 
 Provided for actions convenience. Intended to hold an instance of
-L<C<Config::BINDish::AST::Parent>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST/Parent.md>.
+L<C<Config::BINDish::AST::Node>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST/Node.md>.
 
 =head3 C<$*CFG-TOP>
 
 Provided for actions convenience. Intended to hold an instance of
-L<C<Config::BINDish::AST::TOP>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST/TOP.md>.
+L<C<Config::BINDish::AST::TOP>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST/TOP.md>.
 
-=head3 L<C<Config::BINDish::Grammar::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/Value.md> C<$*CFG-VALUE>
+=head3 L<C<Config::BINDish::Grammar::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/Value.md> C<$*CFG-VALUE>
 
 Must be provided directly or indirectly by any rule or token invoking the C< <value>> token. This variable will be set to a
-L<C<Config::BINDish::Grammar::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/Value.md>
+L<C<Config::BINDish::Grammar::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/Value.md>
 instance created by C<set-value> method.
 
-=head3 L<C<Config::BINDish::Grammar::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/Value.md> C<$*CFG-KEYWORD>
+=head3 L<C<Config::BINDish::Grammar::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/Value.md> C<$*CFG-KEYWORD>
 
 Set by C< <keyword>> token. The value stored will be of type L<C<Str>|https://docs.raku.org/type/Str> and have type name
 I<"keyword">.
@@ -156,7 +156,7 @@ I<"keyword">.
 =head3 C<$*CFG-BLOCK-TYPE>, C<$*CFG-BLOCK-NAME>, C<$*CFG-BLOCK-CLASS>
 
 All three are of
-L<C<Config::BINDish::Grammar::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/Value.md> type.
+L<C<Config::BINDish::Grammar::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/Value.md> type.
 When the following example is parsed:
 
     foo "bar" baz { }
@@ -169,7 +169,7 @@ The variables will be set to:
 
 Note that the name could be of any value, supported by the grammar. If an extension adds a new value type then the
 type can also be used as a type name. Say, with
-L<C<Config::BINDish::INET>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/INET.md>
+L<C<Config::BINDish::INET>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/INET.md>
 loaded one can have the following valid declaration:
 
     IP 192.168.1.42 { }
@@ -196,7 +196,7 @@ successfully parsed.
 =head3 C<set-value(Mu \type, *%value)>
 
 This methods creates a new
-L<C<Config::BINDish::Grammar::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/Value.md>
+L<C<Config::BINDish::Grammar::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/Value.md>
 object and assigns it to C<$*CFG-VALUE>. Takes value's type object as its single positional parameter. Type name and
 payload are passed as the only named argument of the method call. Here is how a single-quoted string is handled by
 the grammar:
@@ -209,7 +209,7 @@ the grammar:
     }
 
 In this example the new
-L<C<Config::BINDish::Grammar::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/Value.md>
+L<C<Config::BINDish::Grammar::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/Value.md>
 object will be created with payload set from C<$<string>>, type name set to I<"sq-string">, and type set to
 L<C<Str>|https://docs.raku.org/type/Str>.
 
@@ -261,8 +261,8 @@ accepts only a single named parameter with name being the statement type. The fo
 
 Returns pre-declaration properties class depending on the value of C<$what>. The candidates provided by the core only
 support I<'option'> and I<'block'> and return
-L<C<Config::BINDish::Grammar::OptionProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/OptionProps.md>
-or L<C<Config::BINDish::Grammar::BlockProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/BlockProps.md>
+L<C<Config::BINDish::Grammar::OptionProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/OptionProps.md>
+or L<C<Config::BINDish::Grammar::BlockProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/BlockProps.md>
 respectively. An extension can add own candidate if it introduces additional statement type.
 
 =head3 C<declare-statement(Str:D $what, Any:D $id = self.autogen-id, $keyword where Str:D | Bool, :%props, Bool :$cleanup = True)>
@@ -333,7 +333,7 @@ Returns a unique string to be used as a statement identifier.
 =head3 C<enter-ctx(Value:D :$keyword, Str:D :$type, *%profile)>
 
 Creates a new
-L<C<Config::BINDish::Grammar::Context>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/Context.md>
+L<C<Config::BINDish::Grammar::Context>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/Context.md>
 object. Returns the new context, which is also stored into C<$*CFG-CTX>.
 
 This method expects C<$*CFG-PARENT-CTX> to be set to the parent context instance, and C<$*CFG-CTX> to be undefined.
@@ -381,9 +381,9 @@ Validates currently being parsed option based on its keyword. Uses pre-set varia
 L<C<$*CFG-KEYWORD>|#$*CFG-KEYWORD> and L<C<$*CFG-VALUE>|#$*CFG-VALUE>.
 
 Can throw one of
-L<C<Config::BINDish::X::Parse::Context>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/X/Parse/Context.md>,
-L<C<Config::BINDish::X::Parse::ValueType>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/X/Parse/ValueType.md>,
-or L<C<Config::BINDish::X::Parse::Unknown>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/X/Parse/Unknown.md>.
+L<C<Config::BINDish::X::Parse::Context>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/X/Parse/Context.md>,
+L<C<Config::BINDish::X::Parse::ValueType>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/X/Parse/ValueType.md>,
+or L<C<Config::BINDish::X::Parse::Unknown>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/X/Parse/Unknown.md>.
 
 =head3 C<validate-block()>
 
@@ -393,22 +393,22 @@ L<C<$*CFG-BLOCK-CLASS>|#$*CFG-BLOCK-CLASS>. If block passes the validation then 
 the context stack.
 
 Can throw one of
-L<C<Config::BINDish::X::Parse::Context>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/X/Parse/Context.md>,
-L<C<Config::BINDish::X::Parse::ExtraPart>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/X/Parse/ExtraPart.md>,
-L<C<Config::BINDish::X::Parse::MissingPart>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/X/Parse/MissingPart.md>,
-or L<C<Config::BINDish::X::Parse::Unknown>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/X/Parse/Unknown.md>.
+L<C<Config::BINDish::X::Parse::Context>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/X/Parse/Context.md>,
+L<C<Config::BINDish::X::Parse::ExtraPart>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/X/Parse/ExtraPart.md>,
+L<C<Config::BINDish::X::Parse::MissingPart>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/X/Parse/MissingPart.md>,
+or L<C<Config::BINDish::X::Parse::Unknown>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/X/Parse/Unknown.md>.
 
 =head3 C<validate-value()>
 
 Makes sure a value can be used in the current context. Uses variable L<C<$*CFG-VALUE>|#$*CFG-VALUE>.
 
 Can throw
-L<C<Config::BINDish::X::Parse::ValueType>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/X/Parse/ValueType.md>.
+L<C<Config::BINDish::X::Parse::ValueType>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/X/Parse/ValueType.md>.
 
 =head3 C<multi method panic(Str:D $msg)>
 
 Throws
-L<C<Config::BINDish::X::Parse::General>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/X/Parse/General.md>
+L<C<Config::BINDish::X::Parse::General>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/X/Parse/General.md>
 with message C<$msg>.
 
 =head3 C<multi method panic(Config::BINDish::X::Parse:U \exception, Str $msg?, *%profile)>
@@ -447,7 +447,7 @@ Pushes I<"TOP"> context onto the stack and invokes C<statement-list>.
 =head3 C<token enter-TOP>
 
 Does nothing, used as anchor for
-L<C<Config::BINDish::Actions>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Actions.md>.
+L<C<Config::BINDish::Actions>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Actions.md>.
 
 =head3 C<rule statement-list>
 
@@ -504,7 +504,7 @@ L<C<$*CFG-KEYWORD>|#$*CFG-KEYWORD>.
 
 Double- and single-quoted strings. The standard grammar and actions do not care about the exact nature of a string.
 But extensions could adjust their behavior based on the string type. For example,
-L<C<Config::BINDish::Expandable>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Expandable.md>
+L<C<Config::BINDish::Expandable>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Expandable.md>
 implements macro expansion for double-quoted strings only.
 
 =head3 C<proto token value>
@@ -584,7 +584,7 @@ assumes the current enclosing block.
 Let's consider a network configuration file where we use C<host> and C<lan> blocks and some network-related options.
 
 I<NOTE> that the following example requires
-L<C<Config::BINDish::INET>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/INET.md>
+L<C<Config::BINDish::INET>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/INET.md>
 module to be used.
 
     ip 192.168.1.2; // Error, we don't know the host to apply this ip to
@@ -911,7 +911,7 @@ if you need a unique one.
 =EXTENSIONS
 
 This section provides tips for writing own grammar extensions. See
-L<C<Config::BINDish::Actions>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Actions.md>
+L<C<Config::BINDish::Actions>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Actions.md>
 to find more about action extensions.
 
 =head2 Context
@@ -940,7 +940,7 @@ the steps taken by C«statement:sym<option>» or C«statement:sym<block>» rules
 
 =head2 Extending The Grammar
 
-L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish.md>
+L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish.md>
 contains general information about writing extensions. Here we provide only grammar-specific details.
 
 Only the rules and tokens documented in corresponding section above are guaranteed to be supported and not be changed
@@ -962,12 +962,12 @@ easy as adding new rules or tokens akin to the following example:
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish.md>,
-L<C<Config::BINDish::Grammar::Strictness>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/Strictness.md>,
-L<C<Config::BINDish::Grammar::StatementProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/StatementProps.md>,
-L<C<Config::BINDish::Grammar::ContainerProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/ContainerProps.md>,
-L<C<Config::BINDish::Grammar::OptionProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/OptionProps.md>,
-L<C<Config::BINDish::Grammar::BlockProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/BlockProps.md>
+L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish.md>,
+L<C<Config::BINDish::Grammar::Strictness>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/Strictness.md>,
+L<C<Config::BINDish::Grammar::StatementProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/StatementProps.md>,
+L<C<Config::BINDish::Grammar::ContainerProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/ContainerProps.md>,
+L<C<Config::BINDish::Grammar::OptionProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/OptionProps.md>,
+L<C<Config::BINDish::Grammar::BlockProps>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/BlockProps.md>
 
 =AUTHOR Vadim Belman <vrurg@cpan.org>
 

@@ -6,7 +6,7 @@ NAME
 DESCRIPTION
 ===========
 
-This module extends [`Config::BINDish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish.md) with ability to parse IPv4/IPv6 IP addresses and networks; and with very generic form of URIs.
+This module extends [`Config::BINDish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish.md) with ability to parse IPv4/IPv6 IP addresses and networks; and with very generic form of URIs.
 
 For supported IP formats see [`IP::Addr`](https://modules.raku.org/dist/IP::Addr) module.
 
@@ -19,7 +19,7 @@ is a valid URI.
 This Is A Value!
 ----------------
 
-This extension creates a normal [`Config::BINDish::AST::Value`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST/Value.md). And as such it can be used anywhere where a value is allowed. Say, we can decalre a network block:
+This extension creates a normal [`Config::BINDish::AST::Value`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST/Value.md). And as such it can be used anywhere where a value is allowed. Say, we can decalre a network block:
 
     network 192.168.1.0/24 {
         ns { 192.168.1.1; 192.168.1.5 }
@@ -55,7 +55,7 @@ Or you may want to iterate over all known networks. Then it would be:
 SEE ALSO
 ========
 
-[`Config::BINDish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish.md), [`Config::BINDish::AST`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST.md)
+[`Config::BINDish`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish.md), [`Config::BINDish::AST`](https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST.md)
 
 AUTHOR
 ======

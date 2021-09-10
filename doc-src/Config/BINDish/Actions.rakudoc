@@ -3,37 +3,37 @@
 =head1 CLASS
 
 C<Config::BINDish::Actions> - default actions for
-L<C<Config::BINDish::Grammar>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar.md>
+L<C<Config::BINDish::Grammar>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar.md>
 
 =head1 DESCRIPTION
 
 This class is the default to be used for parsing configs. It builds
-L<C<Config::BINDish::AST>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST.md>
+L<C<Config::BINDish::AST>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST.md>
 tree representation of a config data which is then provided to application code via
-L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish.md>
+L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish.md>
 attribute C<$.top>. The tree can be used to fetch required configuration data, see
-L<C<Config::BINDish::AST>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST.md>.
+L<C<Config::BINDish::AST>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST.md>.
 
 =head1 METHODS
 
 Most of the methods correspond to named rules in
-L<C<Config::BINDish::Grammar>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar.md>.
+L<C<Config::BINDish::Grammar>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar.md>.
 In this section only utility methods are documented.
 
 =head3 C<make-container(Config::BINDish::Grammar::Value:D $val)>
 
 Method creates a new instance of
-L<C<Config::BINDish::AST::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST/Value.md>
+L<C<Config::BINDish::AST::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST/Value.md>
 from its grammar counterpart.
 
-=head3 C<enter-parent(Config::BINDish::AST::Parent:D $inner --> Config::BINDish::AST::Parent:D)>
-=head3 C<enter-parent(Config::BINDish::AST::Parent:U $inner, |profile --> Config::BINDish::AST::Parent:D)>
+=head3 C<enter-parent(Config::BINDish::AST::Node:D $inner --> Config::BINDish::AST::Node:D)>
+=head3 C<enter-parent(Config::BINDish::AST::Node:U $inner, |profile --> Config::BINDish::AST::Node:D)>
 
 Method is invoked when a new
-L<C<Config::BINDish::AST::Parent>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST/Parent.md>
-node is to be created. For example, this class uses it when creates the C<TOP> node and each time a new block node is
+L<C<Config::BINDish::AST::Node>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST/Node.md>
+is to be created. For example, this class uses it when creates the C<TOP> node and each time a new block node is
 created.
-L<C<Config::BINDish::Extendabale>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Extendabale.md> also uses this method for another kinds of nodes.
+L<C<Config::BINDish::Extendabale>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Extendabale.md> also uses this method for another kinds of nodes.
 
 If C<$inner> is an undefined typeobject then the method first creates an instance of it using method `new` and using
 C<profile> as its arguments:
@@ -48,8 +48,8 @@ Returns the innermost parent node.
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish.md>,
-L<C<Config::BINDish::Grammar>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar.md>
+L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish.md>,
+L<C<Config::BINDish::Grammar>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar.md>
 
 =AUTHOR Vadim Belman <vrurg@cpan.org>
 

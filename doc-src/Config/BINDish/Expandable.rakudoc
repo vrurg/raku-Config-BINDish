@@ -6,11 +6,11 @@ C<Config::BINDish::Expandable> - C<Config::BINDish> extension implmeneting expan
 =head1 DESCRIPTION
 
 This module extends
-L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish.md>
+L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish.md>
 with strings which can include other option values. Only double-quoted string (i.e. those for which
-L<C<Config::BINDish::Grammar::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Grammar/Value.md>
+L<C<Config::BINDish::Grammar::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Grammar/Value.md>
 and
-L<C<Config::BINDish::AST::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST/Value.md>
+L<C<Config::BINDish::AST::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST/Value.md>
 have type name set to I<dq-string>) are expandable.
 
 To incorporate a value into a string the following macro format is used:
@@ -79,9 +79,9 @@ Symbol escaping is traditionally done with a backslash:
 =head2 This Is A Value!
 
 I<Actually, this is a
-L<C<Config::BINDish::AST::Container>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST/Container.md>.
+L<C<Config::BINDish::AST::Container>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST/Container.md>.
 And a
-L<C<Config::BINDish::AST::Node>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST/Node.md>.
+L<C<Config::BINDish::AST::Node>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST/Node.md>.
 But as long as we talk about option values, so – let it be a value then.>
 
 Because expandable strings are normal values they can be used anywhere, where a value is accepted. We can do things
@@ -102,8 +102,8 @@ This works because when a macro is expanded server name and class can be specifi
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish.md>,
-L<C<Config::BINDish::AST>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST.md>
+L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish.md>,
+L<C<Config::BINDish::AST>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST.md>
 
 =head1 AUTHOR
 

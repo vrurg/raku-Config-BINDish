@@ -6,7 +6,7 @@ C<Config::BINDish::AST> - the standard C<Config::BINDish> AST tree representatio
 =head1 DESCRIPTION
 
 As a module C<Config::BINDish::AST> defines all standard AST node classes used by
-L<C<Config::BINDish::Actions>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Actions.md>
+L<C<Config::BINDish::Actions>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Actions.md>
 to build the resulting representation of the parsed configuration.
 
 As a class C<Config::BINDish::AST> is the base class for all other AST classes.
@@ -18,9 +18,9 @@ A little bit of special attention must be paid to labeling functionality of AST.
     the-answer 42;
 
 In the above example both `the-answer` and `42` are considered to be I<values> and as such they result in two instances
-of L<C<Config::BINDish::AST::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST/Value.md>.
+of L<C<Config::BINDish::AST::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST/Value.md>.
 Both objects then become children of an
-L<C<Config::BINDish::AST::Option>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST/Option.md>
+L<C<Config::BINDish::AST::Option>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST/Option.md>
 instance. Roughly, the parsed tree will look like:
 
     Option
@@ -50,7 +50,7 @@ Returns current parent node.
 =head3 C<multi parent(Config::BINDish::AST:U \parent-type)>
 
 Returns the closest parent node of type C<parent-type>. For example, to get the enclosing block of a
-L<C<Config::BINDish::AST::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST/Value.md> one can do:
+L<C<Config::BINDish::AST::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST/Value.md> one can do:
 
     $value.parent(Config::BINDish::AST::Block);
 
@@ -86,7 +86,7 @@ based on its registered name.
 Creates a new instance of ast node based on its name. The name can be either a registered AST node name, see
 C<register-type> method above; or a short name under C<Config::BINDish::AST::> namespace. If no associated AST type
 object is found then a failure wrapped around
-L<C<Config::BINDish::X::AST::DoesnExists>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/X/AST/DoesnExists.md>
+L<C<Config::BINDish::X::AST::DoesnExists>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/X/AST/DoesnExists.md>
 is returned.
 
 For example, with the following statement:
@@ -109,23 +109,23 @@ Returns the topmost node, or, in other words, the root of the AST tree.
 
 =head2 Roles
 
-=item L<C<Config::BINDish::AST::Container>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST/Container.md>
-=item L<C<Config::BINDish::AST::Node>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST/Parent.md>
+=item L<C<Config::BINDish::AST::Container>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST/Container.md>
+=item L<C<Config::BINDish::AST::Node>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST/Parent.md>
 
 =head2 Classes
 
-=item L<C<Config::BINDish::AST::Block>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST/Block.md>
-=item L<C<Config::BINDish::AST::Comment>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST/Comment.md>
-=item L<C<Config::BINDish::AST::Option>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST/Option.md>
-=item L<C<Config::BINDish::AST::NOP>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST/NOP.md>
-=item L<C<Config::BINDish::AST::Stmts>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST/Stmts.md>
-=item L<C<Config::BINDish::AST::TOP>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST/TOP.md>
-=item L<C<Config::BINDish::AST::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/AST/Value.md>
+=item L<C<Config::BINDish::AST::Block>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST/Block.md>
+=item L<C<Config::BINDish::AST::Comment>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST/Comment.md>
+=item L<C<Config::BINDish::AST::Option>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST/Option.md>
+=item L<C<Config::BINDish::AST::NOP>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST/NOP.md>
+=item L<C<Config::BINDish::AST::Stmts>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST/Stmts.md>
+=item L<C<Config::BINDish::AST::TOP>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST/TOP.md>
+=item L<C<Config::BINDish::AST::Value>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/AST/Value.md>
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish.md>,
-L<C<Config::BINDish::Aactions>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.4/docs/md/Config/BINDish/Aactions.md>
+L<C<Config::BINDish>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish.md>,
+L<C<Config::BINDish::Aactions>|https://github.com/vrurg/raku-Config-BINDish/blob/v0.0.5/docs/md/Config/BINDish/Aactions.md>
 
 =head1 AUTHOR
 
