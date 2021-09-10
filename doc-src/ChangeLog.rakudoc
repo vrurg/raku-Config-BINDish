@@ -4,6 +4,10 @@
 =head v0.0.5
 
 =item Added support for default values
+=item Multi-option queries
+=item Request operator(s): `∷` and `::`
+=item Clarified `.get` API
+=item Minor technical cleanups
 
 =head2 v0.0.4
 
