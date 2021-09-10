@@ -333,7 +333,7 @@ role Config::BINDish::AST::Blockish {
     }
 
     method values(::?CLASS:D: Bool :$raw) {
-        self.find-all({ .^isa(Config::BINDish::AST::Value) && .is-marked('standalone') })
+        self.find-all({ .^isa(Config::BINDish::AST::Value) && .is-marked('standalone') }, :local)
             .map: { $raw ?? $_ !! .payload }
     }
 
