@@ -13,6 +13,8 @@ class Config::BINDish::AST {
     has Config::BINDish::AST::Node $!parent is built;
     has SetHash:D $!labels is built = SetHash.new;
 
+    has Config::BINDish::AST::Node $!top-node;
+
     my %ast-types;
 
     method dup(::?CLASS:D: *%twiddles) {
@@ -77,13 +79,10 @@ class Config::BINDish::AST {
                 !! fail Config::BINDish::X::AST::DoestExists.new(:$node-type))
     }
 
-    method top-node(::?CLASS:D: --> ::?CLASS) {
-        return $_ with $*CFG-TOP;
-        my $top = self;
-        while $top.parent.defined {
-            $top = $top.parent;
-        }
-        $top;
+    method top-node(::?CLASS:D: --> ::?CLASS:D) {
+        return $_ with $!top-node;
+        return ($!top-node = $_) with $*CFG-TOP;
+        $!top-node = $!parent.defined ?? $!parent.top-node !! self
     }
 
     # This method is invoked whenever an AST node is dropped.
