@@ -3,7 +3,7 @@ NAME
 
 
 
-[`Config::BINDish`](Config/BINDish.md) - parse BIND9/named kind of config files
+[`Config::BINDish`](docs/md/Config/BINDish.md) - parse BIND9/named kind of config files
 
 SYNOPSIS
 ========
@@ -110,13 +110,13 @@ Here is a sample config:
 
 A config can be parse in either strict or relaxed mode. Depending on chosen mode, the terminating semi-colon can be either optional or mandatory. For the above sample in strict mode the `category` block declaration would be an error because its closing `}` is not followed with `;`. Contrary, in relaxed mode one can safely remove the ending semi-colon after `products` as as well as after `"item3"` too.
 
-More information about strictness modes can be found in [`Config::BINDish::Grammar::Strictness`](Config/BINDish/Grammar/Strictness.md)
+More information about strictness modes can be found in [`Config::BINDish::Grammar::Strictness`](docs/md/Config/BINDish/Grammar/Strictness.md)
 
 Note how term `block-name` in the grammar is declared as a `value`. It means that any valid option value can serve as the block name. For example:
 
     block 3.14 { }
 
-Or, with [`Config::BINDish::INET`](Config/BINDish/INET.md) loaded it could even be:
+Or, with [`Config::BINDish::INET`](docs/md/Config/BINDish/INET.md) loaded it could even be:
 
     network 192.168.1.0/24 {
     }
@@ -232,7 +232,7 @@ There is no limit on nesting blocks:
         }
     }
 
-*NB* We use strings for IP addresses. But with bundled [`Config::BINDish::INET`](Config/BINDish/INET.md) extension one can have it like `gw 172.1.2.1;`. But this paper tries to stick to the barebones module as much as possible.
+*NB* We use strings for IP addresses. But with bundled [`Config::BINDish::INET`](docs/md/Config/BINDish/INET.md) extension one can have it like `gw 172.1.2.1;`. But this paper tries to stick to the barebones module as much as possible.
 
 So far the examples written as if the parser works in relaxed mode. In strict mode the rule of *mandatory semi-colon* applies and a block must always be terminated with `;`:
 
@@ -281,11 +281,11 @@ The meaning of the directive is the same as in C: it makes the grammar to preten
 
 then when a error is reported it will point at line 14 in *mock-file.conf*.
 
-Note that the file name part of `#line` can either be omitted or use any valid option value. For example, with [`Config::BINDish::INET`](Config/BINDish/INET.md) one can do something like:
+Note that the file name part of `#line` can either be omitted or use any valid option value. For example, with [`Config::BINDish::INET`](docs/md/Config/BINDish/INET.md) one can do something like:
 
     #line 1 https://configs.local/common/std.inc
 
-It would then be only a matter of overriding [`Config::BINDish::Grammar`](Config/BINDish/Grammar.md) `include-source` method to provide support for URLs.
+It would then be only a matter of overriding [`Config::BINDish::Grammar`](docs/md/Config/BINDish/Grammar.md) `include-source` method to provide support for URLs.
 
 Hybrid mode
 -----------
@@ -307,7 +307,7 @@ where they end is totally up to them!
 SEE ALSO
 ========
 
-[`Config::BINDish`](Config/BINDish.md)
+[`Config::BINDish`](docs/md/Config/BINDish.md)
 
 AUTHOR
 ======
