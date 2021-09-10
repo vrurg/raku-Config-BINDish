@@ -70,6 +70,8 @@ role StatementProps {
         return $cur-block.is-TOP if $!top-only;
         $!in ?? ( $cur-block.id ∈ $!in) !! True
     }
+
+    method Bool { False }
 }
 
 role ContainerProps does TypeStringify {
@@ -293,7 +295,7 @@ method build-prop-relations {
                 $prop.in<.TOP> = True;
             }
             for $prop.in.keys -> $in-id {
-                unless %!props<block>{$in-id} {
+                without %!props<block>{$in-id} {
                     # If `in` referencing an unknown block then we consider it the case where ID is block type
                     self.declare-block: $in-id, $in-id, %( :autovivified ), :!cleanup;
                 }
@@ -564,7 +566,7 @@ method validate-block {
 method validate-value {
     my $ctx = $*CFG-CTX;
     my $props = $ctx.props;
-    if $props && $props ~~ ContainerProps {
+    if $props.defined && $props ~~ ContainerProps {
         unless (my $value = $*CFG-VALUE) ~~ $props {
             self.panic: X::Parse::ValueType, :what($ctx.type.lc), :keyword($ctx.keyword), :$ctx, :$value
         }
