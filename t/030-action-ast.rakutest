@@ -8,7 +8,7 @@ use Config::BINDish::X;
 plan 7, :parallel;
 
 subtest "Basics" => {
-    plan 29;
+    plan 30;
 
     my $cfg = Config::BINDish.new;
     $cfg.read: string => q:to/CFG/;
@@ -30,6 +30,7 @@ subtest "Basics" => {
 
     my $top = $cfg.top;
     is $top.value('opt'), "top level", "simple top-level option value";
+    cmp-ok $top.value('no-such-opt'), '===', Nil, "no-option results in Nil";
     my $opt = $top.option('opt');
     isa-ok $opt, Config::BINDish::AST::Option, "method option returns an AST::Option instance";
     unless $opt {
@@ -138,7 +139,7 @@ CFG
 }
 
 subtest "Method 'get'" => {
-    plan 6;
+    plan 8;
     my $cfg = Config::BINDish.new;
     $cfg.read: string => q:to/CFG/;
         multi "1" {
@@ -147,6 +148,8 @@ subtest "Method 'get'" => {
                 opt 1.3;
                 subsubblk "level 2" nesting {
                     opt2 "π";
+                    foo 42;
+                    bar "The Answer is";
                 }
             }
             subblk "level 1.a" special {
@@ -188,9 +191,18 @@ subtest "Method 'get'" => {
            Config::BINDish::AST::Block,
            ":block('type') gives a block";
 
-#    say $cfg.top then :multi("special", "class");
-#    say $cfg.top then :multi("1")
-#                  then :subblk("level 1.a") then "opt";
+    is-deeply $cfg.get( :multi<1>
+                        => :subblk("level 1.a")
+                           => :subsubblk('level 2', 'nesting')
+                              => <bar foo no-such-one>).List,
+              ("The Answer is", 42, Nil),
+              "request for multiple options returns all of them";
+
+    throws-like {
+        $cfg.get( :multi<1> => <foo bar> => :subblk("level 1.a") => "opt" )
+    },
+    Config::BINDish::X::Get::BadPathElement,
+    "use of a positional in the middle of a block path throws";
 }
 
 # Multiple block declarations are allowed. But some operations on such configs are limited.

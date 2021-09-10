@@ -1,0 +1,133 @@
+use v6.d;
+use MONKEY-SEE-NO-EVAL;
+use Test::Async;
+use Config::BINDish <op ascii-op>;
+use Config::BINDish::X;
+
+plan 3;
+
+my $cfg = Config::BINDish.new:
+    blocks => ( :cluster => ( :in<.TOP>, :named ),
+                :srv-group<group> => ( :in<cluster> ),
+                :service-group<service> => ( :in<srv-group>, :named ),
+                :service-host<host> => ( :in<service-group>, :named ),
+                :meta => (),
+    ),
+    options => ( :srv-host-iface<interface> => ( :in<service-host> ),
+                 :srv-host-port<port> => ( :in<service-host> ),
+                 :cluster-foo<foo> => ( :in<cluster> ),
+                 :top-foo => ( :in<.TOP> ),
+                 :detached-opt => (),
+    );
+
+lives-ok {
+    $cfg.read: string => q:to/CFG/;
+                            top-opt "is top";
+                            cluster "generic" {
+                                the-answer 42;
+                                group {
+                                    service "api" {
+                                        host "h1" {
+                                            ip "192.168.1.2";
+                                        }
+                                        host "h2" {
+                                            ip "192.168.1.3";
+                                            interface "eth2";
+                                        }
+                                    }
+                                }
+                            }
+                            CFG
+}, "config parsed";
+
+my $tests = S/^'<line>'/#line {$?LINE + 2} $?FILE/ with q:to/TEST-BODY/;
+    <line>
+    isa-ok $cfg ∷ :cluster<generic>, Config::BINDish::AST::Block, "simple block access";
+
+    cmp-ok
+        $cfg ∷ :cluster<generic>, '===', $cfg.top ∷ :cluster<generic>,
+        "operator is equivalent on both config object and its top node";
+
+    is $cfg ∷ "top-opt", "is top", "simple option access";
+
+    isa-ok $cfg ∷ :cluster<generic> ∷ :group ∷ :service<api> ∷ :host<h2>,
+            Config::BINDish::AST::Block,
+            "multi-component path to a block";
+
+    isa-ok $cfg ∷ :cluster<generic> ∷ "group" ∷ :service<api> ∷ :host<h2>,
+            Config::BINDish::AST::Block,
+            "multi-component path to a block, a nameless block is referenced with a string";
+
+    is $cfg ∷ :cluster<generic> ∷ "the-answer", 42, "nested option access";
+
+    is $cfg ∷ :cluster<generic> ∷ "group" ∷ :service<api> ∷ :host<h2> ∷ "interface", "eth2",
+            "multi-component path to an option, a nameless block is referenced with a string";
+
+    isa-ok $cfg ∷ :cluster<generic> ∷ "group" ∷ :service<api> ∷ :host<h3>,
+            Config::BINDish::Grammar::BlockProps,
+            "accessing a non-existent but pre-declared block returns its properties";
+
+    cmp-ok $cfg ∷ :cluster<generic> ∷ "group" ∷ :service<api> ∷ :not-there, '=:=', Nil,
+            "request for a non-existing block yields Nil";
+
+    cmp-ok $cfg ∷ :cluster<generic> ∷ "no-such-option", '=:=', Nil,
+            "request for a non-existing option yields Nil";
+
+    isa-ok $cfg ∷ :cluster<generic> ∷ "foo" :raw, Config::BINDish::Grammar::OptionProps,
+            "accessing a non-existent but pre-declared option returns its properties with :raw";
+
+    isa-ok $cfg ∷ "top-foo" :raw, Config::BINDish::Grammar::OptionProps,
+            "accessing a non-existent but pre-declared option on TOP with :raw";
+
+    cmp-ok $cfg ∷ :cluster<generic> ∷ "no-such-option" :raw, '=:=', Nil,
+            "request for a non-existing option yields Nil with :raw";
+
+    isa-ok $cfg ∷ "top-opt" :raw, Config::BINDish::AST::Option, ":raw adverb gives an Option instance";
+
+    isa-ok $cfg ∷ :cluster<generic> ∷ "group" :block, Config::BINDish::AST::Block,
+            ":block adverb makes the trailing string represents a block keyword";
+
+    is-deeply ($cfg ∷ :cluster<generic> ∷ :group ∷ :service<api> ∷ :host<h2> ∷ <interface ip>).List,
+                <eth2 192.168.1.3>,
+                "a positional (List) as the trailing element represents a list of options";
+
+    is-deeply ($cfg ∷ :cluster<generic> ∷ :group ∷ :service<api> ∷ :host<h2> ∷ [<interface ip>]).List,
+                <eth2 192.168.1.3>,
+                "a positional (Array) as the trailing element represents a list of options";
+
+    is-deeply ($cfg ∷ :cluster<generic> ∷ :group ∷ :service<api> ∷ :host<h2> ∷ <interface ip fubar>).List,
+                (<eth2>, <192.168.1.3>, Nil),
+                "a non-existing option in a positional request results in Nil";
+
+    is-deeply ($cfg ∷ :cluster<generic> ∷ :group ∷ :service<api> ∷ :host<h2> ∷ { "interface", "ip" }).List,
+                <eth2 192.168.1.3>,
+                "we can use a code object as option request";
+
+    isa-ok $cfg ∷ :meta, Config::BINDish::Grammar::BlockProps, "an anywhere block at the top";
+    isa-ok $cfg ∷ :cluster<generic> ∷ :meta, Config::BINDish::Grammar::BlockProps, "an anywhere block in a block";
+    isa-ok $cfg ∷ :cluster<generic> ∷ :group ∷ :service<api> ∷ :meta, Config::BINDish::Grammar::BlockProps,
+                "an anywhere block deeper in nested subblocks";
+
+    isa-ok $cfg ∷ "detached-opt" :raw, Config::BINDish::Grammar::OptionProps, "an anywhere option at the top";
+    isa-ok $cfg ∷ :cluster<generic> ∷ "detached-opt" :raw, Config::BINDish::Grammar::OptionProps, "an anywhere option in a block";
+    isa-ok $cfg ∷ :cluster<generic> ∷ :group ∷ :service<api> ∷ "detached-opt" :raw, Config::BINDish::Grammar::OptionProps,
+                "an anywhere option deeper in nested subblocks";
+
+    throws-like { isa-ok $cfg ∷ :cluster<generic> ∷ ["group"] :block, Config::BINDish::AST::Block,
+                            ":block adverb makes the trailing string represents a block keyword";
+                },
+                Config::BINDish::X::Get::BadPathElement,
+                ":block throws with trailing positional element";
+    TEST-BODY
+
+subtest "Operator `∷` (unicode)" => {
+    plan 26;
+    EVAL $tests;
+}
+
+subtest "Operator `::` (ASCII)" => {
+    plan 26;
+    EVAL S:g:s/'∷'/::/ with $tests;
+}
+
+done-testing;

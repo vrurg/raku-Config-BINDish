@@ -1,0 +1,107 @@
+use Test::Async;
+use Config::BINDish::Grammar;
+use Config::BINDish <op>;
+use Config::BINDish::X;
+
+plan 23;
+
+my $cfg = Config::BINDish.new:
+    blocks => (
+        :cluster => ( :in<.TOP>, :named ),
+        :srv-services<services> => ( :in<cluster>, :default<api login files> ),
+        :srv-group<group> => ( :in<cluster> ),
+        :service-group<service> => ( :in<srv-group>, :named ),
+        :service-host<host> => ( :in<service-group>, :named ),
+        :meta => ( :default(13, 42, pi) ),
+    ),
+    options => (
+        :srv-host-iface<interface> => ( :in<service-host>, :default<*> ),
+        :srv-host-port<port> => ( :in<service-host>, :default(666) ),
+        :detached-opt => ( :default("FOO") ),
+     );
+
+lives-ok {
+    $cfg.read: string => q:to/CFG/;
+                            cluster "generic" {
+                                group {
+                                    service "api" {
+                                        host "h1" {
+                                            ip "192.168.1.2";
+                                        }
+                                        host "h2" {
+                                            ip "192.168.1.3";
+                                            interface "eth2";
+                                        }
+                                    }
+                                }
+                            }
+                            CFG
+}, "config parsed";
+
+is $cfg.get(:cluster<generic> => :group => :service<api> => :host<h1> => "ip"),
+   "192.168.1.2",
+   "control for explicit option";
+
+is $cfg.get(:cluster<generic> => :group => :service<api> => :host<h1> => "interface"),
+   "*",
+   "for a missing pre-declared option we get its default";
+
+isa-ok my $bprops = $cfg.get(:block( :cluster<generic> => :group => :service<api> => :host<h3> )),
+       Config::BINDish::Grammar::BlockProps,
+       "for a missing pre-declared block we get its props object with :block";
+
+is $bprops.id, 'service-host', "the block props object is the right one";
+
+nok $cfg.get(:block( :cluster<generic> => :group => :service<api> => :host<h3> )),
+    "result for a missing pre-declared block is falsy in boolen context";
+
+cmp-ok $cfg.get(:block( :cluster<generic> => :group => :service<api> => :hostile<h3> )), '=:=', Nil,
+       "a missing block results in Nil";
+
+isa-ok my $oprops = $cfg.get(:option( :cluster<generic> => :group => :service<api> => :host<h1> => "interface" )),
+   Config::BINDish::Grammar::OptionProps,
+   "for a missing pre-declared option we get its props object with :option";
+
+is $oprops.id, 'srv-host-iface', "the option props object is the right one";
+
+isa-ok $cfg.get(:cluster<generic> => :group => :service<api> => :host<h1> => "interface", :raw),
+       Config::BINDish::Grammar::OptionProps,
+       "for a missing pre-declared option we get its props object with :raw";
+
+nok $cfg.get(:option( :cluster<generic> => :group => :service<api> => :host<h1> => "interface" )),
+    "result for a missing pre-declared option is falsy in boolean context";
+
+cmp-ok $cfg.get(:cluster<generic> => :group => :service<api> => :host<h1> => "interface2"), '=:=', Nil,
+       "a missing option results in Nil";
+
+is $cfg.get(:cluster<generic> => :group => :service<unknown> => :host<h3> => "interface"),
+   "*",
+   "we get option default even when looking in a chain of missing blocks";
+
+is-deeply $cfg.get(:block(:cluster<generic> => :services)).values.Set, set(<api login files>),
+   "for a missing pre-declared subblock we can get its default values";
+
+is $cfg.get(:block(:meta)).values.List, (13, 42, pi), "for a missing anywhere block we can get its default values";
+is $cfg.get(:block(:cluster<generic> => :group => :meta)).values.List, (13, 42, pi),
+   "when looking in a subblock for a missing anywhere block we can get its default values";
+
+is $cfg.get(:block(:meta)).values.List, (13, 42, pi), "for a missing anywhere block we can get its default values";
+is $cfg.get(:block(:cluster<generic> => :group => :meta)).values.List, (13, 42, pi),
+   "when lookin in a subblock for a missing anywhere block we can get its default values";
+
+is $cfg.get("detached-opt"), "FOO", "for a missing anywhere option we get its default";
+is $cfg.get(:cluster<generic> => :group => "detached-opt"), "FOO",
+  "when looking in a subblock for a missing anywhere option we get its default";
+todo "needs fixing yet";
+is $cfg.get(:no-top => :no-subblk => :bar => "detached-opt"), "FOO",
+   "when looking in a chain of missing subblocks for a missing anywhere option we get its default";
+
+is-deeply $cfg.get( :cluster<generic> => group => :service<api> => :host<h2> => ["ip", "port", "interface"] ).List,
+          ("192.168.1.3", 666, "eth2"),
+          "multi-option request returns correct mix of explicit and default values";
+
+is-deeply ($cfg ∷ :cluster<generic> ∷ :group ∷ :service<api> ∷ :host<h2> ∷ ["ip", "port", "interface"]).List,
+          ("192.168.1.3", 666, "eth2"),
+          "request operator ∷ works with defaults too";
+
+done-testing;

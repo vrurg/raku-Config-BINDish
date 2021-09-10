@@ -131,7 +131,7 @@ subtest "Structure" => {
                                         CFG
                 },
                 Config::BINDish::X::Parse::ValueType,
-                "bad value type within a vlue-only block",
+                "bad value type within a value-only block",
                 :message(/"Block 'paths' expects a (Str) value but got <int> of (Int)"/);
 }
 
