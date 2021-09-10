@@ -16,9 +16,11 @@ method TOP($/, |c) {
 
 method enter-TOP($) {
     # If the source parsed is included from another config then we must produce just a list of statements.
-    $*CFG-TOP = self.enter-parent:
-                    Config::BINDish::AST.new-ast:
-                        $*CFG-AS-INCLUDE ?? 'Stmts' !! 'TOP'
+    my ($node-type, $id) =
+        $*CFG-AS-INCLUDE
+            ?? ('Stmts', '.STMTS'                             )
+            !! ('TOP',   ($*CFG-CTX ?? $*CFG-CTX.id !! '.TOP'));
+    $*CFG-TOP = self.enter-parent: Config::BINDish::AST.new-ast($node-type, :$id)
 }
 
 method statement:sym<value>($/) {
@@ -31,7 +33,8 @@ method statement:sym<comment>($/) {
 
 method enter-option($/) {
     self.enter-parent:
-        my $opt = Config::BINDish::AST.new-ast('Option');
+        my $opt = Config::BINDish::AST.new-ast('Option',
+                                               :id($*CFG-CTX.id));
     make $opt;
 }
 
@@ -192,7 +195,8 @@ method block-head($/) {
 
 method enter-block($/) {
     self.enter-parent:
-        my $blk = Config::BINDish::AST.new-ast('Block');
+        my $blk = Config::BINDish::AST.new-ast('Block',
+                                               :id($*CFG-CTX.id));
     make $blk;
 }
 
