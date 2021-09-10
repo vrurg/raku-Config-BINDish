@@ -470,11 +470,15 @@ class Config::BINDish::AST::Block
     }
 }
 
-class Config::BINDish::AST::TOP
-    is Config::BINDish::AST::Block
-{
+class Config::BINDish::AST::TOP is Config::BINDish::AST::Block {
+    has %.prop-relations;
     method new(*%c) {
         nextwith keyword => self.new-ast('Value', :payload('*TOP*'), :type-name<keyword>), |%c
+    }
+    submethod TWEAK {
+        with $*CFG-GRAMMAR {
+            %!prop-relations := .prop-relations<>;
+        }
     }
     method gist(::?CLASS:D:) { "*TOP*" }
 }
