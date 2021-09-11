@@ -26,6 +26,11 @@ has a block referenced in its C<$.in> and the block is not explicitly declared.
 Checks if this statement can be used in context C<$ctx> by locating the nearest enclosing block context and verifying
 if the block is mentioned in statement's C<$.in> set. Always matches if C<$.in> is empty.
 
+=head3 C<Bool()>
+
+Coerces a property object into I<False>. See method C<get> in L<C<Config::BINDish::AST::Blockish>|../AST/Blockish.md>
+for details about default values.
+
 =head1 SEE ALSO
 
 L<C<Config::BINDish>|../../BINDish.md>,

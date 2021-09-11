@@ -502,9 +502,9 @@ GRAMMAR OPERATION
 Pre-declaration
 ---------------
 
-*DISCLAIMER. I don't like the term "pre-declaration", but really can't come up with something better so far. Ideas are welcome!*
+*DISCLAIMER. I don't like the term "pre-declaration", but fail to come up with something better so far. Ideas are welcome!*
 
-In the default mode operation the grammar accepts any blocks and options in a config file as long as the adhere to the syntax requirements. But often it is desirable to constrain the set of accepted block/option keywords. And even more often it is necessary to restrict certain syntax rules applied to them.
+In the default mode of operation the grammar accepts any blocks and options in a config file as long as they adhere to the syntax requirements. But often it is desirable to constrain the set of accepted block/option keywords. And even more often it is necessary to restrict certain syntax rules applied to them.
 
 For example, for options it would make sense to restrict acceptable types of their values; actually, sometimes this applies to blocks too. For blocks we may need to specify requirements for the name and class parts to be used or not.
 
@@ -764,6 +764,21 @@ Here is an example of how this peculiarity can be used:
     network "public" {
         access-rules { allow { any } }
     }
+
+#### `default`
+
+Specifies the default value of a statement. When used with a block declaration then multiple values can be used.
+
+    blocks => (
+        :server => %( :in<.TOP> ),
+        :services => %( :default<api login files>, :type(Str), :in<server> ),
+    ),
+    options => (
+        :server-iface<interface> => { :type(Str), :default<*>, :in<server> },
+        :server-port<port> => { :type(Int), :default(80), :in<server> },
+    )
+
+Default values are not verified against pre-declaration `type` constrain.
 
 ### Reservations
 

@@ -56,6 +56,7 @@ The order in which the extensions are added is defined by the order and the way 
 There are two and a half ways to extend the parser. First is to use `is BINDish-grammar` or `is BINDish-actions` trait:
 
     unit module Config::BINDish::Ext1;
+    use Config::BINDish;
     role Grammar is BINDish-grammar {
         token value:sym<mine> {
             ...
@@ -128,7 +129,7 @@ If set to `True` then [`Config::BINDish::Actions`](BINDish/Actions.md) will act 
 `$.top`
 -------
 
-The top node produced by the grammar actions. I.e. it is the result of `$<TOP>.ast` of the [`Match`](https://docs.raku.org/type/Match) object produced by grammar's `parse` method. For [`Config::BINDish::Actions`](BINDish/Actions.md) it would be an instance of [`Config::BINDish::AST`](BINDish/AST.md). But an extension can produce something to its taste which wouldn't be an AST whatsoever. The only requirement imposed on the object stored by the attribute is to provide `get` method.
+The top node produced by the grammar actions. I.e. it is the result of `$<TOP>.ast` of the [`Match`](https://docs.raku.org/type/Match) object produced by grammar's `parse` method. For [`Config::BINDish::Actions`](BINDish/Actions.md) it would be an instance of [`Config::BINDish::AST::TOP`](BINDish/AST/TOP.md). But an extension can produce something to its taste which wouldn't be an AST whatsoever. The only requirement imposed on the object stored in the attribute is to provide `get` method.
 
 This attribute `handles` method `get`.
 
@@ -165,10 +166,31 @@ The method returns what is returned by grammar's `parse` method. The same value 
 
 Method is handled by `$.top` attribute. See [`Config::BINDish::AST::Blockish`](BINDish/AST/Blockish.md) for detailed method description.
 
+EXPORTS
+=======
+
+By default this module exports only `BINDish-grammar` and `BINDish-actions` traits. But if `use`d with either "op" or "ascii-op" positional arguments it will also export _request operator_ in either unicode or ASCII form:
+
+    use Config::BINDish <op>;
+    my $cfg = Config::BINDish.new.read(...);
+    say $cfg ∷ :top-block<name> ∷ "option";
+
+Or:
+
+    use Config::BINDish <ascii-op>;
+    my $cfg = Config::BINDish.new.read(...);
+    say $cfg :: :top-block<name> :: "option";
+
+*Note* that `::` (ASCII version) may conflict with Raku's name resolution. Though in my tests this never happened, I would still prefer the unicode version over the ASCII.
+
+More information about the operator can be found in [`Config::BINDish::Ops`](BINDish/Ops.md).
+
 SEE ALSO
 ========
 
 [README.md](../../../README.md)
+
+[`Config::BINDish::Grammar`](BINDish/Grammar.md), [`Config::BINDish::AST`](BINDish/AST.md), [`Config::BINDish::Expandable`](BINDish/Expandable.md), [`Config::BINDish::INET`](BINDish/INET.md)
 
 AUTHOR
 ======

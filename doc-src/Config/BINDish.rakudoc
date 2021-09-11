@@ -57,6 +57,7 @@ serve as the earlier parents meaning that Raku's method call dispatching will ha
 There are two and a half ways to extend the parser. First is to use `is BINDish-grammar` or `is BINDish-actions` trait:
 
     unit module Config::BINDish::Ext1;
+    use Config::BINDish;
     role Grammar is BINDish-grammar {
         token value:sym<mine> {
             ...
@@ -142,9 +143,9 @@ will act in flattening mode.
 The top node produced by the grammar actions. I.e. it is the result of C<<$<TOP>.ast>> of the
 L<C<Match>|https://docs.raku.org/type/Match> object produced by grammar's C<parse> method. For
 L<C<Config::BINDish::Actions>|BINDish/Actions.md> it would be an instance of
-L<C<Config::BINDish::AST>|BINDish/AST.md>.
+L<C<Config::BINDish::AST::TOP>|BINDish/AST/TOP.md>.
 But an extension can produce something to its taste which wouldn't be an AST whatsoever. The only requirement imposed
-on the object stored by the attribute is to provide C<get> method.
+on the object stored in the attribute is to provide C<get> method.
 
 This attribute C<handles> method C<get>.
 
@@ -183,9 +184,34 @@ Method is handled by C<$.top> attribute. See
 L<C<Config::BINDish::AST::Blockish>|BINDish/AST/Blockish.md>
 for detailed method description.
 
+=head1 EXPORTS
+
+By default this module exports only C<BINDish-grammar> and C<BINDish-actions> traits. But if C<use>d with either "op"
+or "ascii-op" positional arguments it will also export _request operator_ in either unicode or ASCII form:
+
+    use Config::BINDish <op>;
+    my $cfg = Config::BINDish.new.read(...);
+    say $cfg ∷ :top-block<name> ∷ "option";
+
+Or:
+
+    use Config::BINDish <ascii-op>;
+    my $cfg = Config::BINDish.new.read(...);
+    say $cfg :: :top-block<name> :: "option";
+
+*Note* that C<::> (ASCII version) may conflict with Raku's name resolution. Though in my tests this never happened,
+I would still prefer the unicode version over the ASCII.
+
+More information about the operator can be found in L<C<Config::BINDish::Ops>|BINDish/Ops.md>.
+
 =head1 SEE ALSO
 
 L<README.md|../../../README.md>
+
+L<C<Config::BINDish::Grammar>|BINDish/Grammar.md>,
+L<C<Config::BINDish::AST>|BINDish/AST.md>,
+L<C<Config::BINDish::Expandable>|BINDish/Expandable.md>,
+L<C<Config::BINDish::INET>|BINDish/INET.md>
 
 =AUTHOR Vadim Belman <vrurg@cpan.org>
 

@@ -8,6 +8,13 @@ C<role Config::BINDish::AST::Blockish> - interface of a generic block class
 This role mostly implements basic block search capabilities provding interface for locating and pulling out various
 kinds of children objects.
 
+=head1 ATTRIBUTES
+
+=head3 C<$.id>
+
+Unique ID of a blockish object. See L<C<Config::BINDish::Grammar Pre-declaration>|../Grammar.md#Pre-declaration>
+section.
+
 =head1 METHODS
 
 =head3 C<<multi find(:$block!, :$name, :$class, Bool :$local --> Config::BINDish::AST::Block)>>
@@ -24,9 +31,9 @@ L<C<Config::BINDish::AST::Option>|Option.md>.
 Throws with
 L<C<Config::BINDish::X::Option::Ambiguous>|../X/Option/Ambiguous.md>.
 
-=head3 C<block($block, *%p)>
+=head3 C<block($block, Bool :$local, *%p)>
 
-A shortcut for C<$node.find(:$block, |%p)>.
+A shortcut for C<$node.find(:$block, :$local, |%p)>.
 
 =head3 C<blocks($block, *%p)>
 
@@ -61,19 +68,67 @@ L<C<Config::BINDish::AST::Value>|Value.md>.
 
 =head2 Method C<get>
 
-This is an umbrella method which provides a few ways of accessing configuration data.
+This is an umbrella method which provides a few ways of accessing configuration data. It is also considered the primary
+means of accessing configuration data stored on an AST.
+
+=head3 Default Values
+
+One of the key features of `get` which sets it apart of methods C<value>, C<option>, C<block>, etc., is its ability to
+return some kind of default for a requested configuration element which is actually missing from the config file. For
+example, if we have a L<C<pre-declaration>|../Grammar.md#Pre-declaration> like this:
+
+    blocks => (
+        :host => %( :named ),
+    ),
+    options => (
+        :host-iface<interface> => %( :in<host>, :default<*> ),
+    )
+
+And then request the value of C<interface> option from a config file like:
+
+    host "srv1.local" {
+        ip 192.168.1.42;
+    }
+
+Then the method will supply us with string I<"*"> which it would find in corresponding
+L<C<Config::BINDish::Grammar::OptionProps>|../Grammar/OptionProps.md>, created from the above pre-declaration structure.
+
+For a missing option with no default value (or no pre-declaration whatsoever) `Nil` will be returned.
+
+Whenever we expect an option or a block object to be returned (see C<:raw> parameter in the followin sub-sections)
+instead of L<C<Config::BINDish::AST::Option>|Option.md> or L<C<Config::BINDish::AST::Block>|Block.md>
+instance the method would return L<C<Config::BINDish::Grammar::OptionProps>|../Grammar/OptionProps.md> or
+L<C<Config::BINDish::Grammar::BlockProps>|../Grammar/BlockProps.md>, respectively, if the requested elements
+do have corresponding pre-declarations. For example, for the above config snippet:
+
+    $cfg.get( :host<srv1.local> => "interface", :raw )
+
+an instance of C<OptionProps> will be returned. If one misspells the option name like, say, I<"intrface"> then the
+method will return C<Nil>, same as for when a value is requested. Yet, in either case one can test against the return
+value to know if the option exists in the config file:
+
+    ? $cfg.get( :host<srv1.local> => "interface", :raw ); # False
+    ? $cfg.get( :host<srv1.local> => "intrface", :raw );  # False
+    ? $cfg.get( :host<srv1.local> => "ip", :raw );        # True
+
+This is because all C<OptionProps> and C<BlockProps> objects are I<falsy> in a boolean context. This way one can check
+it out if an option or a block is actually present in the config. To find out if the requested option or block is not
+in the config and neither has a pre-declaration one can use `.defined` on the return value or test it against `Nil`.
 
 =head3 C<multi get(Str:D $option, Bool :$raw, Bool :$local = True)>
 
 By default returns C<$option> value. With C<:raw> argument will return corresponding
-L<C<Config::BINDish::AST::Option>|Option.md>
-object. With C<:!local> will search for the option recursively.
+L<C<Config::BINDish::AST::Option>|Option.md> or L<C<Config::BINDish::Grammar::OptionProps>|../Grammar/OptionProps.md>
+object.
 
-    $block.get("foo");        # Option "foo" value
+With C<:!local> will search for the option recursively.
+
+    $block.get("foo");         # Option "foo" value
+    $block.get("foo", !local); # Option "foo" value in this or any nested block
 
 =head3 C<multi get(Str:D :$option, Bool :$local = True)>
 
-Returns an option object.
+Returns an option object. A shortcut for C<$block.get($option, :$local, :raw)>.
 
 =head3 C<multi get(Str:D :$value, Bool :$local = True)>
 
@@ -81,32 +136,42 @@ Returns an option value. Note that C<$value> must contain option keyword:
 
     $block.get: :value<foo>; # Option "foo" value
 
+A shortcut for C<$block.get($value, :$local, :!raw)>.
+
+=head3 C<multi get(Str:D $keyword, :block)>
+
+Returns a nameless block located by C<$keyword> locally on the invocator.
+
 =head3 C<multi get(Str:D :$block, *%c)>
 
-Finds and returns a block object. Named arguments in C<%c> must be all the same as for the C<block> method above.
+Finds and returns a block object by its keyword. A shortcut for `$block.get($block, :block)`.
 
-=head3 C<multi get(Pair:D $path)>
+=head3 C<multi get(Pair:D $path, Bool :$block, Bool :$raw, Bool :$local)>
 
-I<B<NOTE!> This interface is experimental and may change in the future versions of the module. Yet, if it ever be
-removed this won't happen without a deprecation cycle.>
+This is the most advanced form of C<get> method. It allows to find an option or block by its path. The path is defined
+as a nested structure of L<C<Pair>|https://docs.raku.org/type/Pair>s. For each C<Pair> its key specifies a subblock
+within its parent block; its value specifies an object within the subblock:
 
-This is the most advanced form of C<get> method. It allows to find an option by its path. The path is defined as a
-nested structure of L<C<Pair>|https://docs.raku.org/type/Pair>s. For each C<Pair> its key specifies a subblock within
-its parent block; value specifies an object within the subblock. In a pseudocode it looks like:
+    # Get option "fubar" from a top block "foo"
+    $cfg.top.get(:foo<fubar>);
+    # Get "fubar" from block "baz" inside block "bar", inside block "foo"
+    $cfg.top.get(foo => bar => baz => "fubar");
+    $cfg.get(:foo(:bar(:baz<fubar>))); # Same as above
 
-    $block => $subpath # Proceed to subpath under $block
-    $block => $option  # Get option value from $block
+Both key and value can be L<C<Pair>|https://docs.raku.org/type/Pair> on their own. When key is a
+L<C<Pair>|https://docs.raku.org/type/Pair> then it is considered a block reference. Its key defines block
+type, its value defines block name and, possibly, class:
 
-Both key and value can be L<C<Pair>|https://docs.raku.org/type/Pair>s.
+    # find in `foo "bar" { ... }`
+    :foo<bar> => ...;
 
-When key is a L<C<Pair>|https://docs.raku.org/type/Pair> then it is considered a block reference. Its key defines block type, its value defines block
-name and, possibly, class:
+    # find in `foo "bar" baz { ... }`
+    :foo("bar", "baz") => ...;
 
-    :foo<bar> => ...; # find in `foo "bar" { ... }`
-    :foo("bar", "baz") => ... # find in `foo "bar" baz { ... }`
-
-When value is a L<C<Pair>|https://docs.raku.org/type/Pair> then it is considered the next step in the path what returns us recursively to the definition
-of the path above.
+When pair's value is a L<C<Pair>|https://docs.raku.org/type/Pair> on it's own it is considered to be a subpath, to be
+handled recursively. I.e., in the above example of C«foo => bar => baz => "fubar"» the value C«bar => ...» is a path,
+then C«baz => "fubar"» is too. But then when we reach I<"fubar"> it is considered to be the object the method is
+requested for.
 
 Let's use an example from tests:
 
@@ -145,6 +210,76 @@ instance, and by noting that method C<get> is available on it via C<$.top> attri
                 :subblk("level 1.a") =>
                     :subsubblk("level 2", "nesting") =>
                         "opt2"; # "π"
+
+It is also possible to request multiple objects at once by passing a L<C<Positional>|https://docs.raku.org/type/Positional> as the final path value:
+
+    $cfg.get(:foo<bar baz>); # Returns options "bar" and "baz" in block "foo"
+
+Or another way to achieve the same result is to use a L<C<Code>|https://docs.raku.org/type/Code> object as the final path value:
+
+    $cfg.get(foo => { "bar", "baz" });
+
+In this case the return value of the code is coerced into a L<C<List>|https://docs.raku.org/type/List> and used as in the previous example. This also
+means that C«$cfg.get(foo => { "bar" })» would return a single-element list consisting of I<"bar"> value.
+
+I<Note.> The code object takes a single argument which is the last block object on the path. In the last example this
+would be the object representing block I<"foo">.
+
+Apparently, there is no way for the method to distinguish block requests from option requests and there is no way to
+tell wether C«:foo<name>» stands for option I<"name"> in block I<"foo">, or is it for a block C«foo "name" { }»? To
+make one's intentions clear a named argument C<:block> can be used:
+
+    $cfg.get(:foo<name>, :block);  # Would return a block object
+    $cfg.get(:foo<name>, :!block); # Would return an option object;
+
+C«:!block» is the default. Similarly to options, blocks can be referenced with a string (for nameless ones), with a
+L<C<Positional>|https://docs.raku.org/type/Positional>, or a L<C<Code>|https://docs.raku.org/type/Code> object.
+
+Note that because a block is mostly useful for introspection whereas from options we would mostly require their values,
+method C<get> has different return semantics for different requests. Thus, if a block has values on it like in the
+following example:
+
+    serivce "api" {
+        servers {
+            "srv1.local";
+            "srv2.local";
+        }
+    }
+
+and the values are what we need then we'd have to request them explicitly:
+
+    $cfg.get(:service<api> => :servers, :block).values; # ("srv1.local", "srv2.local")
+
+Contrary, is we need to introspect an option object then we need to use C<:raw> named argument with a request:
+
+    $cfg.get(:foo<bar>, :raw);
+
+I<Note.> The actual nature of the returned option or block object may differ depedning on the conditions. See the
+Default Values section above.
+
+Option lookup is done locally on the last block preceding the option reference in path. This behavior can be changed
+with explicit C<:!local> argument causing the option to be looked upon in any nested block recursively. Note though that
+if the lookup fails then search for a default value is only done locally. I.e., if we have a config file like this:
+
+    foo { bar { } }
+
+And request for C«:foo<fubar>», a C<Nil> will be returned even with the following pre-declaration:
+
+    options => (
+        :fubar => %( :in<bar>, :default(42) ),
+    )
+
+=head3 C<multi get(Pair:D :$option, *%c)>
+
+Returns an option object defined by a path. Shortcut for C«$blk.get($option, :!block, :raw, |%c)».
+
+=head3 C<multi get(Pair:D :$value, *%c)>
+
+Returns an option value defined by a path. Shortcut for C«$blk.get($value, :!block, :!raw, |%c)».
+
+=head3 C<multi get(Pair:D :$block, *%c)>
+
+Returns a block object defined by a path. Shorcut for C«$blk.get($block, :block, |%c)».
 
 =head1 SEE ALSO
 

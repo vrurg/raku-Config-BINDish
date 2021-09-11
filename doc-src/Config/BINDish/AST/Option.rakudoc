@@ -7,7 +7,14 @@ C<class Config::BINDish::AST::Option> - configuration option representation
 
 Is L<C<Config::BINDish::AST::Node>|Node.md>.
 
-=METHODS
+=head1 ATTRIBUTES
+
+=head3  C<$.id>
+
+Unique ID of an option object. See L<C<Config::BINDish::Grammar Pre-declaration>|../Grammar.md#Pre-declaration>
+section.
+
+=head1 METHODS
 
 =head3 C<keyword()>
 

@@ -26,6 +26,10 @@ METHODS
 
 Checks if this statement can be used in context `$ctx` by locating the nearest enclosing block context and verifying if the block is mentioned in statement's `$.in` set. Always matches if `$.in` is empty.
 
+### `Bool()`
+
+Coerces a property object into *False*. See method `get` in [`Config::BINDish::AST::Blockish`](../AST/Blockish.md) for details about default values.
+
 SEE ALSO
 ========
 

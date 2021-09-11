@@ -8,10 +8,15 @@ DESCRIPTION
 
 Is [`Config::BINDish::AST::Node`](Node.md).
 
+ATTRIBUTES
+==========
+
+### `$.id`
+
+Unique ID of an option object. See [`Config::BINDish::Grammar Pre-declaration`](../Grammar.md#Pre-declaration) section.
+
 METHODS
 =======
-
-
 
 ### `keyword()`
 

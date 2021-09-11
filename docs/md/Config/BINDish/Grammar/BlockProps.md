@@ -28,6 +28,13 @@ If *True* then block can only contain values. For example:
         default-gw 192.168.1.1; # Context error, option cannot be used here
     }
 
+METHODS
+=======
+
+### `values()`
+
+Coerces `$.default` attribute to [`List`](https://docs.raku.org/type/List) and returns it. If the attribute is not set then returns an empty list.
+
 SEE ALSO
 ========
 
