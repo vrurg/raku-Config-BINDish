@@ -470,13 +470,12 @@ role Config::BINDish::AST::Blockish {
     multi traverse(Config::BINDish::AST::Block:D $blk,
                    Pair:D $path ( :key($keyword), :value($subpath))
                         where { $path.value ~~ Pair:D | Str:D | Bool:D | Positional:D | Code:D },
-                   Bool :$block,
                    *%c)
     {
         my $subblk = traverse($blk, $keyword, :block);
-        return traverse-default($blk, $subblk.id, :keyword($subpath), :$block, |%c)
+        return traverse-default($blk, $subblk.id, :keyword($subpath), |%c)
             if $subblk ~~ Config::BINDish::Grammar::BlockProps;
-        return traverse($subblk, $subpath, :$block, |%c) with $subblk;
+        return traverse($subblk, $subpath, |%c) with $subblk;
         Nil
     }
     multi traverse(Config::BINDish::AST::Block:D $blk, :@path, Bool:D :$block, *%c) {
