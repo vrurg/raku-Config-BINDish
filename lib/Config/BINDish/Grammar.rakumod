@@ -117,7 +117,7 @@ class BlockProps
 
     method values {
         return .List with $.default;
-        Empty
+        ()
     }
 }
 
