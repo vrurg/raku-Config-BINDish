@@ -139,7 +139,7 @@ CFG
 }
 
 subtest "Method 'get'" => {
-    plan 8;
+    plan 11;
     my $cfg = Config::BINDish.new;
     $cfg.read: string => q:to/CFG/;
         multi "1" {
@@ -168,6 +168,10 @@ subtest "Method 'get'" => {
             num 3.14e0;
         }
 
+        block {
+            desc "'block' keyword";
+        }
+
         top-opt 3.1415926;
         CFG
 
@@ -187,9 +191,17 @@ subtest "Method 'get'" => {
     is $cfg.get(:multi(<special class>) => "num"),
        3.14e0,
        "get on a top-level named classified block";
-    isa-ok $cfg.get(:block<multi>, :name<special>, :class<class>),
+    isa-ok $cfg.get(:block<multi>),
            Config::BINDish::AST::Block,
            ":block('type') gives a block";
+    isa-ok $cfg.get(:block(:multi)),
+           Config::BINDish::AST::Block,
+           ":block(:type) gives a block";
+    isa-ok $cfg.get(:block(:block)),
+           Config::BINDish::AST::Block,
+           ":block(:block) lets us access `block \{...}`";
+    is $cfg.get(:block(:block)).value('desc'), "'block' keyword",
+       ":block(:block) give the right block object";
 
     is-deeply $cfg.get( :multi<1>
                         => :subblk("level 1.a")
