@@ -518,7 +518,7 @@ role Config::BINDish::AST::Blockish {
         traverse(self, $value, |%c, :!block, :!raw)
     }
     multi method get(::?CLASS:D: Str:D :$block, *%c) {
-        self.block($block, |%c)
+        traverse(self, $block, |%c, :block)
     }
     multi method get(::?CLASS:D: Pair:D :$block, *%c) {
         traverse(self, $block, |%c, :block)
