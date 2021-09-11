@@ -190,7 +190,7 @@ SEE ALSO
 
 [README.md](../../../README.md)
 
-[`Config::BINDish::Grammar`](BINDish/Grammar.md), [`Config::BINDish::AST`](BINDish/AST.md), [`Config::BINDish::Expandable`](BINDish/Expandable.md), [`Config::BINDish::INET`](BINDish/INET.md)
+[`Config::BINDish::Grammar`](BINDish/Grammar.md), [`Config::BINDish::AST`](BINDish/AST.md), [`Config::BINDish::Ops`](BINDish/Ops.md), [`Config::BINDish::Expandable`](BINDish/Expandable.md), [`Config::BINDish::INET`](BINDish/INET.md)
 
 AUTHOR
 ======

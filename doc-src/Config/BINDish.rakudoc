@@ -210,6 +210,7 @@ L<README.md|../../../README.md>
 
 L<C<Config::BINDish::Grammar>|BINDish/Grammar.md>,
 L<C<Config::BINDish::AST>|BINDish/AST.md>,
+L<C<Config::BINDish::Ops>|BINDish/Ops.md>,
 L<C<Config::BINDish::Expandable>|BINDish/Expandable.md>,
 L<C<Config::BINDish::INET>|BINDish/INET.md>
 
