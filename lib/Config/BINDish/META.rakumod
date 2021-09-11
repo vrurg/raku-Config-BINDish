@@ -13,8 +13,7 @@ our sub META6 {
         'IP::Addr',
     ],
     test-depends   => [
-        'Test::Async:ver<0.1.2>',
-        'App::Prove6'
+        'Test::Async:auth<zef:vrurg>:ver<0.1.2+>',
     ],
     # build-depends  => <META6 p6doc Pod::To::Markdown>,
     tags           => <CONFIG>,
@@ -32,6 +31,7 @@ our sub META6 {
         'Config::BINDish::Grammar' => 'lib/Config/BINDish/Grammar.rakumod',
         'Config::BINDish::INET' => 'lib/Config/BINDish/INET.rakumod',
         'Config::BINDish::META' => 'lib/Config/BINDish/META.rakumod',
+        'Config::BINDish::Ops' => 'lib/Config/BINDish/Ops.rakumod',
         'Config::BINDish::Test' => 'lib/Config/BINDish/Test.rakumod',
         'Config::BINDish::X' => 'lib/Config/BINDish/X.rakumod',
     },
