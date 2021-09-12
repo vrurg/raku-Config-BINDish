@@ -8,7 +8,8 @@
   ],
   "depends": [
     "AttrX::Mooish",
-    "IP::Addr"
+    "IP::Addr",
+    "Test::Async:auth<zef:vrurg>:ver<0.1.2+>"
   ],
   "description": "Extensible BIND9-like Configuration Files Support",
   "license": "Artistic-2.0",
@@ -38,7 +39,6 @@
     "CONFIG"
   ],
   "test-depends": [
-    "Test::Async:auth<zef:vrurg>:ver<0.1.2+>"
   ],
   "version": "0.0.5"
 }

@@ -11,9 +11,9 @@ our sub META6 {
     depends        => [
         'AttrX::Mooish',
         'IP::Addr',
+        'Test::Async:auth<zef:vrurg>:ver<0.1.2+>',
     ],
     test-depends   => [
-        'Test::Async:auth<zef:vrurg>:ver<0.1.2+>',
     ],
     # build-depends  => <META6 p6doc Pod::To::Markdown>,
     tags           => <CONFIG>,
