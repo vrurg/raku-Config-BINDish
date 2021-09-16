@@ -100,7 +100,7 @@ Roles
 
   * [`Config::BINDish::AST::Container`](AST/Container.md)
 
-  * [`Config::BINDish::AST::Node`](AST/Parent.md)
+  * [`Config::BINDish::AST::Blockish`](AST/Blockish.md)
 
 Classes
 -------
@@ -110,6 +110,8 @@ Classes
   * [`Config::BINDish::AST::Comment`](AST/Comment.md)
 
   * [`Config::BINDish::AST::Option`](AST/Option.md)
+
+  * [`Config::BINDish::AST::Node`](AST/Node.md)
 
   * [`Config::BINDish::AST::NOP`](AST/NOP.md)
 
