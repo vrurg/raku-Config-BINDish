@@ -32,7 +32,7 @@ A shortcut for `$node.find(:$block, :$local, |%p)`.
 
 ### `blocks($block, *%p)`
 
-A shortcut for $<$node.find-all(:$block, |%p)>.
+A shortcut for `$node.find-all(:$block, |%p)`.
 
 ### `option($option, Bool :$local = True, *%p)`
 

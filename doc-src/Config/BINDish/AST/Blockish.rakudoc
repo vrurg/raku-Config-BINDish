@@ -37,7 +37,7 @@ A shortcut for C<$node.find(:$block, :$local, |%p)>.
 
 =head3 C<blocks($block, *%p)>
 
-A shortcut for $<$node.find-all(:$block, |%p)>.
+A shortcut for C<$node.find-all(:$block, |%p)>.
 
 =head3 C<option($option, Bool :$local = True, *%p)>
 
