@@ -126,7 +126,7 @@ Returns the topmost node, or, in other words, the root of the AST tree.
 =head1 SEE ALSO
 
 L<C<Config::BINDish>|../BINDish.md>,
-L<C<Config::BINDish::Aactions>|Aactions.md>
+L<C<Config::BINDish::Actions>|Actions.md>
 
 =head1 AUTHOR
 

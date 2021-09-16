@@ -124,7 +124,7 @@ Classes
 SEE ALSO
 ========
 
-[`Config::BINDish`](../BINDish.md), [`Config::BINDish::Aactions`](Aactions.md)
+[`Config::BINDish`](../BINDish.md), [`Config::BINDish::Actions`](Actions.md)
 
 AUTHOR
 ======
