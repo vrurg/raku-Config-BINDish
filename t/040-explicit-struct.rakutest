@@ -5,7 +5,7 @@ use Config::BINDish::Grammar;
 use Config::BINDish::AST;
 use Config::BINDish::X;
 
-plan 8, :parallel;
+plan 9, :parallel;
 
 # The purpose of this test suite is to make sure that in strict mode only pre-declared constructs are allowed.
 my $custom-set-invoked = False;
@@ -20,7 +20,7 @@ role CustomExt is BINDish-grammar {
         ;
         self.declare-options:
             op-top => { :in<.TOP>, :type(Str) },
-            op-sub => { :in<my-top-named>, :type-name<bool> },
+            op-bool => { :type(Bool) },
             op-any => {},
             op-numish => { value-sym => <int num rat> },
     }
@@ -49,10 +49,13 @@ $cfg.read: string => '';
 ok $custom-set-invoked, "custom extension setup method has been invoked";
 
 subtest "Syntax" => {
-    plan 7;
+    plan 8;
 
     lives-ok { $cfg.read: string => q<my-top "named" { }> },
              "when name is optional it can be used";
+
+    lives-ok { $cfg.read: string => q<my-top-named "named" { }> },
+             "name is required and present";
 
     lives-ok { $cfg.read: string => q<subsystem "named" classified { }> },
              "when class is optional it can be used";
@@ -136,7 +139,7 @@ subtest "Structure" => {
 }
 
 subtest "Value validation" => {
-    plan 20;
+    plan 22;
 
     throws-like { $cfg.read: string => q<op-top 1;>; },
                 Config::BINDish::X::Parse::ValueType,
@@ -144,6 +147,25 @@ subtest "Value validation" => {
                 :message(/"Option 'op-top' expects a (Str) value but got <int> of (Int)"/);
 
     lives-ok { $cfg.read: string => q<op-top "ok";>; }, "valid option type";
+
+    lives-ok {
+        $cfg.read: string => q:to/CFG/;
+                    my-top {
+                        op-bool off;
+                    }
+                    CFG
+    }, "boolean option with explicit value";
+
+    throws-like {
+                    $cfg.read: string => q:to/CFG/;
+                    my-top {
+                        op-bool non-boolean;
+                    }
+                    CFG
+                },
+                Config::BINDish::X::Parse::ValueType,
+                :message(/"Option 'op-bool' expects a (Bool) value but got <keyword> of (Str)"/),
+                "boolean option with a non-boolean keyword";
 
     throws-like { $cfg.read: string => q:to/CFG/;
                                 general {
@@ -352,6 +374,11 @@ subtest "Competing Value Types" => {
                 extend-grammar => [BadValueType],
                 extend-actions => [BVTActions],
                 options => ( foo => { :type(Str), value-sym => ($sym) } );
+
+            $cfg.read: string => q:to/CFG/;
+                                foo "*";
+                                CFG
+
             lives-ok {
                          $cfg.read: string => q:to/CFG/;
                                 foo "*";
@@ -572,6 +599,49 @@ subtest "Auto-vivification" => -> \suite {
             }
         };
     $cfg.read: string => "";
+}
+
+subtest "Boolean/keyword conflicts" => {
+    plan 17;
+    my $cfg = Config::BINDish.new:
+                options => (
+                    |(|("true-opt$_" => { :type(Bool) }, "false-opt$_" => { :type(Bool) }) for ^3),
+                    kw-opt => { :type(Str), :value-sym<keyword> },
+                 );
+    lives-ok {
+        $cfg.read: string => q:to/CFG/;
+                                true-opt0 on;
+                                true-opt1 yes;
+                                true-opt2 true;
+                                false-opt0 off;
+                                false-opt1 no;
+                                false-opt2 false;
+                                kw-opt true;
+                                any-opt true;
+                                CFG
+    }, "config parsed";
+
+    for (True, False) -> $val {
+        my $opt-base = $val.Str.lc ~ '-opt';
+        for ^3 -> $idx {
+            my $opt-name = $opt-base ~ $idx;
+            is $cfg.top.option($opt-name).value.type-name, 'bool', "$opt-name type is boolean";
+            cmp-ok $cfg.top.value($opt-name), '===', $val, "$opt-name is " ~ $val;
+        }
+    }
+
+    cmp-ok $cfg.top.value('any-opt'), '===', True,
+           'option without a pre-declaration gets a bool';
+    is $cfg.top.option('any-opt').value.type-name,
+       'bool',
+       'option without a pre-declaration parsed as a bool';
+
+    is $cfg.top.value('kw-opt'),
+       'true',
+       '`keyword` value-sym makes `true` parsed as a keyword';
+    is $cfg.top.option('kw-opt').value.type-name,
+       'keyword',
+       '`keyword` value-sym makes `true` parsed as `keyword` type';
 }
 
 done-testing;

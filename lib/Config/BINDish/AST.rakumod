@@ -639,7 +639,7 @@ class Config::BINDish::AST::Option
     has Config::BINDish::AST::Container $!value;
     has Str:D $.id is required;
 
-    method keyword(::?CLASS:D:) { $!keyword //= self.child('keyword') }
+    method keyword(::?CLASS:D:) { $!keyword //= self.child('option-name') }
     method name(::?CLASS:D:) { $!keyword //= self.child('option-name') }
     method value(::?CLASS:D:) { $!value //= self.child('option-value') }
 

@@ -41,13 +41,10 @@ method enter-option($/) {
 method statement:sym<option>($/) {
     my $opt := self.inner-parent;
     $opt.add: $<option-name>.made.mark-as('option-name');
-    my $val;
-    with $<option-value> {
-        $val = .made;
-    }
-    else {
-        $val = Config::BINDish::AST.new-ast('Value', :payload, :type-name<bool>).mark-as('implicit');
-    }
+    my Config::BINDish::AST::Container:D $val =
+        $<option-value>.defined
+        ?? $<option-value>.made
+        !! Config::BINDish::AST.new-ast('Value', :payload, :type-name<bool>).mark-as('implicit');
     $opt.add: $val.mark-as('option-value');
     make $opt;
 }
@@ -132,7 +129,7 @@ method value:sym<num>($/) {
 }
 
 method value:sym<bool>($/) {
-    make $<bool-val>.made
+    make $<boolean>.made
 }
 
 method value:sym<file-path>($/) {
@@ -145,6 +142,10 @@ method bool-true($/) {
 
 method bool-false($/) {
     make Config::BINDish::AST.new-ast('Value', :!payload, :type-name<bool>);
+}
+
+method boolean($/) {
+    make $<bool-true>.made // $<bool-false>.made;
 }
 
 method C-comment($/) {

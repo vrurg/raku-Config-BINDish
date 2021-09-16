@@ -5,7 +5,7 @@ use Config::BINDish::Grammar;
 use Config::BINDish::AST;
 use Config::BINDish::X;
 
-plan 7, :parallel;
+plan 8, :parallel;
 
 subtest "Basics" => {
     plan 30;
@@ -136,6 +136,34 @@ CFG
     is $top.value("opt-neg-int"), -12345678, "negative int";
     is $top.value("opt-rat"), 12345.678999, "plain rat";
     is $top.value("opt-neg-rat"), -12345.678999, "negative rat";
+}
+
+subtest "Boolean/keyword conflicts" => {
+    plan 15;
+    my $cfg = Config::BINDish.new;
+    lives-ok {
+                 $cfg.read: string => q:to/CFG/;
+                                true-opt0 on;
+                                true-opt1 yes;
+                                true-opt2 true;
+                                false-opt0 off;
+                                false-opt1 no;
+                                false-opt2 false;
+                                any-opt any-keyword;
+                                CFG
+    }, "config parsed";
+
+    for (True, False) -> $val {
+        my $opt-base = $val.Str.lc ~ '-opt';
+        for ^3 -> $idx {
+            my $opt-name = $opt-base ~ $idx;
+            is $cfg.top.option($opt-name).value.type-name, 'bool', "$opt-name type is boolean";
+            cmp-ok $cfg.top.value($opt-name), '===', $val, "$opt-name is " ~ $val;
+        }
+    }
+
+    is $cfg.top.value('any-opt'), 'any-keyword', 'arbitrary keyword works as a value';
+    is $cfg.top.option('any-opt').value.type-name, 'keyword', "arbitrary keyword is parsed as a keyword";
 }
 
 subtest "Method 'get'" => {

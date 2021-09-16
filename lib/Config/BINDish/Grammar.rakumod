@@ -85,6 +85,13 @@ role ContainerProps does TypeStringify {
     # Default value of a container
     has Mu $.default is default(Nil);
 
+    # Don't forget keeping can-type and ACCEPTS in sync in their semantics until inlining would be able to
+    # sufficiently optimize ACCEPTS calling can-type
+    method can-type(Str $type-name, Mu $type) {
+        (!$!type-name.defined || $type-name ~~ $!type-name)
+        && ($!type =:= Mu || $type ~~ $!type)
+    }
+
     multi method ACCEPTS(Value:D $val) {
         (!$!type-name.defined || $val.type-name ~~ $!type-name)
         && ($!type =:= Mu || $val.type ~~ $!type)
@@ -842,6 +849,10 @@ token bool-false {
     no | off | false
 }
 
+token boolean {
+    <.wb> [<bool-true> | <bool-false>] <.wb>
+}
+
 token qstring($quote) {
     [ [ $<chunk>=<{ '<-[ \\\\ ' ~ $quote ~ ' ]>+'  }> ] | [ \\ $<char>=. ] ]*? <?before $($quote)>
 }
@@ -900,12 +911,23 @@ multi token value:sym<string> {
     <dq-string> | <sq-string>
 }
 
+multi token value:sym<bool> {
+    # Make sure we don't parse for pre-declared non-boolean containers
+    <?{ (my $ctx = $*CFG-CTX)
+        && (!$ctx.props.defined || $ctx.props.can-type('bool', Bool)) }>
+    <boolean> { self.set-value: Bool, :bool($/) }
+}
+
 multi token value:sym<keyword> {
     <?{ (my $ctx = $*CFG-CTX) and
         (($ctx.type eq 'option')
          || ($ctx.cur-block-ctx.props andthen .value-only)) }>
     :my Value $*CFG-KEYWORD;
-    <keyword> { $*CFG-GRAMMAR.set-value: Str, :keyword($*CFG-KEYWORD.payload) }
+    [
+        <?{ $*CFG-SPECIFIC-VALUE-SYM andthen $_ eq 'keyword' }> <keyword>
+        | <!before <.boolean>> <keyword>
+    ]
+    { $*CFG-GRAMMAR.set-value: Str, :keyword($*CFG-KEYWORD.payload) }
 }
 
 multi token value:sym<num> {
@@ -935,10 +957,6 @@ multi token value:sym<int> {
     ]
     <!before <[.e]>>
     { self.set-value: Int, :int($/) }
-}
-
-multi token value:sym<bool> {
-    $<bool-val>=[ <.bool-true> | <.bool-false> ] { self.set-value: Bool, :bool($/) }
 }
 
 token path-component {
