@@ -780,12 +780,12 @@ token bad-statement {
 
 token enter-option { <?> }
 
-rule block-head {
+token block-head {
     :my Value $*CFG-KEYWORD;
-    $<block-type>=<.keyword>
+    $<block-type>=<.keyword> <.ws>
     <?{ ! $*CFG-GRAMMAR.is-reserved(block => $*CFG-KEYWORD.coerced) }>
     { $*CFG-BLOCK-TYPE = $*CFG-KEYWORD }
-    [ <block-name> <block-class>? ]?
+    [ <block-name> <.ws> [<block-class> <.ws>]? ]?
     <?before '{'>
     <.enter-block>
 }
