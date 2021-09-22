@@ -128,7 +128,7 @@ depends: meta depends-install
 
 depends-install: meta6_mod
 	@echo "===> Installing dependencies"
-	@zef install Pod::To::Markdown Async::Workers
+	@zef install Pod::To::Markdown Async::Workers fez
 	@zef --deps-only --test-depends install .
 
 version: doc meta clean
