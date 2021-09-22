@@ -471,7 +471,7 @@ method file {
 }
 
 method line(:$absolute) {
-    self.prematch.chomp.split(/\n/).elems - ($absolute ?? 0 !! $*CFG-GRAMMAR.line-delta)
+    self.prematch.split(/\n/).elems - ($absolute ?? 0 !! $*CFG-GRAMMAR.line-delta)
 }
 
 my atomicint $decl-id = 0;

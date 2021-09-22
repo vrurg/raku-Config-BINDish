@@ -570,7 +570,7 @@ subtest "Errors" => {
 }
 
 subtest "Explicit Structure" => {
-    plan 12;
+    plan 14;
 
     my @blocks = :block => {:in<.TOP>, :named},
                  :subblock => {:in<block>, :named},
@@ -696,7 +696,7 @@ subtest "Explicit Structure" => {
                                                        :$strict).sink;
                     },
                     Config::BINDish::X::Parse::Context,
-                    "a option in a wronh block in $mode throws",
+                    "a option in a wrong block in $mode throws",
                     message => /:s Option .* cannot be used in block/;
         throws-like {
                         Config::BINDish::Grammar.parse(q<parent-block { description 'any'; };>,
@@ -708,6 +708,33 @@ subtest "Explicit Structure" => {
                     "a top-level option can't be used in a block in $mode",
                     message => /:s Option .* cannot be used in block/;
     }
+
+    throws-like {
+                    Config::BINDish::Grammar.parse(q:to/CFG/,
+                                                        # Make it not the first line
+                                                        description 12;
+                                                        CFG
+                                                   :@blocks,
+                                                   :@options).sink;
+                },
+                Config::BINDish::X::Parse::ValueType,
+                "correct line number reported for an option with bad value in .TOP",
+                line => 2;
+
+    throws-like {
+                    Config::BINDish::Grammar.parse(q:to/CFG/,
+                                                        block "bad one" {
+                                                            subblock "because of bad option" {
+                                                                subopt "can't be a string"
+                                                            }
+                                                        }
+                                                        CFG
+                                                   :@blocks,
+                                                   :@options).sink;
+                },
+                Config::BINDish::X::Parse::ValueType,
+                "correct line number reported for an option with bad value in a subblock",
+                line => 3;
 }
 
 done-testing;
