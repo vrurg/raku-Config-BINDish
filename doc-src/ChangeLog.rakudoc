@@ -1,6 +1,15 @@
 =begin pod
 =head1 VERSIONS
 
+=head v0.0.6
+
+Bugfix release:
+
+=item Moved `Test::Async` dependency from `test-depends` into `depends`
+=item Fixed boolean values conflicting and racing with keywords. Booleans now have higher-priority over keywords
+=item Fix wrong line number reported for errors pointing at a line start
+=item Fixed `Expandable` loosing values and causing weird parsing errors
+
 =head v0.0.5
 
 =item Added support for default values

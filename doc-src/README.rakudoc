@@ -335,7 +335,8 @@ where they end is totally up to them!
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|docs/md/Config/BINDish.md>
+L<C<Config::BINDish>|docs/md/Config/BINDish.md>,
+L<ChangeLog|ChangeLog.md>
 
 =AUTHOR Vadim Belman <vrurg@cpan.org>
 =end pod

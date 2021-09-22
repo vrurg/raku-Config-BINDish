@@ -307,7 +307,7 @@ where they end is totally up to them!
 SEE ALSO
 ========
 
-[`Config::BINDish`](docs/md/Config/BINDish.md)
+[`Config::BINDish`](docs/md/Config/BINDish.md), [ChangeLog](ChangeLog.md)
 
 AUTHOR
 ======

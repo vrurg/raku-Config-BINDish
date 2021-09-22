@@ -4,6 +4,21 @@ VERSIONS
 head
 ====
 
+v0.0.6
+
+Bugfix release:
+
+  * Moved `Test::Async` dependency from `test-depends` into `depends`
+
+  * Fixed boolean values conflicting and racing with keywords. Booleans now have higher-priority over keywords
+
+  * Fix wrong line number reported for errors pointing at a line start
+
+  * Fixed `Expandable` loosing values and causing weird parsing errors
+
+head
+====
+
 v0.0.5
 
   * Added support for default values
