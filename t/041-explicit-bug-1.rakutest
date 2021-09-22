@@ -1,0 +1,44 @@
+use v6.d;
+use Test::Async <Config::BINDish::Test Base>;
+use Config::BINDish;
+use Config::BINDish::Grammar;
+use Config::BINDish::Expandable;
+use Config::BINDish::AST;
+use Config::BINDish::X;
+use IP::Addr;
+
+# Testing for a bug in Expandable where $*CFG-VALUE was lost and was causing incorrect syntax errors
+
+plan 2;
+
+role CustomExt is BINDish-grammar {
+    submethod setup-BINDish {
+        self.declare-blocks:
+            :server => ( :in<.TOP> ),
+            :file-pool => ( :in<.TOP>, :named );
+            ;
+        self.declare-options:
+            :fpool-path<path> => ( :in<file-pool>, :type(Str) ),
+            :base-path => ( :in<server>, :type(Str | IO::Path), value-sym => <file-path> ),
+            ;
+    }
+}
+
+my $cfg = Config::BINDish.new: :strict(:blocks, :options);
+
+lives-ok {
+    $cfg.read: string => q:to/CFG/;
+            file-pool "static" {
+                path "{/server/base-path}/frontend";
+            }
+
+            server {
+                // How the server can be reached by a client.
+                base-path .;
+            }
+            CFG
+}, "config parsed";
+
+is $cfg.get(:file-pool<static> => "path"), "./frontend", "option is parsed and expanded correctly";
+
+done-testing;

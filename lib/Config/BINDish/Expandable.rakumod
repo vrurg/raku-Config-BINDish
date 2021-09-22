@@ -198,7 +198,6 @@ Example:
 
 role Grammar is BINDish-grammar {
     token dq-string {
-        :my $*CFG-VALUE;
         \" ~ \" $<string>=<.expandable-string> { self.set-value: Str, :dq-string($<string>) }
     }
 
