@@ -37,17 +37,17 @@ subtest "Basics" => {
         skip-rest "option not found";
         test-suite.abort;
     }
-    is $opt.keyword.type-name, 'keyword', "option's keyword container type name";
-    is $opt.keyword.payload, "opt", "option's keyword container payload";
-    is $opt.value.type-name, "dq-string", "option's value container type name";
-    is $opt.value.payload, "top level", "option's value container payload";
+    is $opt.keyword(:raw).type-name, 'keyword', "option's keyword container type name";
+    is $opt.keyword, "opt", "option's keyword container payload";
+    is $opt.value(:raw).type-name, "dq-string", "option's value container type name";
+    is $opt.value, "top level", "option's value container payload";
 
     my $blk = $top.block("blk");
 
     isa-ok $blk, Config::BINDish::AST::Block, "a block is returned by method 'block'";
     nok $blk.name.defined, "block is unnamed";
     nok $blk.class.defined, "block is unclassified";
-    is ~$blk.keyword, "blk", "block type";
+    is $blk.keyword, "blk", "block type";
 
     $opt = $blk.option("opt");
     isa-ok $opt, Config::BINDish::AST::Option, "option object in block `blk`";
@@ -62,9 +62,9 @@ subtest "Basics" => {
     $subblk = $blk.block("subblk", :name("level 1.a"));
     ok $subblk.defined, "named subblock found";
     isa-ok $subblk, Config::BINDish::AST::Block, "subblock type";
-    is ~$subblk.name, "level 1.a", "the right subblock is found";
+    is $subblk.name, "level 1.a", "the right subblock is found";
     nok $subblk.class.defined, "subblock is unclassified";
-    is ~$subblk.keyword, "subblk", "subblock type";
+    is $subblk.keyword, "subblk", "subblock type";
 
     $opt = $subblk.option("opt");
     isa-ok $opt, Config::BINDish::AST::Option, "option object in subblock `subblk`";
@@ -73,10 +73,10 @@ subtest "Basics" => {
     $subblk = $blk.block("subblk", :name("level 1.a"), :class<special>);
     ok $subblk.defined, "classified subblock found";
     isa-ok $subblk, Config::BINDish::AST::Block, "subblock type";
-    is ~$subblk.name, "level 1.a", "the right subblock is found";
+    is $subblk.name, "level 1.a", "the right subblock is found";
     ok $subblk.class.defined, "subblock is classified";
-    is ~$subblk.class, "special", "subblock class";
-    is ~$subblk.keyword, "subblk", "subblock type";
+    is $subblk.class, "special", "subblock class";
+    is $subblk.keyword, "subblk", "subblock type";
     is $subblk.value("opt"), -1.3, "subblock option value";
 
     is $top.block("blk").block("subblk", :name("level 1.b")).value("opt"),
@@ -157,13 +157,13 @@ subtest "Boolean/keyword conflicts" => {
         my $opt-base = $val.Str.lc ~ '-opt';
         for ^3 -> $idx {
             my $opt-name = $opt-base ~ $idx;
-            is $cfg.top.option($opt-name).value.type-name, 'bool', "$opt-name type is boolean";
+            is $cfg.top.option($opt-name).value(:raw).type-name, 'bool', "$opt-name type is boolean";
             cmp-ok $cfg.top.value($opt-name), '===', $val, "$opt-name is " ~ $val;
         }
     }
 
     is $cfg.top.value('any-opt'), 'any-keyword', 'arbitrary keyword works as a value';
-    is $cfg.top.option('any-opt').value.type-name, 'keyword', "arbitrary keyword is parsed as a keyword";
+    is $cfg.top.option('any-opt').value(:raw).type-name, 'keyword', "arbitrary keyword is parsed as a keyword";
 }
 
 subtest "Method 'get'" => {

@@ -289,8 +289,8 @@ role Config::BINDish::AST::Blockish {
     }
     multi ensure-single(@b, :$option!) {
         given +@b {
-            when 1 { @b.head }
             when 0 { Nil }
+            when 1 { @b.head }
             default {
                 Config::BINDish::X::Option::Ambiguous.new(name => $option, :count($_)).throw
             }
@@ -325,10 +325,8 @@ role Config::BINDish::AST::Blockish {
         self.find-all: :$option, :$local, |%p
     }
 
-    method value(::?CLASS:D: $option, Bool :$local = True, *%p) {
-        with self.find(:$option, :$local, |%p) {
-            return .value.payload
-        }
+    method value(::?CLASS:D: $option, Bool :$local = True, Bool:D :$raw = False, *%p) {
+        return .value(:$raw) with self.find(:$option, :$local, |%p);
         Nil
     }
 
@@ -442,7 +440,7 @@ role Config::BINDish::AST::Blockish {
     }
     multi traverse(Config::BINDish::AST::Block:D $blk, Str:D $keyword, Bool :$block where !*, Bool :$raw, *%c) {
         with $blk.option($keyword, |%c) {
-            return $raw ?? $_ !! .value.payload
+            return $raw ?? $_ !! .value
         }
         traverse-default $blk, :$keyword, :!block, :$raw, |%c
     }
@@ -562,14 +560,14 @@ class Config::BINDish::AST::Block
     # Whether block should merge/overwrite duplicate entries or keep them apart.
     has Bool:D $.flat = $*CFG-FLAT-BLOCKS // False;
 
-    method keyword(::?CLASS:D:) {
-        $!keyword //= self.child('block-type');
+    method keyword(::?CLASS:D: Bool :$raw) {
+        ($!keyword //= self.child('block-type') andthen ($raw ?? $_ !! .payload)) // Nil
     }
-    method name(::?CLASS:D:) {
-        $!name //= self.child('block-name')
+    method name(::?CLASS:D: Bool :$raw) {
+        ($!name //= self.child('block-name') andthen ($raw ?? $_ !! .payload)) // Nil
     }
-    method class(::?CLASS:D:) {
-        $!class //= self.child('block-class')
+    method class(::?CLASS:D: Bool :$raw) {
+        ($!class //= self.child('block-class') andthen ($raw ?? $_ !! .payload)) // Nil
     }
 
     method gist(::?CLASS:D:) {
@@ -639,9 +637,15 @@ class Config::BINDish::AST::Option
     has Config::BINDish::AST::Container $!value;
     has Str:D $.id is required;
 
-    method keyword(::?CLASS:D:) { $!keyword //= self.child('option-name') }
-    method name(::?CLASS:D:) { $!keyword //= self.child('option-name') }
-    method value(::?CLASS:D:) { $!value //= self.child('option-value') }
+    method keyword(::?CLASS:D: Bool :$raw) {
+        ($!keyword //= self.child('option-name') andthen ($raw ?? $_ !! .payload)) // Nil
+    }
+    method name(::?CLASS:D: Bool :$raw) {
+        ($!keyword //= self.child('option-name') andthen ($raw ?? $_ !! .payload)) // Nil
+    }
+    method value(::?CLASS:D: Bool :$raw) {
+        ($!value //= self.child('option-value') andthen ($raw ?? $_ !! .payload)) // Nil
+    }
 
     method dup(::?CLASS:D: *%twiddles) {
         my %p = (:$!id unless %twiddles<id>:exists);

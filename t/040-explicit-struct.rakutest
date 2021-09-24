@@ -328,7 +328,7 @@ subtest "Value validation" => {
              },
              "a file path option parsed ok with a single bareword";
     my $opt = $cfg.get('pathy', :raw);
-    is $opt.value.type-name, 'file-path', "file path option type name";
+    is $opt.value(:raw).type-name, 'file-path', "file path option type name";
 
     lives-ok { $cfg.read: string => q:to/CFG/;
                                     lookup {
@@ -388,8 +388,8 @@ subtest "Competing Value Types" => {
             abort-testing unless ?$cfg.match;
             my $option = $cfg.get("foo", :raw);
             ok $option.defined, "option object is present";
-            isa-ok $option.value.payload, Str, "option's value is Str";
-            is $option.value.type-name, $type-name, "option's value type name is $type-name";
+            isa-ok $option.value, Str, "option's value is Str";
+            is $option.value(:raw).type-name, $type-name, "option's value type name is $type-name";
         }
     }
 }
@@ -625,21 +625,21 @@ subtest "Boolean/keyword conflicts" => {
         my $opt-base = $val.Str.lc ~ '-opt';
         for ^3 -> $idx {
             my $opt-name = $opt-base ~ $idx;
-            is $cfg.top.option($opt-name).value.type-name, 'bool', "$opt-name type is boolean";
+            is $cfg.top.option($opt-name).value(:raw).type-name, 'bool', "$opt-name type is boolean";
             cmp-ok $cfg.top.value($opt-name), '===', $val, "$opt-name is " ~ $val;
         }
     }
 
     cmp-ok $cfg.top.value('any-opt'), '===', True,
            'option without a pre-declaration gets a bool';
-    is $cfg.top.option('any-opt').value.type-name,
+    is $cfg.top.option('any-opt').value(:raw).type-name,
        'bool',
        'option without a pre-declaration parsed as a bool';
 
     is $cfg.top.value('kw-opt'),
        'true',
        '`keyword` value-sym makes `true` parsed as a keyword';
-    is $cfg.top.option('kw-opt').value.type-name,
+    is $cfg.top.option('kw-opt').value(:raw).type-name,
        'keyword',
        '`keyword` value-sym makes `true` parsed as `keyword` type';
 }
