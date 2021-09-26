@@ -42,9 +42,9 @@ A shortcut for `$node.find(:$option, :$local, |%p)`. Note that `$local` is *True
 
 A shortcut to `$node.find-all(:$option, :$local, |%p)`. Note that `$local` is also set to *True* by default, as for `option` method above. This is still meaningful because a block may contain multiple options of the same name.
 
-### `value($option, Bool :$local = True, *%p)`
+### `value($option, Bool :$local = True, Bool :$raw = False, *%p)`
 
-This method is similar to the `option` method above except that `value` returns not option but payload of the option's value.
+This method is similar to the `option` method above except that `value` returns not option but option's value payload, unless `:raw` is passed in which case a [`Config::BINDish::AST::Container`](Container.md) object is returned.
 
 ### `values(Bool :$raw)`
 

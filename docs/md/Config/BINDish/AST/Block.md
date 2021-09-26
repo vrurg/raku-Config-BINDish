@@ -35,17 +35,17 @@ The attribute is by default set either to the value in `$*CFG-FLAT-BLOCKS` or to
 METHODS
 =======
 
-### `keyword()`
+### `keyword(Bool :$raw)`
 
-Returns a child value marked with *'block-type'* or *'keyword'* label.
+Returns value payload of a child marked with *'block-type'* or *'keyword'* label. Returns the AST node itself with `:raw` argument.
 
-### `name()`
+### `name(Bool :$raw)`
 
-Returns a child value marked with *'block-name'* label.
+Returns value payload of a child marked with *'block-name'* label. Returns the AST node itself with `:raw` argument.
 
-### `class()`
+### `class(Bool :$raw)`
 
-Returns a child value marked with *'block-class'* label.
+Returns value payload of a child marked with *'block-class'* label. Returns the AST node itself with `:raw` argument.
 
 ### `multi add(Config::BINDish::AST::Block:D $block)`
 

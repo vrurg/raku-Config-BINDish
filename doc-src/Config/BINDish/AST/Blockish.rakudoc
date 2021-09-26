@@ -50,10 +50,10 @@ instance.
 A shortcut to C<$node.find-all(:$option, :$local, |%p)>. Note that C<$local> is also set to I<True> by default, as for
 C<option> method above. This is still meaningful because a block may contain multiple options of the same name.
 
-=head3 C<value($option, Bool :$local = True, *%p)>
+=head3 C<value($option, Bool :$local = True, Bool :$raw = False, *%p)>
 
-This method is similar to the C<option> method above except that C<value> returns not option but payload
-of the option's value.
+This method is similar to the C<option> method above except that C<value> returns not option but option's value payload,
+unless `:raw` is passed in which case a L<C<Config::BINDish::AST::Container>|Container.md> object is returned.
 
 =head3 C<values(Bool :$raw)>
 

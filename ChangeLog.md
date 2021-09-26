@@ -4,6 +4,15 @@ VERSIONS
 head
 ====
 
+v0.0.7
+
+  * Change some identity/value methods from returning an `AST::Container` to its value instead [b7ece317](https://github.com/vrurg/raku-Config-BINDish/commit/b7ece3173f156e94c8d42d3a12edc44cd33b8b26)
+
+  * Use to more legit approach in registering phasers
+
+head
+====
+
 v0.0.6
 
 Bugfix release:

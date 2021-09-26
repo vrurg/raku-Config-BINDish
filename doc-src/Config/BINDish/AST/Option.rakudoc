@@ -16,21 +16,17 @@ section.
 
 =head1 METHODS
 
-=head3 C<keyword()>
+=head3 C<keyword(Bool :$raw)>
 
-Returns a
-L<C<Config::BINDish::AST::Container>|Container.md>
-child labeled with I<"keyword"> label which represents the value used to declare the option.
+Returns value payload of a child node labeled with I<"keyword"> label. Returns the AST node itself with `:raw` argument.
 
-=head3 C<name()>
+=head3 C<name(Bool :$raw)>
 
 An alias to the C<keyword()> method.
 
-=head3 C<value()>
+=head3 C<value(Bool :$raw)>
 
-Returns a
-L<C<Config::BINDish::AST::Container>|Container.md>
-child marked with I<"option-value"> label which represents option's value.
+Returns value payload of a child marked with I<"option-value">. Returns the AST node itself with `:raw` argument.
 
 =head1 SEE ALSO
 

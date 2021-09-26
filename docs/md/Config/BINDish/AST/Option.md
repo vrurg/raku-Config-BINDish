@@ -18,17 +18,17 @@ Unique ID of an option object. See [`Config::BINDish::Grammar Pre-declaration`](
 METHODS
 =======
 
-### `keyword()`
+### `keyword(Bool :$raw)`
 
-Returns a [`Config::BINDish::AST::Container`](Container.md) child labeled with *"keyword"* label which represents the value used to declare the option.
+Returns value payload of a child node labeled with *"keyword"* label. Returns the AST node itself with `:raw` argument.
 
-### `name()`
+### `name(Bool :$raw)`
 
 An alias to the `keyword()` method.
 
-### `value()`
+### `value(Bool :$raw)`
 
-Returns a [`Config::BINDish::AST::Container`](Container.md) child marked with *"option-value"* label which represents option's value.
+Returns value payload of a child marked with *"option-value"*. Returns the AST node itself with `:raw` argument.
 
 SEE ALSO
 ========
