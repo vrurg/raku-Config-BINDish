@@ -1,6 +1,4 @@
 use v6.d;
-use NQPHLL:from<NQP>;
-use nqp;
 #use Config::BINDish::Ops;
 class Config::BINDish:ver<0.0.6>:api<0.0.6> {
 
@@ -24,27 +22,20 @@ class Config::BINDish:ver<0.0.6>:api<0.0.6> {
             }
         }
 
-        my sub phaser-blk( $what, Mu \extension ) {
-            QAST::Block.new(
-                QAST::Stmts.new,
-                QAST::Stmts.new(
-                    QAST::Op.new(
-                        :op<callmethod>,
-                        :name( "extend-" ~ $what ),
-                        QAST::WVal.new( :value( nqp::decont( Config::BINDish.HOW ) ) ),
-                        QAST::WVal.new( :value( nqp::decont( extension ) ) )
-                        )
-                    )
-                );
+        my sub add_phaser(&phaser) {
+            my $unit-code-object;
+            my $scopes = 0;
+            while $*W.get_code_object(scopes => ++$scopes) -> \code-object {
+                $unit-code-object = code-object;
+            }
+            $unit-code-object.add_phaser('ENTER', &phaser);
         }
 
         multi trait_mod:<is>( Mu:U \extension, :$BINDish-grammar! ) is export {
-            my $blk := phaser-blk( 'grammar', extension );
-            $*W.add_phaser( $*LEAF, 'INIT', $*W.create_code_obj_and_add_child( $blk, 'Block' ), $blk );
+            add_phaser { Config::BINDish.HOW.extend-grammar: extension };
         }
         multi trait_mod:<is>( Mu:U \extension, :$BINDish-actions! ) is export {
-            my $blk := phaser-blk( 'actions', extension );
-            $*W.add_phaser( $*LEAF, 'INIT', $*W.create_code_obj_and_add_child( $blk, 'Block' ), $blk );
+            add_phaser { Config::BINDish.HOW.extend-actions: extension };
         }
 
     }
