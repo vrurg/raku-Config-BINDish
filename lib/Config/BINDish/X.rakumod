@@ -95,11 +95,13 @@ class Config::BINDish::X::Parse::SpecificValue
     does Config::BINDish::X::Parse
     does Config::BINDish::X::Contextish
 {
+    has Str $.guess;
     method message {
         self.wrap-message: $.what.tc
                             ~ " " ~ $.keyword.gist
-                            ~ " must be "
+                            ~ " value must be "
                             ~ $.ctx.props.value-sym.join(", or ")
+                            ~ ("\n" ~ .indent(4) with $.guess)
     }
 }
 

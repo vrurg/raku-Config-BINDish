@@ -38,6 +38,10 @@ method enter-option($/) {
     make $opt;
 }
 
+method option-name($/) {
+    make $<keyword>.made;
+}
+
 method statement:sym<option>($/) {
     my $opt := self.inner-parent;
     $opt.add: $<option-name>.made.mark-as('option-name');

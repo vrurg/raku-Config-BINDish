@@ -693,13 +693,17 @@ multi rule statement:sym<value> {
     { $<err-pos>.validate-value }
 }
 
+token option-name {
+    <keyword> <?before \s || <.statement-terminator>>
+}
+
 multi rule statement:sym<option> {
     :my Value $*CFG-KEYWORD;
     :my Value $*CFG-VALUE;
     :my Context:D $*CFG-PARENT-CTX = $*CFG-CTX;
     :temp $*CFG-CTX = Nil;
     :temp $*CFG-INNER-PARENT;
-    $<err-pos>=<?> $<option-name>=<.keyword>
+    $<err-pos>=<?> <option-name>
     <?{ ! $*CFG-GRAMMAR.is-reserved(option => $*CFG-KEYWORD.coerced) }>
     {
         $<err-pos>.enter-ctx: :type<option>,
@@ -899,7 +903,12 @@ method maybe-specific-value(Str:D $what --> Mu) is raw {
                     return $_ if $_;
                 }
             }
-            self.panic: X::Parse::SpecificValue, :$what, :$ctx, :keyword( $*CFG-KEYWORD )
+            # We either have a non-value or a wrong value type. Try parsing as an option first if current context is a
+            # value-only block as the rule would throw correct context exception then.
+            if $ctx.type eq 'block' && $ctx.props.value-only {
+                self."statement:sym<option>"();
+            }
+            self.panic: X::Parse::SpecificValue, :$what, :$ctx, :keyword( $ctx.keyword )
         }
     }
     my $m := self.value;

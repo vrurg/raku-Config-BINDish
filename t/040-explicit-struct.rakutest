@@ -31,7 +31,9 @@ my $cfg = Config::BINDish.new:
         blocks => (
             :general => { :in<.TOP>, :!named },
             :subsystem => { :in<.TOP>, :named },
-            :paths => { :in<general subsystem>, :named, :type(Str), :value-only },
+            :paths => { :in<general subsystem>, :named, :type(Str), :value-only, :value-sym<file-path string> },
+            :numbers => { :in<subsystem>, :type(Numeric), :value-only, :value-sym<int rat num> },
+            :strings => { :in<subsystem general>, :type(Stringy), :value-only },
             blist => { :named, :!classified, :type-name<keyword>, :value-only },
             lookup => { :value-sym<string file-path>, :value-only },
         ),
@@ -71,7 +73,7 @@ subtest "Syntax" => {
     throws-like { $cfg.read: string => q<op-numish;> },
                 Config::BINDish::X::Parse::SpecificValue,
                 "value type specific option requires a value",
-                :message(/"Option 'op-numish' must be int, or num, or rat"/);
+                :message(/"Option 'op-numish' value must be int, or num, or rat"/);
 
     throws-like { $cfg.read: string => q<general "named" { }> },
                 Config::BINDish::X::Parse::ExtraPart,
@@ -85,7 +87,7 @@ subtest "Syntax" => {
 }
 
 subtest "Structure" => {
-    plan 4;
+    plan 5;
 
     throws-like { $cfg.read: string => q:to/CFG/;
                                         my-top {
@@ -105,6 +107,7 @@ subtest "Structure" => {
                                             paths "public" {
                                                 "pub/";
                                                 "user/pub";
+                                                etc/some.cfg;
                                             }
                                         }
                                         CFG
@@ -113,29 +116,41 @@ subtest "Structure" => {
 
     throws-like { $cfg.read: string => q:to/CFG/;
                                         subsystem "storage" {
-                                            paths "public" {
-                                                "pub/";
-                                                "user/pub";
-                                                base "/";
+                                            numbers {
+                                                1;
+                                                2;
+                                                op-numish 13;
                                             }
                                         }
                                         CFG
                 },
                 Config::BINDish::X::Parse::Context,
                 "option used in a value-only block is an error",
-                :message(/"Option 'base' cannot be used in block 'paths \"public\"'"/);
+                :message(/"Option 'op-numish' cannot be used in block 'numbers'"/);
 
     throws-like { $cfg.read: string => q:to/CFG/;
                                         subsystem "storage" {
-                                            paths "public" {
-                                                13;
+                                            strings {
+                                                3.1415926;
                                             }
                                         }
                                         CFG
                 },
                 Config::BINDish::X::Parse::ValueType,
                 "bad value type within a value-only block",
-                :message(/"Block 'paths' expects a (Str) value but got <int> of (Int)"/);
+                :message(/"Block 'strings' expects a (Stringy) value but got <rat> of (Rat)"/);
+
+    throws-like { $cfg.read: string => q:to/CFG/;
+                                        subsystem "storage" {
+                                            numbers {
+                                                "not a number";
+                                            }
+                                        }
+                                        CFG
+                },
+                Config::BINDish::X::Parse::SpecificValue,
+                "bad value type within a value-only block when specific value-sym is used",
+                :message(/"Block 'numbers' value must be int, or rat, or num"/);
 }
 
 subtest "Value validation" => {
@@ -187,7 +202,7 @@ subtest "Value validation" => {
 
     throws-like { $cfg.read: string => q:to/CFG/;
                                         general {
-                                            paths "public" {
+                                            strings {
                                                 "pub/";
                                                 "user/pub";
                                                 3.1415926;
@@ -197,7 +212,7 @@ subtest "Value validation" => {
                 },
                 Config::BINDish::X::Parse::ValueType,
                 "bad value type in a block",
-                :message(/"Block 'paths' expects a (Str) value but got <rat> of (Rat)"/);
+                :message(/"Block 'strings' expects a (Stringy) value but got <rat> of (Rat)"/);
 
     lives-ok { $cfg.read: string => q:to/CFG/;
                                         general {
@@ -313,7 +328,7 @@ subtest "Value validation" => {
                 },
                 Config::BINDish::X::Parse::SpecificValue,
                 "option value parsing is limited to specific types",
-                :message(/"Option 'op-numish' must be int, or num, or rat"/);
+                :message(/"Option 'op-numish' value must be int, or num, or rat"/);
 
     lives-ok { $cfg.read: string => q:to/CFG/;
                                         op-numish 3.14;
