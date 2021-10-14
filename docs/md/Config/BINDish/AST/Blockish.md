@@ -54,7 +54,9 @@ Returns block's standalone values. For example, for the following example it wil
         1; 2; 3;
     }
 
-If `$raw` named argument is used then instead of payloads the method will return instances of [`Config::BINDish::AST::Value`](Value.md).
+If `$raw` named argument is used then instead of payloads the method will return value nodes.
+
+*Note* that value nodes are those consuming [`Config::BINDish::AST::Container`](Container.md) and marked as *standalone*.
 
 Method `get`
 ------------

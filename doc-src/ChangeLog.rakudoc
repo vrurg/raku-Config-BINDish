@@ -1,6 +1,13 @@
 =begin pod
 =head1 VERSIONS
 
+=head v0.0.9
+
+=item Fix node dumping
+=item Fix expandable strings not considered standalone values
+=item C<find-all> results sequence is not lazy anymore
+=item Make dump output a little bit prettier
+
 =head v0.0.8
 
 =item Fix parsing of paths of C<dir/path> kind in value only blocks

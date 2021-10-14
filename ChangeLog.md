@@ -4,6 +4,19 @@ VERSIONS
 head
 ====
 
+v0.0.9
+
+  * Fix node dumping
+
+  * Fix expandable strings not considered standalone values
+
+  * `find-all` results sequence is not lazy anymore
+
+  * Make dump output a little bit prettier
+
+head
+====
+
 v0.0.8
 
   * Fix parsing of paths of `dir/path` kind in value only blocks
@@ -19,7 +32,7 @@ v0.0.7
 
   * Change some identity/value methods from returning an `AST::Container` to its value instead [b7ece317](https://github.com/vrurg/raku-Config-BINDish/commit/b7ece3173f156e94c8d42d3a12edc44cd33b8b26)
 
-  * Use to more legit approach in registering phasers
+  * Use more legit approach in registering phasers
 
 head
 ====
