@@ -1,6 +1,6 @@
 use v6.d;
 #use Config::BINDish::Ops;
-class Config::BINDish:ver<0.0.7>:api<0.0.6> {
+class Config::BINDish:ver<0.0.7>:api<0.0.6>:auth<zef:vrurg> {
 
     BEGIN {
         Config::BINDish.HOW does role ExtensibleHOW {
