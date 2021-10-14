@@ -7,15 +7,21 @@ use Config::BINDish::AST;
 use Config::BINDish::X;
 use IP::Addr;
 
-# Testing for a bug in Expandable where $*CFG-VALUE was lost and was causing incorrect syntax errors
+# Test for Expandable-related bugs:
+# 1. When $*CFG-VALUE was lost and was causing incorrect syntax errors
+# 2. Expandable strings were not considered standalone values as they are not C::B::AST::Value but just containers.
 
-plan 2;
+plan 5;
 
 role CustomExt is BINDish-grammar {
     submethod setup-BINDish {
         self.declare-blocks:
             :server => ( :in<.TOP> ),
-            :file-pool => ( :in<.TOP>, :named );
+            :file-pool => ( :in<.TOP>, :named ),
+            :fpool-alias<alias> => ( :in<file-pool>,
+                                     :type(Str | IO::Path),
+                                     :value-only,
+                                     :value-sym<string file-path> ),
             ;
         self.declare-options:
             :fpool-path<path> => ( :in<file-pool>, :type(Str) ),
@@ -30,6 +36,9 @@ lives-ok {
     $cfg.read: string => q:to/CFG/;
             file-pool "static" {
                 path "{/server/base-path}/frontend";
+                alias "foo.png" {
+                    "img/bar.png";
+                }
             }
 
             server {
@@ -40,5 +49,16 @@ lives-ok {
 }, "config parsed";
 
 is $cfg.get(:file-pool<static> => "path"), "./frontend", "option is parsed and expanded correctly";
+
+my $alias-blk = $cfg.get( :block(:file-pool<static> => :alias<foo.png> ) );
+
+if is $alias-blk.values.elems, 1, "block standalone value count" {
+    my $val0 = $alias-blk.values(:raw)[0];
+    does-ok $val0, Config::BINDish::AST::Container, "value node is a container";
+    is $val0.payload, "img/bar.png", "value payload";
+}
+else {
+    skip "no values to analyze", 2;
+}
 
 done-testing;
