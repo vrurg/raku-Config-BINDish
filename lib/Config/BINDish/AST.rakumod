@@ -62,9 +62,10 @@ class Config::BINDish::AST {
 
     method dump(::?CLASS:D: Int:D :$level = 0) {
         (self.ast-name
-         ~ '{'
-         ~ $!labels.keys.join(",")
-         ~ "}: " ~ self.gist).indent($level * 4);
+         ~ ($!labels.elems
+                ?? '{' ~ $!labels.keys.join(",") ~ "}: "
+                !! ": ")
+         ~ self.gist).indent($level * 4);
     }
 
     method register-type(Str:D $type-name, Mu \ast-type) {
