@@ -23,7 +23,7 @@ multi infix:<∷>(Config::BINDish:D $cfg, +@path, |c) {
     RESOLVE-PATH($cfg.top, @path, |c)
 }
 
-proto infix:<::>(|) is export(:op) is assoc<list> {*}
+proto infix:<::>(|) is export(:ascii-op) is assoc<list> {*}
 multi infix:<::>(Config::BINDish::AST::Block:D $blk, +@path, |c) {
     RESOLVE-PATH($blk, @path, |c)
 }
