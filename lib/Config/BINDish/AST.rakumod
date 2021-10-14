@@ -572,10 +572,10 @@ class Config::BINDish::AST::Block
     }
 
     method gist(::?CLASS:D:) {
-        $.keyword.payload
+        $.keyword
         ~ ($.name.defined
-            ?? " " ~ $.name.gist
-                ~ ($.class.defined ?? " " ~ $.class.gist !! "")
+            ?? " " ~ self.name(:raw).gist
+                ~ ($.class.defined ?? " " ~ self.class(:raw).gist !! "")
             !! "")
     }
 
