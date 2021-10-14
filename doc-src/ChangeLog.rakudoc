@@ -1,6 +1,12 @@
 =begin pod
 =head1 VERSIONS
 
+=head v0.0.8
+
+=item Fix parsing of paths of C<dir/path> kind in value only blocks
+=item Fix a copypasto in export of ASCII version of C<::> operator
+=item Some improvements in error reporting
+
 =head v0.0.7
 
 =item Change some identity/value methods from returning an `AST::Container` to its value instead [b7ece317](https://github.com/vrurg/raku-Config-BINDish/commit/b7ece3173f156e94c8d42d3a12edc44cd33b8b26)
