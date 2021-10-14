@@ -243,7 +243,7 @@ class Config::BINDish::AST::Node is Config::BINDish::AST {
 
     proto method find-all(::?CLASS:D: |) {*}
     multi method find-all(&matcher, Bool :$local --> Seq:D) {
-        lazy gather {
+        gather {
             my sub iterate(@children) {
                 for @children -> $child {
                     take $child if &matcher( $child );
