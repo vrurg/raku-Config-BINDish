@@ -261,7 +261,10 @@ submethod TWEAK(|) {
     # To prevent duplicate iteration over submethods defined in v6.c/v6.d roles
     # record submethod objects we've already invoked.
     my %invoked;
-    for self.^mro(:roles) -> \component {
+    my @components := $*RAKU.compiler.version >= v2021.10.87.gd.38852628
+        ?? self.^mro(:concretizations)
+        !! self.^mro(:roles);
+    for @components -> \component {
         my &setup-method = nqp::can(component.HOW, 'submethod_table')
             ?? component.^submethod_table<setup-BINDish> // Nil
             !! Nil;
