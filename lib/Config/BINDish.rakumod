@@ -168,3 +168,5 @@ multi EXPORT(*@ns) {
     @exports.append: exports-by-opt($_) for @ns;
     Map.new: |@exports
 }
+
+our sub META6 { $?DISTRIBUTION.meta }

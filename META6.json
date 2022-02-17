@@ -1,21 +1,19 @@
 {
-  "api": "0.0.6",
-  "auth": "zef:vrurg",
+  "name": "Config::BINDish",
+  "description": "Extensible BIND9-like Configuration Files Support",
+  "version": "0.0.9",
+  "meta-version": "0",
   "authors": [
     "Vadim Belman <vrurg@lflat.org>"
   ],
-  "build-depends": [
-  ],
+  "auth": "zef:vrurg",
   "depends": [
-    "AttrX::Mooish",
+    "AttrX::Mooish:auth<zef:vrurg>:ver<0.8.0+>",
     "IP::Addr",
     "Test::Async:auth<zef:vrurg>:ver<0.1.2+>"
   ],
-  "description": "Extensible BIND9-like Configuration Files Support",
-  "license": "Artistic-2.0",
-  "meta-version": "0",
-  "name": "Config::BINDish",
-  "production": true,
+  "build-depends": [],
+  "test-depends": [],
   "provides": {
     "Config::BINDish": "lib/Config/BINDish.rakumod",
     "Config::BINDish::AST": "lib/Config/BINDish/AST.rakumod",
@@ -23,22 +21,21 @@
     "Config::BINDish::Expandable": "lib/Config/BINDish/Expandable.rakumod",
     "Config::BINDish::Grammar": "lib/Config/BINDish/Grammar.rakumod",
     "Config::BINDish::INET": "lib/Config/BINDish/INET.rakumod",
-    "Config::BINDish::META": "lib/Config/BINDish/META.rakumod",
     "Config::BINDish::Ops": "lib/Config/BINDish/Ops.rakumod",
     "Config::BINDish::Test": "lib/Config/BINDish/Test.rakumod",
     "Config::BINDish::X": "lib/Config/BINDish/X.rakumod"
   },
-  "raku": "6.d",
-  "resources": [
-  ],
-  "source-url": "https://github.com/vrurg/raku-Config-BINDish.git",
+  "resources": [],
   "support": {
     "source": "https://github.com/vrurg/raku-Config-BINDish.git"
   },
+  "license": "Artistic-2.0",
   "tags": [
-    "CONFIG"
+    "CONFIG",
+    "BIND9"
   ],
-  "test-depends": [
-  ],
-  "version": "0.0.9"
+  "api": "0.0.6",
+  "production": true,
+  "source-url": "https://github.com/vrurg/raku-Config-BINDish.git",
+  "raku": "6.d"
 }
