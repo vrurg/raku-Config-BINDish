@@ -285,7 +285,7 @@ method build-props {
 }
 
 method build-keywords {
-    @!prop-keys.map({ $_ => SetHash.new })
+    @!prop-keys.map: * => SetHash.new
 }
 
 method !build-reserved-keywords {
