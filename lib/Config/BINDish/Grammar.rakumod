@@ -41,7 +41,7 @@ class Value does TypeStringify {
 
     has Mu $.coerced is mooish(:lazy);
 
-    method gist(::?CLASS:D:) {
+    multi method gist(::?CLASS:D:) {
         my $val = Str($!payload);
         my $quote = $!type-name eq 'dq-string' ?? '"' !! "'";
         $!type ~~ Stringy ?? $quote ~ $val ~ $quote !! $val
