@@ -288,7 +288,7 @@ method build-keywords {
     @!prop-keys.map({ $_ => SetHash.new })
 }
 
-method build-reserved-keywords {
+method !build-reserved-keywords {
     @!prop-keys.map: * => SetHash.new
 }
 
