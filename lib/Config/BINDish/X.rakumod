@@ -238,3 +238,10 @@ class Config::BINDish::X::Get::BadPathElement is Config::BINDish::X {
         $!what.tc ~ " cannot be used as a block path element"
     }
 }
+
+class Config::BINDish::X::ContextType is Config::BINDish::X {
+    has Str:D $.type is required;
+    method message {
+        "Unknown parse context type '$.type'"
+    }
+}

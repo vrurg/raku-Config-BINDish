@@ -1,6 +1,10 @@
 =begin pod
 =head1 VERSIONS
 
+=head v0.0.10'
+
+=item Added support for classified blocks for `:in` key of block and option declarations
+
 =head v0.0.9
 
 =item Fix node dumping

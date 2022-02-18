@@ -36,6 +36,7 @@ my $cfg = Config::BINDish.new:
             :strings => { :in<subsystem general>, :type(Stringy), :value-only },
             blist => { :named, :!classified, :type-name<keyword>, :value-only },
             lookup => { :value-sym<string file-path>, :value-only },
+            :classy => { :named, :classified },
         ),
         options => (
             base => { :in<paths>, type => Str },
@@ -43,6 +44,7 @@ my $cfg = Config::BINDish.new:
             multi-type => { :in<general>, type => Int | Rat },
             stringy => { :in<general>, type-name => /\- string$/ },
             pathy => { value-sym => <file-path>, type => Str },
+            :desc => { :in(:classy<described>), type => Str },
         );
 
 does-ok $cfg.grammar, CustomExt, "grammar does our custom extension";
@@ -51,39 +53,47 @@ $cfg.read: string => '';
 ok $custom-set-invoked, "custom extension setup method has been invoked";
 
 subtest "Syntax" => {
-    plan 8;
+    plan 10;
 
     lives-ok { $cfg.read: string => q<my-top "named" { }> },
-             "when name is optional it can be used";
+        "when name is optional it can be used";
 
     lives-ok { $cfg.read: string => q<my-top-named "named" { }> },
-             "name is required and present";
+        "name is required and present";
 
     lives-ok { $cfg.read: string => q<subsystem "named" classified { }> },
-             "when class is optional it can be used";
+        "when class is optional it can be used";
 
     lives-ok { $cfg.read: string => q<my-top "named" classified { }> },
-             "when name and class are optional both can be used";
+        "when name and class are optional both can be used";
+
+    lives-ok { $cfg.read: string => q<classy "named" described { desc "anything"; }> },
+        "option bound to a classified block";
 
     throws-like { $cfg.read: string => q<subsystem { }> },
-                Config::BINDish::X::Parse::MissingPart,
-                "when block must be named",
-                :message(/"Name is missing in declaration of block 'subsystem'"/);
+        Config::BINDish::X::Parse::MissingPart,
+        "when block must be named",
+        :message(/"Name is missing in declaration of block 'subsystem'"/);
 
     throws-like { $cfg.read: string => q<op-numish;> },
-                Config::BINDish::X::Parse::SpecificValue,
-                "value type specific option requires a value",
-                :message(/"Option 'op-numish' value must be int, or num, or rat"/);
+        Config::BINDish::X::Parse::SpecificValue,
+        "value type specific option requires a value",
+        :message(/"Option 'op-numish' value must be int, or num, or rat"/);
 
     throws-like { $cfg.read: string => q<general "named" { }> },
-                Config::BINDish::X::Parse::ExtraPart,
-                "when block must be unnamed",
-                :message(/"Name is unexpected in declaration of block 'general'"/);
+        Config::BINDish::X::Parse::ExtraPart,
+        "when block must be unnamed",
+        :message(/"Name is unexpected in declaration of block 'general'"/);
 
     throws-like { $cfg.read: string => q<blist "named" classified { }> },
-                Config::BINDish::X::Parse::ExtraPart,
-                "block can't be classified",
-                :message(/"Class is unexpected in declaration of block 'blist \"named\"'"/);
+        Config::BINDish::X::Parse::ExtraPart,
+        "block can't be classified",
+        :message(/"Class is unexpected in declaration of block 'blist \"named\"'"/);
+
+    throws-like { $cfg.read: string => q<classy "named" non-desc { desc "can't be here" }> },
+        Config::BINDish::X::Parse::Context,
+        "option bound to a classified block in a differently classified one",
+        :message(/"Option desc cannot be used in block 'classy \"named\" 'non-desc'"/);
 }
 
 subtest "Structure" => {

@@ -17,7 +17,9 @@ BEGIN {
                     .grep({ LEXICAL::{$_}:exists && !LEXICAL::{$_}.defined });
 }
 
-class Context {...}
+role Context          {...}
+class Context::Block  {...}
+class Context::Option {...}
 
 role TypeStringify {
     method type-name {...}
@@ -52,9 +54,15 @@ class Value does TypeStringify {
     }
 }
 
+my class InSet {
+    has %!blocks is Map is built(:bind) handles(<keys Bool>);
+    method new(Mu $from) { self.bless: blocks => $from.list.map({ ($_ ~~ Pair) ?? $_ !! ($_ => True) }).Map }
+    method ACCEPTS(Context::Block:D $blk) { %!blocks{$blk.id}:exists && $blk.class ~~ %!blocks{$blk.id} }
+}
+
 role StatementProps {
     # If non-empty then this statement can only be contained by blocks listed here.
-    has SetHash:D() $.in = ();
+    has InSet:D() $.in = ();
     # If statement can only be declared at the top level
     # DEPRECATED To be removed. Replaced with uniform :in<.TOP> format
     has Bool:D $.top-only = False;
@@ -68,7 +76,7 @@ role StatementProps {
     multi method ACCEPTS(Context:D $ctx) {
         my $cur-block = $ctx.cur-block-ctx;
         return $cur-block.is-TOP if $!top-only;
-        $!in ?? ( $cur-block.id ∈ $!in) !! True
+        $!in ?? ( $cur-block ~~ $!in) !! True
     }
 
     method Bool { False }
@@ -128,20 +136,17 @@ class BlockProps
     }
 }
 
-class Context {
-    # Context type. "block", "option", or something extension-defined
-    has Str:D $.type is required;
+role Context {
     # ID of the current statement properties. $!type defines the key where to search for the ID on %!props.
     has $.id;
     # Statement type (keyword)
     has Value $.keyword;
-    has Value $.name;
-    has ::?CLASS $.parent;
+    has ::?ROLE $.parent;
     has StatementProps $.props is mooish(:lazy);
     has $.relations is mooish(:lazy);
 
     method build-props {
-        $*CFG-GRAMMAR.props{$!type}{$!id}
+        $*CFG-GRAMMAR.props{self.type}{$!id}
     }
 
     method build-relations {
@@ -154,32 +159,50 @@ class Context {
         $!parent.parent($count - 1)
     }
 
-    method cur-block-ctx(::?CLASS:D: --> Context) {
-        return self if self.props ~~ BlockProps;
-        $!parent.cur-block-ctx
-    }
-
-    method is-TOP {
-        ($!type eq 'block') && ($!id eq '.TOP')
+    method cur-block-ctx(::?CLASS:D: --> Context::Block) {
+        $!parent ?? $!parent.cur-block-ctx !! Nil
     }
 
     method description(::?CLASS:D:) {
-        given $!type {
-            when 'block'  {
-                $!id eq '.TOP'
-                    ?? 'global context'
-                    !! "block '" ~ $!keyword.coerced ~ ($!name.defined ?? " " ~ $!name.gist !! "") ~ "'"
-            }
-            when 'option' { "option '" ~ $!keyword.coerced ~ "'" }
-            default {
-                die "Internal: looks like " ~ $_ ~ " context hasn't been given a description!"
-            }
-        }
+        die "Internal: looks like " ~ $_ ~ " context hasn't been given a description!"
     }
 
     multi method ACCEPTS(StatementProps:D $props) {
-        ? (!$props.in || (self.cur-block-ctx andthen .id ∈ $props.in))
+        !$props.in || (self.cur-block-ctx andthen $_ ~~ $props.in)
     }
+
+    method type {...}
+}
+
+class Context::Block does Context {
+    has Value $.name;
+    has Value $.class;
+
+    method description(::?CLASS:D:) {
+        $.id eq '.TOP'
+            ?? 'global context'
+            !! ("block '"
+                ~ $.keyword.coerced
+                ~ ($.name.defined
+                    ?? ' ' ~ $.name.gist
+                    !! "")
+                ~ ($.class.defined ?? ' ' ~ $.class.gist !! "")
+                ~ "'")
+    }
+
+    method is-TOP { $.id eq '.TOP' }
+
+    method type { "block" }
+
+    method cur-block-ctx(::?CLASS:D:) { self }
+}
+
+class Context::Option does Context {
+    method description(::?CLASS:D:) {
+        "option '" ~ $.keyword.coerced ~ "'"
+    }
+
+    method type { "option" }
 }
 
 class Strictness {
@@ -257,6 +280,7 @@ submethod TWEAK(|) {
     self.declare-block: :id<.TOP>, :keyword<.TOP>, :autovivified;
     # Reserve id .ANYWHERE
     self.declare-block: :id<.ANYWHERE>, :keyword<.ANYWHERE>;
+
     # Walk over grammar's MRO and invoke setup methods.
     # To prevent duplicate iteration over submethods defined in v6.c/v6.d roles
     # record submethod objects we've already invoked.
@@ -386,6 +410,13 @@ proto method statement-props(Str:D) is raw {*}
 multi method statement-props('option') is raw { OptionProps }
 multi method statement-props('block') is raw { BlockProps }
 
+proto method context-type(Str:D) is raw {*}
+multi method context-type('option') is raw { Context::Option }
+multi method context-type('block') is raw { Context::Block }
+multi method context-type(Str:D $type) {
+    Config::BINDish::X::ContextType.new(:$type).throw
+}
+
 my subset Keyword of Any:D where Str | { $_ ~~ Bool && .so };
 method declare-statement(Str:D $what,
                          Any:D :$id = self.autogen-id,
@@ -484,7 +515,7 @@ method autogen-id {
 
 method enter-ctx(Value:D :$keyword, Str:D :$type, *%profile --> Context:D) {
     self.panic: Config::BINDish::X::Parse::ContextOverwrite, :ctx($_) with $*CFG-CTX;
-    my $grammar = $*CFG-GRAMMAR;
+    my ::?CLASS:D $grammar = $*CFG-GRAMMAR;
     my Context $parent-ctx = $_ with $*CFG-PARENT-CTX;
     # Make calling code life easier by allowing :props to be an undefined value.
     %profile<props>:delete without %profile<props>;
@@ -514,7 +545,14 @@ method enter-ctx(Value:D :$keyword, Str:D :$type, *%profile --> Context:D) {
         }
         %auto-profile = :$id, :$props;
     }
-    $*CFG-CTX = Context.new(:$keyword, :$type, |%auto-profile, |%profile, :parent($parent-ctx));
+    $*CFG-CTX =
+        $grammar.context-type($type).new(
+            :$keyword,
+            :$type,
+            |%auto-profile,
+            |%profile,
+            |(:parent($parent-ctx) with $parent-ctx)
+            );
 }
 
 method leave-option { }
@@ -819,10 +857,11 @@ token enter-block {
     <?>
     {
         my $block-type = $*CFG-BLOCK-TYPE;
-        self.enter-ctx: :type<block>,
-                        :keyword( $block-type ),
-                        :name( $*CFG-BLOCK-NAME ),
-                        ;
+        self.enter-ctx:
+            :type<block>,
+            :keyword( $block-type ),
+            :name( $*CFG-BLOCK-NAME ),
+            :class( $*CFG-BLOCK-CLASS );
         $*CFG-BLOCK-ERR-POS.validate-block;
     }
 }
@@ -908,7 +947,7 @@ method maybe-specific-value(Str:D $what --> Mu) is raw {
             }
             # We either have a non-value or a wrong value type. Try parsing as an option first if current context is a
             # value-only block as the rule would throw correct context exception then.
-            if $ctx.type eq 'block' && $ctx.props.value-only {
+            if $ctx ~~ Context::Block && $ctx.props.value-only {
                 self."statement:sym<option>"();
             }
             self.panic: X::Parse::SpecificValue, :$what, :$ctx, :keyword( $ctx.keyword )
@@ -932,7 +971,7 @@ multi token value:sym<bool> {
 
 multi token value:sym<keyword> {
     <?{ (my $ctx = $*CFG-CTX) and
-        (($ctx.type eq 'option')
+        (($ctx ~~ Context::Option)
          || ($ctx.cur-block-ctx.props andthen .value-only)) }>
     :my Value $*CFG-KEYWORD;
     [
