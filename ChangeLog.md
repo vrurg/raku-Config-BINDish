@@ -4,6 +4,13 @@ VERSIONS
 head
 ====
 
+v0.0.10'
+
+  * Added support for classified blocks for `:in` key of block and option declarations
+
+head
+====
+
 v0.0.9
 
   * Fix node dumping

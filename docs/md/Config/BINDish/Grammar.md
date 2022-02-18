@@ -639,7 +639,23 @@ With the above declaration:
         location https://nagios.local;
     }
 
-Note how we use `host` alongside with `server` to pre-declare `ip`. This is not an error as the grammar will auto-vivify block pre-declaration for us. It will have both ID and keyword set to `host`. We can late re-declare it with non-default properties. If we do so the re-declaration will lost its *auto-vivified* status and any subsequent re-declaration will become an error.
+Note how we use `host` alongside with `server` to pre-declare `ip`. This is not an error as the grammar will auto-vivify block pre-declaration for us. It will have both ID and keyword set to `host`. We can later re-declare it with non-default properties. If we do so the re-declaration will lost its *auto-vivified* status and any subsequent re-declaration will become an error.
+
+In a little bit more complex case a block can be presented as a pair of two strings where key would still be block's ID and the value would allow to narrow down block classes for which a declaration is allowed. In the most simple case we can limit to a single class by its name:
+
+    :keyword => { :in(:classy<specific>), ... }
+
+`keyword` would only be allowed within a `specific` block `classy`:
+
+    classy "a name" specific {
+        keyword ...;
+    }
+
+Since the value of block definition pair is used on right hand side of a smartmatch operator the class condition is not only limited to strings. Consider the following examples:
+
+    :in(:classy('specific' | 'special' | 'limited'))
+    :in(:classy(/^ specif .* $/))
+    :in(:classy(*.starts-with: 'specif'))
 
 #### `type`
 

@@ -1,6 +1,6 @@
 use v6.d;
 #use Config::BINDish::Ops;
-class Config::BINDish:ver<0.0.9>:api<0.0.6>:auth<zef:vrurg> {
+class Config::BINDish:ver($?DISTRIBUTION.meta<ver>):api($?DISTRIBUTION.meta<api>):auth($?DISTRIBUTION.meta<auth>) {
 
     BEGIN {
         Config::BINDish.HOW does role ExtensibleHOW {
@@ -151,7 +151,7 @@ class Config::BINDish:ver<0.0.9>:api<0.0.6>:auth<zef:vrurg> {
                          |c
     }
 
-    # Experimental
+    our sub META6 { $?DISTRIBUTION.meta }
 }
 
 my proto exports-by-opt($) {*}
@@ -168,5 +168,3 @@ multi EXPORT(*@ns) {
     @exports.append: exports-by-opt($_) for @ns;
     Map.new: |@exports
 }
-
-our sub META6 { $?DISTRIBUTION.meta }
