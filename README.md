@@ -1,9 +1,7 @@
 NAME
 ====
 
-
-
-[`Config::BINDish`](docs/md/Config/BINDish.md) - parse BIND9/named kind of config files
+`Config::BINDish` - parse BIND9/named kind of config files
 
 SYNOPSIS
 ========
@@ -12,302 +10,187 @@ SYNOPSIS
 
     my $cfg = Config::BINDish.new;
     $cfg.read: string => q:to/CFG/;
-        server "s1" {
-            name "my.server";
-            paths {
-                base /opt/myapp;
-                pool "files" static {
-                    ./pub/img;
-                    "static/img";
-                    "docs";
-                };
-                pool "files" dynamic {
-                    "users/reports";
-                    "system/reports"
-                }
+    server "s1" {
+        name "my.server";
+        paths {
+            base "/opt/myapp";
+            pool "files" static {
+                "pub/img";
+                "static/img";
+                "docs";
+            };
+            pool "files" dynamic {
+                "users/reports";
+                "system/reports"
             }
         }
-        CFG
+    }
+    CFG
     say $cfg.top.get( :server("s1") => :paths => :pool("images") => 'root' ); # ./pub/img
+
+    $cfg.read: file => $my-config-filename;
 
 DISCLAIMER
 ==========
 
+This module is very much experimental in the sense of the API methods it provides. The grammar is expected to be more stable, yet no warranties can be given at the moment.
 
+DESCRIPTION
+===========
 
-This module is very much experimental in the sense of the API it provides. The grammar is expected to be more stable, yet no warranties can be given at the moment.
+In this documentation I'll be referring to the configuration format implemented by the module as *BINDish config* or simply *BINDish*.
 
-Also, all the documentation here is created in write-only mode. No proof-reading has been done so far. All kinds and levels of ugliness and errors are anticipated! My apologies for the situation, hope to get some spare hours to fix it some day in the future.
+EXTENSIONS
+==========
 
-PREFACE
-=======
+BINDish configuration parser can be augmented with 3rd-party extensions. Every extension is implemented as a role which will be used to build the final grammar or actions classes (see [`Grammar`](https://docs.raku.org/type/Grammar)). The classes are based upon [`Config::BINDish::Grammar`](BINDish/Grammar.md) and [`Config::BINDish::Actions`](BINDish/Actions.md) respectively. Here is the steps `Config::BINDish` does to build them:
 
+  * An empty class is created which will serve as the final version
 
+  * Extension roles are punned and added as parents to the class
 
-Introduction
-------------
+  * Then the base class is added as the last parent
 
-The purpose of this module is to parse [BIND 9-like](https://bind9.readthedocs.io/en/latest/configuration.html) configuration files. Why *BINDish* then? Because the *"-like"* suffix above is the key. Theoretically, `Config::BINDish` is capable of parsing the native `named` configuration files; practically, it lacks support of few syntax constructs like barewords as references to named configuration blocks.
+The order in which the extensions are added is defined by the order and the way they're registered. The later added ones serve as the earlier parents meaning that Raku's method call dispatching will have their methods invoked first.
 
-Aside of that, it can parse configuration using relaxed syntax where the terminating semi-colon is optional. Look at the [SYNOPSIS](#SYNOPSIS) again; from the perspective of `named` the example is invalid from the syntax point of view.
+There are two and a half ways to extend the parser. First is to use `is BINDish-grammar` or `is BINDish-actions` trait:
 
-So, from this moment on I will refer to the format as to *BINDish config* format. Or just *BINDish* sometimes.
-
-Why BINDish?
-------------
-
-Because among the well-known configuration formats this one is one of the most powerful and flexible. Here is my point:
-
-  * XML? Thank you, but - **no!** Any questions, anyone?
-
-  * JSON is ok, but rather limited in capabilities. The lack of comments is especially frustrating
-
-  * YAML is the power which comes with mandatory indentation and sometimes confusing rules
-
-  * Win-style INI, TOML are a great compromise and I was often finding myself using one or another variant of these. Yet, sometimes I'd love to have nested sections, but they don't fit well into these
-
-That's about it. What makes BINDish different are:
-
-  * Sectioning with help of configuration blocks. Event the ability to give them names and classfy same-named blocks is already powerful enough to break your config into nicely grouped options. Yet, with naturally looking and unlimited nesting of blocks it becomes easier task.
-
-  * Optional naming and classifying of blocks doesn't constrain ones freedom in defining the best configuration content.
-
-  * One doesn't have to count spaces in mind. There is no risk of an overly *smart* editor would accidentally re-indent the config in a way it would get totally different meaning.
-
-  * Easy to read. Really, really easy to get into the content of a config from the first glance. Just by looking at the [SYNOPSIS](#SYNOPSIS) example you can easily guess what's going on and what to expect from the software using this file!
-
-  * Easy to extend. Not in the original BIND 9 implementation, of course. But for a third-party parser, like this one, it shouldn't be a big problem to allow `path /to/my/dir;` instead of `path "/to/my/dir";`. This module goes even further down the road; but I'll get back to this a bit later.
-
-SYNTAX
-======
-
-
-
-Very roughly, the configuration format supported by the module can be described as:
-
-    <config> ::= <statements>
-    <statements> ::= <empty> | <statement> | <statement> <statements>
-    <statement> ::= <block> | <option> | <comment>
-    <block> ::= <block-type> [<block-name> [<block-class>]] '{' <statements> '}' [';']
-    <option> ::= <keyword> [<value>] [';']
-    <block-type> ::= <keyword>
-    <block-name> ::= <value>
-    <block-class> ::= <keyword>
-    <keyword> ::= <alpha> [ <alphanumeric> | '-' ]*
-    <value> ::= <bool> | <string> | <int> | <num> | <rat> | <file-path> | <keyword>
-
-Here is a sample config:
-
-    top-level-option "global value";
-    pi 3.1415926;
-    category "1" {
-        description "something meaningful";
-        public; // Option is set to True value
-        products {
-            "item 1"; "item 2"; "item 3";
-        };
+    unit module Config::BINDish::Ext1;
+    use Config::BINDish;
+    role Grammar is BINDish-grammar {
+        token value:sym<mine> {
+            ...
+        }
+    }
+    role Actions is BINDish-actions {
+        method value:sym<mine>($/) {
+            ...
+        }
     }
 
-A config can be parse in either strict or relaxed mode. Depending on chosen mode, the terminating semi-colon can be either optional or mandatory. For the above sample in strict mode the `category` block declaration would be an error because its closing `}` is not followed with `;`. Contrary, in relaxed mode one can safely remove the ending semi-colon after `products` as as well as after `"item3"` too.
+In this case the role they're applied to will be auto-registered with `Config::BINDish`. When such extension is contained by a module then it would be added when the module is `use`d:
 
-More information about strictness modes can be found in [`Config::BINDish::Grammar::Strictness`](docs/md/Config/BINDish/Grammar/Strictness.md)
+    use Config::BINDish::Ext1;
+    use Config::BINDish::Ext2;
 
-Note how term `block-name` in the grammar is declared as a `value`. It means that any valid option value can serve as the block name. For example:
+*Note* that considering the order of `use` statements, `Ext2` will be able to override methods of `Ext1`.
 
-    block 3.14 { }
+The specificifty of using the traits is that extensions declared this way will become application-wide available. So, even if the extension module is used by a module used by the main code, the extension will be available to any instance of `Config::BINDish`.
 
-Or, with [`Config::BINDish::INET`](docs/md/Config/BINDish/INET.md) loaded it could even be:
+**Note:** We say that extensions registered with the traits are registered *statically*.
 
-    network 192.168.1.0/24 {
-    }
+The other 1.5 ways of adding the extensions are to use `extend-grammar` and `extend-actions` constructor arguments or methods with the same names:
 
-Comments
---------
+    my $cfg = Config::BINDish.new: :extend-grammar(ExtG1, ExtG2), :extend-actions(ExtA1, ExtA2);
+    $cfg.extend-grammar(ExtG3)
+        .extend-actions(ExtA3);
 
-Similarly to the original BIND 9 format, `Config::BINDish` supports C, C++, and Unix-style comments:
+In this case extension roles don't need the traits applied. This way we call *dynamic* registration.
 
-    // C++
-    /*
-     * C
-     */
-    # Unix
+The other specific of dynamic extensions is that they will go after the static ones. I.e. in the above examples `ExtG*` and `ExtA*` will be positioned before `Ext1` and `Ext2` in the MRO order, prioritizing the former over the latter ones.
 
-Comments are considered statements on their own. This limits where a comment can be placed. For example, it's not possible to have a comment inside an option or a block declaration:
+Why is the above called *1.5 ways*? Because the constructor eventually uses the `extend-*` methods with corresponding `:extend-*` named attributes.
 
-    pi /* not ok between option keyword and value! */ 3.1415926; # but it's ok post-option
-    server /* not allowed here! */ 1 { // But here
-        /*
-         * or here
-         * where we can make it a comprehensive description
-         */
-    }
+See also [`Config::BINDish::Grammar`](BINDish/Grammar.md) and [`Config::BINDish::Actions`](BINDish/Actions.md).
 
-Options
+ATTRIBUTES
+==========
+
+[`Config::BINDish::Grammar::Strictness`](BINDish/Grammar/Strictness.md) `$.strict`
+----------------------------------------------------------------------------------
+
+The default grammar strictness mode. See [`Config::BINDish::Grammar::Strictness`](BINDish/Grammar/Strictness.md) documentation for details.
+
+[`Pair:D`](https://docs.raku.org/type/Pair) `@.blocks`, [`Pair:D`](https://docs.raku.org/type/Pair) `@.options`
+---------------------------------------------------------------------------------------------------------------
+
+These two attributes contain user-defined (pre-declared) structure of the config file. More information about them can be found in [Config::BINDish::Grammar](BINDish/Grammar.md) documentation, in [Pre-declaration](BINDish/Grammar.md#Pre-declaration) section.
+
+`$.grammar`, `$.actions`
+------------------------
+
+The final grammar and actions class versions with all registered extensions applied. Both attributes are *lazy* and `clearable` in terms of [`AttrX::Mooish`](https://modules.raku.org/dist/AttrX::Mooish). It means that the following is possible:
+
+    say $cfg.grammar.^name; # Config::BINDish::Grammar...
+    $cfg.extend-grammar(MyApp::GrammarMod);
+    $cfg.clear-grammar;     # Actually, extend-grammar already does this. This line is here to demo the concept only.
+    say $cfg.grammar.^name; # Config::BINDish::Grammar+{MyApp::GrammarMod}...
+
+[`IO::Path`](https://docs.raku.org/type/IO::Path) `$.file`
+----------------------------------------------------------
+
+If `read` method was called with `:file<...>` argument then this attribute will hold corresponding `IO::Path` object for the file name.
+
+[`Bool`](https://docs.raku.org/type/Bool) `$.flat = False`
+----------------------------------------------------------
+
+If set to `True` then [`Config::BINDish::Actions`](BINDish/Actions.md) will act in flattening mode.
+
+`$.top`
 -------
 
-An option is declared with a keyword and an optional value. If the value is omitted then option is considered to have a *true* boolean value:
+The top node produced by the grammar actions. I.e. it is the result of `$<TOP>.ast` of the [`Match`](https://docs.raku.org/type/Match) object produced by grammar's `parse` method. For [`Config::BINDish::Actions`](BINDish/Actions.md) it would be an instance of [`Config::BINDish::AST::TOP`](BINDish/AST/TOP.md). But an extension can produce something to its taste which wouldn't be an AST whatsoever. The only requirement imposed on the object stored in the attribute is to provide `get` method.
 
-    option; # True
-    option on; # Same as above
-    foo yes; # Also true
-    bar off; # False
-    min-size 1024; # or 1K
-    max-size 1.5M;
-    description "bla-bla-bla";
-    refers_to a-block; # same as using "a-block" but can serve as a hint of special case
+This attribute `handles` method `get`.
 
-Options are characterized by three properties inherited from their values: the payload which is the value itself; Raku value type; and a type name providing more information about the purpose of the value. For example, the option `description` from the above example is a [`Str`](https://docs.raku.org/type/Str) with type name *dq-string* which is a shorthand for "double-quoted string". A string can also be single-quoted, or *sq-string*. Now, when we need this, we can decide how to handle a string value based on its type name. Traditionally one could expect a double-quoted string to be expanded if it contains references to other options.
+`$.match`
+---------
 
-Options can be pre-declared. It means that for some options the parser may impose certain restrictions. One of the most typical constraints would be option's type. Say, `max-size` can be set to only be OK if its value is an integer. Then whenever parser finds something like
+This attribute stores the [`Match`](https://docs.raku.org/type/Match) object produced by grammar's `parse` method.
 
-    max-size "1024";
+METHODS
+=======
 
-It will throw an error.
+`extend-grammar( +@ext )`, `extend-actions( +@ext )`
+----------------------------------------------------
 
-An option can also be limited as to where it can appear. For example, if a `resolver` option is set to be allowed only inside a `network` block then:
+Interface to dynamically register extensions. Take a list of roles and records them as extensions. Then it clears `$.grammar` or `$.actions` attributes, respectively. Both return `self` to allow method call chaining.
 
-    network "office" {
-        resolver "default"; # OK
-    }
-    resolver "default"; # Error: option cannot be used here
+`build-grammar()`, `build-actions()`
+------------------------------------
 
-Moreover, if strict mode is set for options the parser will only allow pre-declared ones.
+Methods used by [`AttrX::Mooish`](https://modules.raku.org/dist/AttrX::Mooish) to lazily initialize `$.grammar` and `$.actions` attributes respectively.
 
-Including Configs
------------------
+`multi method read(Config::BINDish:U: |args)`
 
-With `include <source>` statement a configuration from `<source>` is injected into the location where the `include` is used. For example, we have a file *common.inc*:
+Instantiates `Config::BINDish` class and re-invokes `read` method on the instance with `args` capture.
 
-    foo 42;
-    bar {
-        message "thanks for the fish!";
-    }
+`multi method read(IO:D(Str:D) :$file, |args)`, `multi method read(Str:D :$string, |args)`
+------------------------------------------------------------------------------------------
 
-And a config akin to the followin one:
+Parses a configuration stored either in a `$string` or in a `$file` and returns the resulting [`Match`](https://docs.raku.org/type/Match) object. The capture `args` is passed over to the `parse` method of `$.grammar` alongside with `$.actions`, `$.strict`, `$.flat`, `%.blocks`, and `%.options` attributes.
 
-    include ./common.inc;
-    baz {
-        include ./common.inc;
-    }
+The method returns what is returned by grammar's `parse` method. The same value is then stored in `$.match` attribute.
 
-Now option `foo` is available both at the top and block `baz` contexts, as well as block `bar`.
+### `multi get(...)`
 
-Blocks
-------
+Method is handled by `$.top` attribute. See [`Config::BINDish::AST::Blockish`](BINDish/AST/Blockish.md) for detailed method description.
 
-Blocks purpose is to logically group a set of options or other blocks.
+EXPORTS
+=======
 
-Block is declared with a type, a name, and a class. The only mandatory element of block declaration is the type:
+By default this module exports only `BINDish-grammar` and `BINDish-actions` traits. But if `use`d with either "op" or "ascii-op" positional arguments it will also export _request operator_ in either unicode or ASCII form:
 
-    foo { }             # Minimal declaration
-    foo "bar" { }       # A named block
-    foo "bar" class { } # A named and classified block
+    use Config::BINDish <op>;
+    my $cfg = Config::BINDish.new.read(...);
+    say $cfg ∷ :top-block<name> ∷ "option";
 
-The concept of classifying was taken from BIND 9 configuration format. But it can be proved to be useful in complex setups. Consider for example:
+Or:
 
-    rack "A001.2" servers { ... };
-    rack "A001.2" patch-panels { ... };
-    rack "A001.2" switches { ... };
+    use Config::BINDish <ascii-op>;
+    my $cfg = Config::BINDish.new.read(...);
+    say $cfg :: :top-block<name> :: "option";
 
-Apparently, classes could be incorporated into the name part of a block declaration, or be a part of block type (so, we get `rack-switches`), but the above example most certainly looks way better than the alternatives.
+*Note* that `::` (ASCII version) may conflict with Raku's name resolution. Though in my tests this never happened, I would still prefer the unicode version over the ASCII.
 
-There is no limit on nesting blocks:
-
-    rack "A001.2" servers {
-        server "nas-1" {
-            interface 1 {
-                network "office";
-            }
-            interface 2 {
-                network "warehouse";
-            }
-        }
-    }
-    network "office" {
-        cidr "172.1.2.0/24";
-        gw "172.1.2.1";
-        nameservers {
-            "172.1.2.5";
-            "172.1.5.5";
-        }
-    }
-
-*NB* We use strings for IP addresses. But with bundled [`Config::BINDish::INET`](docs/md/Config/BINDish/INET.md) extension one can have it like `gw 172.1.2.1;`. But this paper tries to stick to the barebones module as much as possible.
-
-So far the examples written as if the parser works in relaxed mode. In strict mode the rule of *mandatory semi-colon* applies and a block must always be terminated with `;`:
-
-    network { ... };
-
-An option can also omit the semi-colon if it is followed by a closing curly in non-strict mode:
-
-    interface 1 { network "office" }
-
-One could have already noticed `nameservers` block in the above extensive example. This is a kind of thing often to be met in BIND 9 configuration. For example, this is how ACLs are declared:
-
-    acl our-nets { x.x.x.x/24; x.x.x.x/21; };
-
-Apparently, `Config::BINDish` also supports this kind of syntax and call it "value blocks". But a value block is not by default limited to values only and can also contain options or subblocks:
-
-    nameservers {
-        "172.1.2.5";
-        "172.1.5.5";
-        foreign "google" {
-            "8.8.8.8";
-            priority -100;
-        }
-        foreign "provider" {
-            "A.B.C.D";
-            priority -1;
-        }
-    }
-
-Here we have two additional value subblocks defining fallback nameservers for cases when our own ones are down. Oops, but we all know – s... things happen!
-
-Yet, a block could be limited to be a value-only one. In this case the above example will become an error. Aside of this and similarly to options, blocks can also be restricted as to:
-
-- where they can appear - whether they require a name or/and a class - what value type(s) can be used within the block
-
-Directives
-----------
-
-`Config::BINDish` supports special directives similar to what C is using. Currently the only implemented directive is `#line`:
-
-    #line 13 "mock-file.conf" Here go a comment
-
-The meaning of the directive is the same as in C: it makes the grammar to pretend that lines below the directive are located in file *mock-file.conf* starting with its line 13. If the directive is followed by something like this:
-
-    #
-    opt 1 2 3;
-
-then when a error is reported it will point at line 14 in *mock-file.conf*.
-
-Note that the file name part of `#line` can either be omitted or use any valid option value. For example, with [`Config::BINDish::INET`](docs/md/Config/BINDish/INET.md) one can do something like:
-
-    #line 1 https://configs.local/common/std.inc
-
-It would then be only a matter of overriding [`Config::BINDish::Grammar`](docs/md/Config/BINDish/Grammar.md) `include-source` method to provide support for URLs.
-
-Hybrid mode
------------
-
-It is possible for a grammar to run in relaxed mode but still have some options and/or blocks pre-declared. These pre-declarations are always respected by the parser. This mode of operation when some options/blocks are constrained while others are ok to be free-form is called *hybrid mode*.
-
-Module Extensibility
---------------------
-
-One of the key ideas behind this module is the ability to extend its parsing capabilities by 3rd-party modules or user code. Normally this could be done by creating roles with `BINDish-grammar` or `BINDish-actions` traits applied. ([`Grammar`](https://docs.raku.org/type/Grammar)). Most of the time the purpose of such extensions would be to provide new value types. But they could as well add new syntax constructs, or change behavior of the existing ones, or something I currently can't forecast. When one starts with
-
-    role MyExt::Grammar is BINDish-grammar {
-    }
-    role MyExt::Actions is BINDish-actions {
-    }
-
-where they end is totally up to them!
+More information about the operator can be found in [`Config::BINDish::Ops`](BINDish/Ops.md).
 
 SEE ALSO
 ========
 
-[`Config::BINDish`](docs/md/Config/BINDish.md), [ChangeLog](ChangeLog.md)
+[README.md](../../../README.md)
+
+[`Config::BINDish::Grammar`](BINDish/Grammar.md), [`Config::BINDish::AST`](BINDish/AST.md), [`Config::BINDish::Ops`](BINDish/Ops.md), [`Config::BINDish::Expandable`](BINDish/Expandable.md), [`Config::BINDish::INET`](BINDish/INET.md)
 
 AUTHOR
 ======
