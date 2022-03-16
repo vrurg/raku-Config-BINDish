@@ -49,8 +49,14 @@ class Value does TypeStringify {
         $!type ~~ Stringy ?? $quote ~ $val ~ $quote !! $val
     }
 
-    method build-coerced(::?CLASS:D: --> Mu) {
-        -> ::T { T($!payload) }.($!type)
+    method build-coerced(::?CLASS:D: |c --> Mu) {
+        -> ::T {
+            my Mu $coerced = try T($!payload);
+            if $! && $! ~~ X::Coerce::Impossible {
+                $coerced = T($!payload.Str);
+            }
+            $coerced
+        }.($!type)
     }
 }
 
