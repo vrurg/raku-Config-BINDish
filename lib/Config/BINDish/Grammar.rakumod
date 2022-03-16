@@ -129,6 +129,17 @@ class BlockProps
     has Bool $.classified;
     # Block can only contain values, no options or blocks allowed
     has Bool:D $.value-only = False;
+    # Block may not contain values. Conflicts with the above.
+    has Bool:D $.no-values = False;
+
+    submethod TWEAK(|) {
+        my $value-prop = $!value-only ?? 'value-only' !! ($!value-sym ?? 'value-sym' !! Nil);
+        if $value-prop && $!no-values {
+            Config::BINDish::X::ConflictingProps.new(
+                :prop1($value-prop), :prop2<no-values>,
+                :reason("both are set for block '" ~ self.keyword ~ "'" )).throw
+        }
+    }
 
     method values {
         return .List with $.default;
@@ -620,6 +631,10 @@ method validate-value {
     my $ctx = $*CFG-CTX;
     my $props = $ctx.props;
     if $props.defined && $props ~~ ContainerProps {
+        if $ctx ~~ Context::Block && $props.no-values {
+            self.panic: Config::BINDish::X::Parse::NoValueBlock,
+                :what($ctx.type.lc), :keyword($ctx.keyword), :$ctx
+        }
         unless (my $value = $*CFG-VALUE) ~~ $props {
             self.panic: X::Parse::ValueType, :what($ctx.type.lc), :keyword($ctx.keyword), :$ctx, :$value
         }

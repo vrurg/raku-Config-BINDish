@@ -91,6 +91,15 @@ class Config::BINDish::X::Parse::ValueType
     }
 }
 
+class Config::BINDish::X::Parse::NoValueBlock
+    does Config::BINDish::X::Parse
+    does Config::BINDish::X::Contextish
+{
+    method message {
+        self.wrap-message: "A value encountered in a non-value block " ~ $.keyword.gist
+    }
+}
+
 class Config::BINDish::X::Parse::SpecificValue
     does Config::BINDish::X::Parse
     does Config::BINDish::X::Contextish
@@ -243,5 +252,14 @@ class Config::BINDish::X::ContextType is Config::BINDish::X {
     has Str:D $.type is required;
     method message {
         "Unknown parse context type '$.type'"
+    }
+}
+
+class Config::BINDish::X::ConflictingProps is Config::BINDish::X {
+    has Str:D $.prop1 is required;
+    has Str:D $.prop2 is required;
+    has Str:D $.reason is required;
+    method message {
+        "Options '$.prop1' and '$.prop2' are conflicting: " ~ $.reason
     }
 }

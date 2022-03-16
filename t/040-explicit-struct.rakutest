@@ -35,6 +35,7 @@ my $cfg = Config::BINDish.new:
             :numbers => { :in<subsystem>, :type(Numeric), :value-only, :value-sym<int rat num> },
             :strings => { :in<subsystem general>, :type(Stringy), :value-only },
             blist => { :named, :!classified, :type-name<keyword>, :value-only },
+            :unvaluable => { :no-values },
             lookup => { :value-sym<string file-path>, :value-only },
             :classy => { :named, :classified },
         ),
@@ -42,7 +43,7 @@ my $cfg = Config::BINDish.new:
             base => { :in<paths>, type => Str },
             max => { :in<general>, type => Int },
             multi-type => { :in<general>, type => Int | Rat },
-            stringy => { :in<general>, type-name => /\- string$/ },
+            stringy => { :in{:general, :unvaluable}, type-name => /\- string$/ },
             pathy => { value-sym => <file-path>, type => Str },
             :desc => { :in(:classy<described>), type => Str },
         );
@@ -97,7 +98,7 @@ subtest "Syntax" => {
 }
 
 subtest "Structure" => {
-    plan 5;
+    plan 7;
 
     throws-like { $cfg.read: string => q:to/CFG/;
                                         my-top {
@@ -161,6 +162,24 @@ subtest "Structure" => {
                 Config::BINDish::X::Parse::SpecificValue,
                 "bad value type within a value-only block when specific value-sym is used",
                 :message(/"Block 'numbers' value must be int, or rat, or num"/);
+
+    lives-ok { $cfg.read: string => q:to/CFG/;
+                                    unvaluable {
+                                        stringy "ok";
+                                    }
+                                    CFG
+         },
+        "a no-values block";
+
+    throws-like { $cfg.read: string => q:to/CFG/;
+                                        unvaluable {
+                                            "not ok";
+                                        }
+                                        CFG
+                },
+        Config::BINDish::X::Parse::NoValueBlock,
+        "a non-value block with a value",
+        :message(/"A value encountered in a non-value block 'unvaluable'"/);
 }
 
 subtest "Value validation" => {
