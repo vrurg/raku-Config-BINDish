@@ -40,25 +40,14 @@ my @tests =
             block-head => block-type => 'logging',
             block-body => token-statements(
                 statements => %(
-                    0 => %(
-                        block-head => block-type => 'file',
-                        block-body => token-statements(
-                            statements => %(
-                                0 => UNIX-comment => comment-body => ' ./test-1.log;',
-                                1 => value => './test-2.log',
-                                2 => %(
-                                    option-name => 'level',
-                                    option-value => q<DEBUG>,
-                                ),
-                                3 => UNIX-comment => comment-body => ' level INFO;',
-                            )
-                            )
-                    ),
-                )
-                ),
-        ),
-    ),
-    ;
+                    0 => %( block-head => block-type => 'file',
+                            block-body => token-statements(
+                                statements => %(
+                                    0 => UNIX-comment => comment-body => ' ./test-1.log;',
+                                    1 => value => './test-2.log',
+                                    2 => %( option-name => 'level',
+                                            option-value => q<DEBUG> ),
+                                    3 => UNIX-comment => comment-body => ' level INFO;' )))))));
 
 plan +@tests, :parallel;
 run-grammar-tests $cfg.grammar, @tests, :strict{:blocks, :options};
