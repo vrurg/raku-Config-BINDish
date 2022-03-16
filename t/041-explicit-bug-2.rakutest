@@ -1,0 +1,66 @@
+use v6.d;
+use Test::Async <Config::BINDish::Test Base>;
+use Config::BINDish;
+use Config::BINDish::Grammar;
+use Config::BINDish::Expandable;
+use Config::BINDish::INET;
+use Config::BINDish::AST;
+use Config::BINDish::X;
+use IP::Addr;
+
+# Test a concurrence case where a commented out line could be treated as a file value.
+
+role CustomExt is BINDish-grammar {
+    submethod setup-BINDish {
+        self.declare-blocks:
+            logging => ( :in<.TOP>, :!named ),
+            :log-file<file> => ( :in<logging>, :value-sym<file-path string> ),
+            ;
+        self.declare-options:
+            :log-level<level> => (:in<log-file>, :type(Str) ),
+            ;
+    }
+}
+
+my $cfg = Config::BINDish.new: :strict(:blocks, :options);
+
+my @tests =
+    "commented file path value" => %(
+        source => q:to/CFG/,
+            logging {
+                file {
+                    # ./test-1.log;
+                    ./test-2.log;
+                    level DEBUG;
+                    # level INFO;
+                }
+            }
+            CFG
+        top => statements => 0 => %(
+            block-head => block-type => 'logging',
+            block-body => token-statements(
+                statements => %(
+                    0 => %(
+                        block-head => block-type => 'file',
+                        block-body => token-statements(
+                            statements => %(
+                                0 => UNIX-comment => comment-body => ' ./test-1.log;',
+                                1 => value => './test-2.log',
+                                2 => %(
+                                    option-name => 'level',
+                                    option-value => q<DEBUG>,
+                                ),
+                                3 => UNIX-comment => comment-body => ' level INFO;',
+                            )
+                            )
+                    ),
+                )
+                ),
+        ),
+    ),
+    ;
+
+plan +@tests, :parallel;
+run-grammar-tests $cfg.grammar, @tests, :strict{:blocks, :options};
+
+done-testing;

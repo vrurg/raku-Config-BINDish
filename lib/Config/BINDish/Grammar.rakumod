@@ -934,6 +934,8 @@ token num_suffix {
 }
 
 method maybe-specific-value(Str:D $what --> Mu) is raw {
+    # A value cannot start with a comment-like sequence.
+    return self.new(:$.from, to => -3) if self.postmatch.starts-with('#' | '//' | '/*');
     my $ctx = $*CFG-CTX;
     my $props = $ctx.props;
     with $props {
@@ -947,14 +949,16 @@ method maybe-specific-value(Str:D $what --> Mu) is raw {
             }
             # We either have a non-value or a wrong value type. Try parsing as an option first if current context is a
             # value-only block as the rule would throw correct context exception then.
-            if $ctx ~~ Context::Block && $ctx.props.value-only {
+            my $expected-specific = $ctx ~~ Context::Option && $ctx.props.value-sym;
+            if !$expected-specific && $ctx ~~ Context::Block && $ctx.props.value-only {
                 self."statement:sym<option>"();
+                $expected-specific = True;
             }
-            self.panic: X::Parse::SpecificValue, :$what, :$ctx, :keyword( $ctx.keyword )
+            self.panic: X::Parse::SpecificValue, :$what, :$ctx, :keyword( $ctx.keyword ) if $expected-specific;
+            return self.new(:$.from, to => -3);
         }
     }
-    my $m := self.value;
-    $m
+    self.value
 }
 
 proto token value {*}
@@ -1014,9 +1018,16 @@ token path-component {
     <[\N] - [;/]>+
 }
 multi token value:sym<file-path> {
+    :my Value $*CFG-KEYWORD;
     [
         | [['.' | '..' ]? '/' <.path-component>* %% '/']
-        | <?{ $*CFG-SPECIFIC-VALUE-SYM andthen $_ eq 'file-path' }> <.path-component>+ %% '/'
+        | [ <?{ $*CFG-SPECIFIC-VALUE-SYM andthen $_ eq 'file-path' }>
+            # Option-like looking path is only accepted when:
+            # - it's an option value
+            # - it belongs to a value-only block
+            [ <?{ $_ ~~ Context::Option || .cur-block-ctx.props.value-only with $*CFG-CTX }>
+            | <!before <.option-name>> ]
+            <.path-component>+ %% '/' ]
     ]
     { self.set-value: Str, :file-path($/) }
 }

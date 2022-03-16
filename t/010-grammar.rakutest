@@ -510,6 +510,28 @@ subtest "Grammar Basics", {
                             0 => value => "1.1",
                             1 => value => "2.2",
                             2 => value => "3.3")))),
+        "file values" => %(
+            source => q:to/CFG/,
+                        bmix {
+                            ./file1.ext;
+                            # ./file2.ext;
+                            flag on;
+                        }
+                        CFG
+            top => statements => 0 => %(
+                block-head => block-type => 'bmix',
+                block-body => token-statements(
+                    statements => %(
+                        0 => value => "./file1.ext",
+                        1 => UNIX-comment => "# ./file2.ext;",
+                        2 => %(
+                            option-name => 'flag',
+                            option-value => "on",
+                        )
+                    )
+                    )
+            )
+        ),
         ;
 
     plan +@tests, :parallel;
