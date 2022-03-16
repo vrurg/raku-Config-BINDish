@@ -4,6 +4,19 @@ VERSIONS
 head
 ====
 
+v0.0.12
+
+  * A new `no-values` block property in pre-declarations to declare option-only blocks
+
+  * Implemented value constraints via a new `where` pre-declaration property
+
+  * Fixed a race condition which allowed for non-values to be parsed as values
+
+  * Fixed a problem when a type cannot coerce from a `Match` object
+
+head
+====
+
 v0.0.11
 
   * Fix `AttrX::Mooish` dependency version

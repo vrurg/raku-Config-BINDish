@@ -1,6 +1,13 @@
 =begin pod
 =head1 VERSIONS
 
+=head v0.0.12
+
+=item A new C<no-values> block property in pre-declarations to declare option-only blocks
+=item Implemented value constraints via a new C<where> pre-declaration property
+=item Fixed a race condition which allowed for non-values to be parsed as values
+=item Fixed a problem when a type cannot coerce from a C<Match> object
+
 =head v0.0.11
 
 =item Fix C<AttrX::Mooish> dependency version
