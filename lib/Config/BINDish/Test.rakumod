@@ -113,13 +113,13 @@ method is-cfg-stmt-list(Mu:D $match is raw,
     }
 }
 
-method run-grammar-tests(Mu \grmr, *@tests) is test-tool(:!wrap) {
+method run-grammar-tests(Mu \grmr, *@tests, *%params) is test-tool(:!wrap) {
     self.anchor: {
         for @tests -> ( :key($message), :value(%struct) ) {
             my $match;
             my $ex;
             try {
-                $match = grmr.parse: %struct<source>;
+                $match = grmr.parse: %struct<source>, |%params;
                 CATCH {
                     default {
                         $ex = $_;
