@@ -86,7 +86,7 @@ subtest "Explicit Struct" => {
                                         }
                                         CFG
                 },
-                Config::BINDish::X::Parse::ValueType,
+                Config::BINDish::X::Parse::Value,
                 "can't use ipv4 when ipv6 is expected",
                 :message(/"Option 'ip' expects a " .*? ipv6 <.wb> .*? "value but got <ipv4>"/);
 
@@ -96,7 +96,7 @@ subtest "Explicit Struct" => {
                                         }
                                         CFG
                 },
-                Config::BINDish::X::Parse::ValueType,
+                Config::BINDish::X::Parse::Value,
                 "can't use ipv4 when ipv6 is expected",
                 :message(/"Option 'ip' expects a <ipv4> value but got <ipv6>"/);
 }

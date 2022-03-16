@@ -78,16 +78,29 @@ class Config::BINDish::X::Parse::ExtraPart does Config::BINDish::X::Parse {
     }
 }
 
-class Config::BINDish::X::Parse::ValueType
+class Config::BINDish::X::Parse::Value
     does Config::BINDish::X::Parse
     does Config::BINDish::X::Contextish
 {
     has $.value is required;
     method message {
-        self.wrap-message: $.what.tc
-                           ~ " " ~ $.keyword.gist
-                           ~ " expects a " ~ $.ctx.props.type-as-str
-                           ~ " value but got " ~ $.value.type-as-str;
+        my $context = $.what.tc ~ " " ~ $.keyword.gist;
+        my $props = $.ctx.props;
+        my $got;
+        my $why;
+        if !($props.can-type-name($.value) && $props.can-type($.value)) {
+            $got = $.value.type-as-str
+        }
+        else {
+            $got = $.value.gist;
+            $why = $props.why;
+        }
+        self.wrap-message:
+            $context
+                ~ " expects a " ~ $props.type-as-str
+                ~ " value"
+                ~ |(" (" ~ $_ ~ ")" with $why)
+                ~ " but got " ~ $got
     }
 }
 

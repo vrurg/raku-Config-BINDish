@@ -739,7 +739,7 @@ subtest "Explicit Structure" => {
                                                    :@blocks,
                                                    :@options).sink;
                 },
-                Config::BINDish::X::Parse::ValueType,
+                Config::BINDish::X::Parse::Value,
                 "correct line number reported for an option with bad value in .TOP",
                 line => 2;
 
@@ -754,7 +754,7 @@ subtest "Explicit Structure" => {
                                                    :@blocks,
                                                    :@options).sink;
                 },
-                Config::BINDish::X::Parse::ValueType,
+                Config::BINDish::X::Parse::Value,
                 "correct line number reported for an option with bad value in a subblock",
                 line => 3;
 }

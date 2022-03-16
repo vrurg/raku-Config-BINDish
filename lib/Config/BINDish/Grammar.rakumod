@@ -94,21 +94,43 @@ role ContainerProps does TypeStringify {
     has List(Str) $.value-sym;
     # These attributes are used as RHS of a smartmatch.
     # NOTE: These are kept separate from StatementProps because extensions may add non-container type statements.
-    has $.type-name;
+    has Mu $.type-name;
     has Mu $.type;
     # Default value of a container
     has Mu $.default is default(Nil);
+    # A matcher to be used against value, akin to routine parameter's 'where' clause
+    has Mu $.where = True;
+    # A short string to explain to the user why 'where' failed. For example: "only positive values"
+    has Str $.why;
 
-    # Don't forget keeping can-type and ACCEPTS in sync in their semantics until inlining would be able to
-    # sufficiently optimize ACCEPTS calling can-type
-    method can-type(Str $type-name, Mu $type) {
-        (!$!type-name.defined || $type-name ~~ $!type-name)
-        && ($!type =:= Mu || $type ~~ $!type)
+    proto method can-type($) {*}
+    multi method can-type(Value:D $value) {
+        samewith($value.type)
+    }
+    multi method can-type(Mu $type is raw) {
+        $!type =:= Mu || $type ~~ $!type
+    }
+
+    proto method can-type-name($) {*}
+    multi method can-type-name(Value:D $value) {
+        samewith($value.type-name)
+    }
+    multi method can-type-name(Str:D $type-name) {
+        !$!type-name.defined || $type-name ~~ $!type-name
+    }
+
+    proto method can-value($) {*}
+    multi method can-value(Value:D $val) {
+        $!where === True || $val.coerced ~~ $!where
+    }
+    multi method can-value(Mu:D $value) {
+        $!where == True || $value ~~ $!where
     }
 
     multi method ACCEPTS(Value:D $val) {
-        (!$!type-name.defined || $val.type-name ~~ $!type-name)
-        && ($!type =:= Mu || $val.type ~~ $!type)
+        self.can-type($val)
+            && self.can-type-name($val)
+            && self.can-value($val)
     }
 }
 
@@ -590,7 +612,12 @@ method validate-option {
             unless $props.defined && $props ~~ $blk-ctx && !$blk-ctx.props.value-only;
         my $value = $*CFG-VALUE // Value.new: :type(Bool), :type-name('bool'), :payload<True>;
         unless $value ~~ $props {
-            self.panic: X::Parse::ValueType, :what<option>, :keyword($*CFG-KEYWORD), :$ctx, :$value
+            self.panic:
+                Config::BINDish::X::Parse::Value,
+                :what<option>,
+                :keyword($*CFG-KEYWORD),
+                :$ctx,
+                :$value
         }
     }
     elsif $grammar.strict.options {
@@ -642,7 +669,12 @@ method validate-value {
                 :what($ctx.type.lc), :keyword($ctx.keyword), :$ctx
         }
         unless (my $value = $*CFG-VALUE) ~~ $props {
-            self.panic: X::Parse::ValueType, :what($ctx.type.lc), :keyword($ctx.keyword), :$ctx, :$value
+            self.panic: Config::BINDish::X::Parse::Value,
+                    :what($ctx.type.lc),
+                :keyword($ctx.keyword),
+                :$ctx,
+                :$value,
+                |(:why($_) with $props.why)
         }
     }
 }
@@ -990,7 +1022,9 @@ multi token value:sym<string> {
 multi token value:sym<bool> {
     # Make sure we don't parse for pre-declared non-boolean containers
     <?{ (my $ctx = $*CFG-CTX)
-        && (!$ctx.props.defined || $ctx.props.can-type('bool', Bool)) }>
+        && (!(my $props = $ctx.props).defined
+            || ($props.can-type(Bool)
+                && $props.can-type-name('bool'))) }>
     <boolean> { self.set-value: Bool, :bool($/) }
 }
 

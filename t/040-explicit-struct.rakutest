@@ -42,6 +42,7 @@ my $cfg = Config::BINDish.new:
         options => (
             base => { :in<paths>, type => Str },
             max => { :in<general>, type => Int },
+            min => { :in<general>, type => Int, :where(* >= 2), :why('must be 2 or more') },
             multi-type => { :in<general>, type => Int | Rat },
             stringy => { :in{:general, :unvaluable}, type-name => /\- string$/ },
             pathy => { value-sym => <file-path>, type => Str },
@@ -147,7 +148,7 @@ subtest "Structure" => {
                                         }
                                         CFG
                 },
-                Config::BINDish::X::Parse::ValueType,
+                Config::BINDish::X::Parse::Value,
                 "bad value type within a value-only block",
                 :message(/"Block 'strings' expects a (Stringy) value but got <rat> of (Rat)"/);
 
@@ -183,10 +184,10 @@ subtest "Structure" => {
 }
 
 subtest "Value validation" => {
-    plan 22;
+    plan 23;
 
     throws-like { $cfg.read: string => q<op-top 1;>; },
-                Config::BINDish::X::Parse::ValueType,
+                Config::BINDish::X::Parse::Value,
                 "bad option value type",
                 :message(/"Option 'op-top' expects a (Str) value but got <int> of (Int)"/);
 
@@ -207,9 +208,19 @@ subtest "Value validation" => {
                     }
                     CFG
                 },
-                Config::BINDish::X::Parse::ValueType,
+                Config::BINDish::X::Parse::Value,
                 :message(/"Option 'op-bool' expects a (Bool) value but got <keyword> of (Str)"/),
                 "boolean option with a non-boolean keyword";
+
+    throws-like { $cfg.read: string => q:to/CFG/;
+                                general {
+                                    min 1;
+                                }
+                                CFG
+                },
+        Config::BINDish::X::Parse::Value,
+        "option in a block, value doesn't pass `where` constraint",
+        :message(/"Option 'min' expects a (Int) value (must be 2 or more) but got 1"/);
 
     throws-like { $cfg.read: string => q:to/CFG/;
                                 general {
@@ -217,7 +228,7 @@ subtest "Value validation" => {
                                 }
                                 CFG
                 },
-                Config::BINDish::X::Parse::ValueType,
+                Config::BINDish::X::Parse::Value,
                 "option in a block, bad value",
                 :message(/"Option 'max' expects a (Int) value but got <rat> of (Rat)"/);
 
@@ -239,7 +250,7 @@ subtest "Value validation" => {
                                         }
                                         CFG
                 },
-                Config::BINDish::X::Parse::ValueType,
+                Config::BINDish::X::Parse::Value,
                 "bad value type in a block",
                 :message(/"Block 'strings' expects a (Stringy) value but got <rat> of (Rat)"/);
 
@@ -271,7 +282,7 @@ subtest "Value validation" => {
                                         }
                                         CFG
                 },
-                Config::BINDish::X::Parse::ValueType,
+                Config::BINDish::X::Parse::Value,
                 "multi-type option only accepts allowed types",
                 :message(/"Option 'multi-type' expects a any((Int), (Rat)) value but got <num> of (Num)"/);
 
@@ -281,7 +292,7 @@ subtest "Value validation" => {
                                         }
                                         CFG
                 },
-                Config::BINDish::X::Parse::ValueType,
+                Config::BINDish::X::Parse::Value,
                 "stringy option only accepts '-string' named types",
                 :message(/"Option 'stringy' expects a \/\\- string\$\/ value but got <int> of (Int)"/);
 
@@ -291,7 +302,7 @@ subtest "Value validation" => {
                                         }
                                         CFG
                 },
-                Config::BINDish::X::Parse::ValueType,
+                Config::BINDish::X::Parse::Value,
                 "stringy option doesn't accept a keyword even though it's a Str",
                 :message(/"Option 'stringy' expects a \/\\- string\$\/ value but got <keyword> of (Str)"/);
 
@@ -347,7 +358,7 @@ subtest "Value validation" => {
                                         }
                                         CFG
                 },
-                Config::BINDish::X::Parse::ValueType,
+                Config::BINDish::X::Parse::Value,
                 "value-only block constrained by type-name",
                 :message(/"Block 'blist' expects a <keyword> value but got <dq-string> of (Str)"/);
 
@@ -486,7 +497,7 @@ subtest "Advanced Nesting" => {
                                         }
                                         CFG
             },
-            Config::BINDish::X::Parse::ValueType,
+            Config::BINDish::X::Parse::Value,
             "multi-variant option with incorrect value type";
     }
 
@@ -550,7 +561,7 @@ subtest "Advanced Nesting" => {
                                     }
                                     CFG
                     },
-                    Config::BINDish::X::Parse::ValueType,
+                    Config::BINDish::X::Parse::Value,
                     "wrong option value type in a multi-variant block throws";
     }
 
