@@ -566,7 +566,7 @@ The particular properties will be listed later in this section. For now let's fo
 
 There is a reason for the descriptor to consist of two elements. If we consider an option, its keyword might not be unique across config, but it can have different meaning within different blocks. Often it would mean different value types allowed for use too:
 
-    lan "Data Center" {
+    LAN "Data Center" {
         server "microservices.my.net" {
             location "Room C3, Rack 1234";
         }
@@ -781,6 +781,18 @@ Here is an example of how this peculiarity can be used:
         access-rules { allow { any } }
     }
 
+#### `no-values`
+
+Block-only. This property is a direct opposite to `value-only` as blocks declared with it can not hold any values. So, a declaration like this:
+
+    foo => { :no-values }
+
+will cause the following to throw:
+
+    foo { "bar"; }
+
+Since the property is clearly conflicting with `value-only` use of both within a block declaration will result in an exception thrown.
+
 #### `default`
 
 Specifies the default value of a statement. When used with a block declaration then multiple values can be used.
@@ -795,6 +807,27 @@ Specifies the default value of a statement. When used with a block declaration t
     )
 
 Default values are not verified against pre-declaration `type` constrain.
+
+#### `where`
+
+This property meaning is the same, as [`where`](https://docs.raku.org/type/Signature#Type_constraints) clause in Raku: it defines a constraint on the allowed values. The property is used as smartmatch RHS. Consider the examples:
+
+    foo => { :type(Int), :where(* > 10) }
+    bar => { :type(Str), :where(any <debug info error>) }
+
+**Note** that similar outcome could be achieved by using a [`subset`](https://docs.raku.org/language/typesystem#index-entry-subset-subset) with `type` property. But `where` is more obvious on many occasions.
+
+#### `why`
+
+This property must be a short string to be used within error message of the exception thrown when `where` constraint is not met. For example, if there is an option declaration:
+
+    min => { :type(Int), :where(* >= 10), :why('must be 10 or more') }
+
+Then defining the option as `min 1;` in a configuration file would produce output similar to the following:
+
+    Option 'min' expects a (Int) value (must be 10 or more) but got 1
+      at line 2
+        ⏏min 1;
 
 ### Reservations
 
