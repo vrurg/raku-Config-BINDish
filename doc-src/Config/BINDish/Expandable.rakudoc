@@ -15,7 +15,9 @@ have type name set to I<dq-string>) are expandable.
 
 To incorporate a value into a string the following macro format is used:
 
-    '{' <option> | <option-path> '}'
+    '{' <option> | <option-path> | '$' <environment-variable> ['?'] '}'
+
+=head2 Option
 
 I<option> is a plain string naming an option from the current block:
 
@@ -23,6 +25,8 @@ I<option> is a plain string naming an option from the current block:
         name "server.local";
         description "{name} is a mock server"; # becomes "server.local is a mock server"
     }
+
+=head2 Option Path
 
 I<option-path> defines a path to the option if it is located in another block. It consist of a list of blocks in the
 order of nesting and must end with an option name. Elements in a path are separated with a slash (C</>) symbol.
@@ -75,6 +79,19 @@ Symbol escaping is traditionally done with a backslash:
     client-data {
         description "Some basic info \{?} \\";
     }
+
+=head2 Environment
+
+Environment variables are expanded with C<"{$HOME}"> syntax. For example:
+
+    base-dir "{$HOME}/.myapp";
+
+Normally, if requested environment variable doesn't exists the parser would throw
+L<C<Config::BINDish::X::Macro::DoesntExists>|X/Macro/DoesntExists.md> exception. But if the variable name is followed
+with a question mark sign then the macro would be expanded into an empty string:
+
+    default-prefix "{$MYAPP_PFX?}";
+    table-prefix "{default-prefix}my_table";
 
 =head2 This Is A Value!
 

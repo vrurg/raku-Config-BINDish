@@ -10,7 +10,10 @@ This module extends [`Config::BINDish`](../BINDish.md) with strings which can in
 
 To incorporate a value into a string the following macro format is used:
 
-    '{' <option> | <option-path> '}'
+    '{' <option> | <option-path> | '$' <environment-variable> ['?'] '}'
+
+Option
+------
 
 *option* is a plain string naming an option from the current block:
 
@@ -18,6 +21,9 @@ To incorporate a value into a string the following macro format is used:
         name "server.local";
         description "{name} is a mock server"; # becomes "server.local is a mock server"
     }
+
+Option Path
+-----------
 
 *option-path* defines a path to the option if it is located in another block. It consist of a list of blocks in the order of nesting and must end with an option name. Elements in a path are separated with a slash (`/`) symbol.
 
@@ -69,6 +75,18 @@ Symbol escaping is traditionally done with a backslash:
     client-data {
         description "Some basic info \{?} \\";
     }
+
+Environment
+-----------
+
+Environment variables are expanded with `"{$HOME}"` syntax. For example:
+
+    base-dir "{$HOME}/.myapp";
+
+Normally, if requested environment variable doesn't exists the parser would throw [`Config::BINDish::X::Macro::DoesntExists`](X/Macro/DoesntExists.md) exception. But if the variable name is followed with a question mark sign then the macro would be expanded into an empty string:
+
+    default-prefix "{$MYAPP_PFX?}";
+    table-prefix "{default-prefix}my_table";
 
 This Is A Value!
 ----------------
