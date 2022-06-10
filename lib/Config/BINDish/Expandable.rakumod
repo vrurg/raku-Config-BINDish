@@ -113,16 +113,19 @@ class AST::Macro
             elsif $child.WHAT ~~ AST::ParentBlk {
                 $cur-blk = $cur-blk.parent(Config::BINDish::AST::Block);
             }
+            elsif $child.WHAT ~~ Config::BINDish::AST::Value {
+                $exp = ~$child;
+            }
             else {
-                with $cur-blk.option($child.keyword) {
-                    $exp = .value;
+                if (my $val := $cur-blk.get($child.keyword.Str)) === Nil {
+                    Config::BINDish::X::Macro::DoesntExists.new(name => $child.keyword, what => 'Option').throw
                 }
                 else {
-                    Config::BINDish::X::Option::DoesntExists.new(name => $child.keyword).throw
+                    $exp = $val;
                 }
             }
         }
-        $exp;
+        $exp
     }
 
     method gist(::?CLASS:D: :$detailed) {
@@ -207,7 +210,7 @@ role Grammar is BINDish-grammar {
         [
             | $<chunks>=( $<chunk>=<-[ \\ \" { ]>+ )
             | $<chunks>=( \\ $<chunk>=. )
-            | $<chunks>=(<expandable-macro>)
+            | $<chunks>=( <expandable-macro> )
         ]*? <?before \">
     }
 
@@ -220,10 +223,12 @@ role Grammar is BINDish-grammar {
             <.expandable-macro-enter>
             [
                 | \s* <?before '}'>
-                | $<body>=( $<from-top>='/'?
+                | $<body>=(
+                    $<from-top>='/'?
                     $<block-path>=<expandable-block-ref>*
                     <expandable-option>
                 )
+                | $<env>=( '$' $<name>=\w+ $<optional>='?'? <?before '}'> )
             ]
         ]
     }
@@ -332,6 +337,23 @@ role Actions is BINDish-actions {
                 $macro.add: .ast;
             }
             $macro.add: .<expandable-option>.ast;
+        }
+        with $<env> {
+            my $env-value = "";
+            my $env-name = ~.<name>;
+            if %*ENV{$env-name}:exists {
+                $env-value = %*ENV{$env-name};
+            }
+            elsif .<optional> ne '?' {
+                Config::BINDish::X::Macro::DoesntExists.new(
+                    name => $env-name,
+                    what => 'Environment variable' ).throw
+            }
+            $macro.add:
+                Config::BINDish::AST.new-ast: 'Value',
+                    :type(Str),
+                    :type-name('sq-string'),
+                    :payload($env-value);
         }
         make $macro;
     }

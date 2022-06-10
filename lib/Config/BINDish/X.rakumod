@@ -166,11 +166,12 @@ class Config::BINDish::X::Block::DoesntExists is Config::BINDish::X {
     }
 }
 
-class Config::BINDish::X::Option::DoesntExists is Config::BINDish::X {
+class Config::BINDish::X::Macro::DoesntExists is Config::BINDish::X {
     has $.name is required;
+    has Str:D $.what is required;
 
     method message {
-        "Option '$!name' doesn't exists" # TODO add more info about error location. Config file:line would be the best.
+        "$.what '$.name' doesn't exists" # TODO add more info about error location. Config file:line would be the best.
     }
 }
 

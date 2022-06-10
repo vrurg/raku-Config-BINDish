@@ -77,7 +77,7 @@ class Config::BINDish::AST {
             ?? %ast-types{$node-type}.new(|c)
             !! (Config::BINDish::AST::{$node-type}:exists
                 ?? Config::BINDish::AST::{$node-type}.new(|c)
-                !! fail Config::BINDish::X::AST::DoestExists.new(:$node-type))
+                !! fail Config::BINDish::X::AST::DoesntExists.new(:$node-type))
     }
 
     method top-node(::?CLASS:D: --> ::?CLASS:D) {

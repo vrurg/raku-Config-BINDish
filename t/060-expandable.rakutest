@@ -4,7 +4,7 @@ use Config::BINDish::Expandable;
 use Config::BINDish::INET;
 use Config::BINDish;
 
-plan 2;
+plan 3;
 
 subtest "Nesting" => {
     plan 2;
@@ -31,7 +31,7 @@ subtest "Nesting" => {
 }
 
 subtest "Base", {
-    plan 11;
+    plan 13;
     my $cfg-src = q:to/CFG/;
 
         name "test config";
@@ -40,6 +40,8 @@ subtest "Base", {
         test2 "path from a subblock: {server(S1, addr)/resource(Img)/path}";
         test3 "integer: {server(S1, addr)/resource(Img)/max-size}";
         test4 "subblock name with spaces: {server(S1, addr)/meta('spaced name')/id}";
+        test5 "environment HOME: {$HOME}";
+        test6 "environment NOHOME: {$NOHOME?}"; # Just make sure this doesn't break parsing
 
         server "S1" addr {
             name "server addresses";
@@ -70,7 +72,7 @@ subtest "Base", {
         CFG
 
     my $cfg = Config::BINDish.new(:!strict);
-    $cfg.read(string => $cfg-src);
+    lives-ok { $cfg.read(string => $cfg-src) }, "config parsed";
 
     my $top = $cfg.top;
 
@@ -95,6 +97,10 @@ subtest "Base", {
        "subblock name with spaces: 42",
        "subblock is seen when its name contains whitespaces";
 
+    is $top.value("test5"),
+        "environment HOME: " ~ %*ENV<HOME>,
+        "expanded from environment";
+
     my $blk1 = $top.block("server", name => "S1", class => 'addr');
 
     is $blk1.value("test1"), "block-related: 42", "relative expansion within a block";
@@ -108,6 +114,32 @@ subtest "Base", {
     is $sub-blk.value("sub-url"), "https://localhost/sub", "reference to parent block";
     $sub-blk = $sub-blk.block("deep");
     is $sub-blk.value("sub-sub-url"), "https://localhost/sub-sub", "reference to parent of the parent block";
+}
+
+subtest "Errors" => {
+    plan 2;
+    my $cfg-src = q:to/CFG/;
+        # Without optional marker '?' after the $NOHOME this must fail
+        test-env "environment NOHOME: {$NOHOME}";
+        CFG
+
+    throws-like
+        {
+            my $cfg = Config::BINDish.new(:!strict);
+            $cfg.read(string => $cfg-src);
+        },
+        Config::BINDish::X::Macro::DoesntExists,
+        "no environment variable throws",
+        :what('Environment variable'),
+        :name<NOHOME>;
+
+    throws-like
+        {
+            my $cfg = Config::BINDish.new(:!strict);
+            $cfg.read(string => q<test-bad "{$}">);
+        },
+        Config::BINDish::X::Parse::General,
+        "no environment variable name in macro";
 }
 
 done-testing;

@@ -1,0 +1,30 @@
+use v6.d;
+use Test::Async;
+use Config::BINDish::Expandable;
+use Config::BINDish::INET;
+use Config::BINDish;
+
+# Test for expanding macros over options with no explicit value
+
+plan 2;
+
+my $cfg = Config::BINDish.new:
+    blocks => (
+        :test => ( :in<.TOP> ),
+    ),
+    options => (
+        :BASE-DIR => ( :in<.TOP>, :default("/tmp/somewhere") ),
+        :foo => ( :in<test> ),
+    );
+
+lives-ok {
+    $cfg.read: string => q:to/CFG/;
+                            test {
+                                foo "{/BASE-DIR}/bar";
+                            }
+                            CFG
+}, "config parsed";
+
+is $cfg.get(:test => <foo>), "/tmp/somewhere/bar", "macro expanded over a default value";
+
+done-testing;
