@@ -1,7 +1,7 @@
 {
   "name": "Config::BINDish",
   "description": "Extensible BIND9-like Configuration Files Support",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "meta-version": "0",
   "authors": [
     "Vadim Belman <vrurg@lflat.org>"

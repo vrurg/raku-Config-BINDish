@@ -4,6 +4,15 @@ VERSIONS
 head
 ====
 
+v0.0.13
+
+  * Make macro expansion work for option default value
+
+  * Add support for environment variables in macro expansion
+
+head
+====
+
 v0.0.12
 
   * A new `no-values` block property in pre-declarations to declare option-only blocks

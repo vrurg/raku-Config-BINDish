@@ -1,6 +1,11 @@
 =begin pod
 =head1 VERSIONS
 
+=head v0.0.13
+
+=item Make macro expansion work for option default value
+=item Add support for environment variables in macro expansion
+
 =head v0.0.12
 
 =item A new C<no-values> block property in pre-declarations to declare option-only blocks
