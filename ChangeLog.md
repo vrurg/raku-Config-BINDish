@@ -4,6 +4,13 @@ VERSIONS
 head
 ====
 
+v0.0.14
+
+  * Fix testing on Windows platforms where there is no $HOME
+
+head
+====
+
 v0.0.13
 
   * Make macro expansion work for option default value
