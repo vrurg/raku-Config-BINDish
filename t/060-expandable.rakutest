@@ -32,6 +32,11 @@ subtest "Nesting" => {
 
 subtest "Base", {
     plan 13;
+
+    if $*VM.osname.starts-with('mswin') {
+        %*ENV<HOME> ||= %*ENV<USERPROFILE>;
+    }
+
     my $cfg-src = q:to/CFG/;
 
         name "test config";
