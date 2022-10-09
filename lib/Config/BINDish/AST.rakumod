@@ -255,7 +255,7 @@ class Config::BINDish::AST::Node is Config::BINDish::AST {
             iterate @!children;
         }
     }
-    multi method find-all(::?CLASS:D: :$block!, :$name, :$class, Bool :$local --> Seq:D) {
+    multi method find-all(::?CLASS:D: Mu :$block!, :$name, :$class, Bool :$local --> Seq:D) {
         self.find-all: -> $ast {
             $ast.^isa(Config::BINDish::AST::Block)
             && ($ast.keyword ~~ $block)
@@ -263,7 +263,7 @@ class Config::BINDish::AST::Node is Config::BINDish::AST {
             && ( !($class.defined || $ast.class.defined) || ($class.defined && $ast.class ~~ $class) )
         }, :$local
     }
-    multi method find-all(::?CLASS:D: :$option!, Bool :$local --> Seq:D) {
+    multi method find-all(::?CLASS:D: Mu :$option!, Bool :$local --> Seq:D) {
         self.find-all: { .^isa(Config::BINDish::AST::Option)
                          && .keyword ~~ $option
                        }, :$local
