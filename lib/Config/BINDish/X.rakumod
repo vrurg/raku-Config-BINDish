@@ -1,5 +1,5 @@
 use v6.d;
-class Config::BINDish::X is Exception is export {
+class Config::BINDish::X is Exception {
 }
 
 role Config::BINDish::X::Parse is Config::BINDish::X {
