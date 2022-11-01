@@ -121,8 +121,8 @@ class Config::BINDish::X::Parse::SpecificValue
     method message {
         self.wrap-message: $.what.tc
                             ~ " " ~ $.keyword.gist
-                            ~ " value must be "
-                            ~ $.ctx.props.value-sym.join(", or ")
+                            ~ " value must be a "
+                            ~ $.ctx.props.value-sym.join(", or a ")
                             ~ ("\n" ~ .indent(4) with $.guess)
     }
 }
