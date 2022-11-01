@@ -567,7 +567,7 @@ method enter-ctx(Value:D :$keyword, Str:D :$type, *%profile --> Context:D) {
         if $kwd ∈ $grammar.keywords{$type} {
             # We do have a pre-declaration for this keyword. Try to locate it's properties for finding out its ID
             for $parent-ctx.cur-block-ctx.id, ".ANYWHERE" -> $parent-id {
-                with $grammar.prop-relations{$parent-id} andthen $_{$type} andthen $_{$kwd} {
+                with $grammar.prop-relations{$parent-id} andthen .{$type} andthen .{$kwd} {
                     $props = $_;
                 }
                 last if $props;
