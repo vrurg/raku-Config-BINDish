@@ -464,7 +464,7 @@ Some named captures are also considered public API.
 
 Records the location to which call of method `panic` should be bound. In other words, if the location within a rule body where we make the decision about syntax validity is different from the location where the user would understand it best then `panic` should be invoked as:
 
-    $<err-pos>.panic: X::Parse::AError, ...;
+    $<err-pos>.panic: Config::BINDish::X::Parse::AError, ...;
 
 For example, we parse an option like:
 

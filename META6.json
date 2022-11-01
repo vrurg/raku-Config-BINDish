@@ -1,14 +1,14 @@
 {
   "name": "Config::BINDish",
   "description": "Extensible BIND9-like Configuration Files Support",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "meta-version": "0",
   "authors": [
     "Vadim Belman <vrurg@lflat.org>"
   ],
   "auth": "zef:vrurg",
   "depends": [
-    "AttrX::Mooish:auth<zef:vrurg>:ver<0.8.1+>",
+    "AttrX::Mooish:auth<zef:vrurg>:ver<1.0.0+>:api<1.0.*>",
     "IP::Addr",
     "Test::Async:auth<zef:vrurg>:ver<0.1.2+>"
   ],

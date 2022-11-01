@@ -4,6 +4,13 @@ VERSIONS
 head
 ====
 
+v0.0.15
+
+  * Fix some issues with exceptions
+
+head
+====
+
 v0.0.14
 
   * Fix testing on Windows platforms where there is no $HOME
