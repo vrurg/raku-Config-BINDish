@@ -80,7 +80,7 @@ subtest "Syntax" => {
     throws-like { $cfg.read: string => q<op-numish;> },
         Config::BINDish::X::Parse::SpecificValue,
         "value type specific option requires a value",
-        :message(/"Option 'op-numish' value must be int, or num, or rat"/);
+        :message(/"Option 'op-numish' value must be int, num, or rat"/);
 
     throws-like { $cfg.read: string => q<general "named" { }> },
         Config::BINDish::X::Parse::ExtraPart,
@@ -162,7 +162,7 @@ subtest "Structure" => {
                 },
                 Config::BINDish::X::Parse::SpecificValue,
                 "bad value type within a value-only block when specific value-sym is used",
-                :message(/"Block 'numbers' value must be int, or rat, or num"/);
+                :message(/"Block 'numbers' value must be int, rat, or num"/);
 
     lives-ok { $cfg.read: string => q:to/CFG/;
                                     unvaluable {
@@ -368,7 +368,7 @@ subtest "Value validation" => {
                 },
                 Config::BINDish::X::Parse::SpecificValue,
                 "option value parsing is limited to specific types",
-                :message(/"Option 'op-numish' value must be int, or num, or rat"/);
+                :message(/"Option 'op-numish' value must be int, num, or rat"/);
 
     lives-ok { $cfg.read: string => q:to/CFG/;
                                         op-numish 3.14;

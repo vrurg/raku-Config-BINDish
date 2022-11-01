@@ -230,5 +230,5 @@ multi method enter-parent(Config::BINDish::AST::Node:U $inner, |c --> Config::BI
 }
 
 method inner-parent {
-    $*CFG-INNER-PARENT // fail X::NoInnerParent.new
+    $*CFG-INNER-PARENT // fail Config::BINDish::X::NoInnerParent.new
 }

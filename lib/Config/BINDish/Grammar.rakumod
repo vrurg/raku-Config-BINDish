@@ -608,7 +608,7 @@ method validate-option {
         my $ctx = $*CFG-CTX;
         my $blk-ctx = $ctx.cur-block-ctx;
         my StatementProps $props = $ctx.props;
-        self.panic: X::Parse::Context, :what<option>, :keyword($keyword), :ctx($blk-ctx)
+        self.panic: Config::BINDish::X::Parse::Context, :what<option>, :keyword($keyword), :ctx($blk-ctx)
             unless $props.defined && $props ~~ $blk-ctx && !$blk-ctx.props.value-only;
         my $value = $*CFG-VALUE // Value.new: :type(Bool), :type-name('bool'), :payload<True>;
         unless $value ~~ $props {
@@ -621,7 +621,7 @@ method validate-option {
         }
     }
     elsif $grammar.strict.options {
-        self.panic: X::Parse::Unknown, :what<option>, :$keyword
+        self.panic: Config::BINDish::X::Parse::Unknown, :what<option>, :$keyword
     }
 }
 
@@ -632,22 +632,22 @@ method validate-block {
         my $ctx = $*CFG-CTX;
         my $parent-ctx = $*CFG-PARENT-CTX;
         my StatementProps $props = $ctx.props;
-        self.panic: X::Parse::Context, :what<block>, :$keyword, :ctx($parent-ctx)
+        self.panic: Config::BINDish::X::Parse::Context, :what<block>, :$keyword, :ctx($parent-ctx)
             unless $props.defined && ($parent-ctx ~~ $props);
         with $props.named {
-            self.panic: X::Parse::MissingPart, :what<name>, :block-spec($keyword)
+            self.panic: Config::BINDish::X::Parse::MissingPart, :what<name>, :block-spec($keyword)
                 unless !$_ || $*CFG-BLOCK-NAME.defined;
-            self.panic: X::Parse::ExtraPart, :what<name>, :block-spec($keyword)
+            self.panic: Config::BINDish::X::Parse::ExtraPart, :what<name>, :block-spec($keyword)
                 if !$_ && $*CFG-BLOCK-NAME.defined;
         }
         if $props.named {
             with $props.classified {
-                self.panic: X::Parse::MissingPart,
+                self.panic: Config::BINDish::X::Parse::MissingPart,
                             :what<class>,
                             :block-spec( $keyword ~
                                          ~( $*CFG-BLOCK-NAME ?? " " ~ $*CFG-BLOCK-NAME.gist !! '' ) )
                     unless !$_ || $*CFG-BLOCK-CLASS.defined;
-                self.panic: X::Parse::ExtraPart,
+                self.panic: Config::BINDish::X::Parse::ExtraPart,
                             :what<class>,
                             :block-spec( $keyword ~
                                          ~( $*CFG-BLOCK-NAME ?? " " ~ $*CFG-BLOCK-NAME.gist !! '' ) )
@@ -656,7 +656,7 @@ method validate-block {
         }
     }
     elsif $grammar.strict.blocks {
-        self.panic: X::Parse::Unknown, :what('block type'), :keyword($keyword)
+        self.panic: Config::BINDish::X::Parse::Unknown, :what('block type'), :keyword($keyword)
     }
 }
 
@@ -697,10 +697,10 @@ multi method panic(Config::BINDish::X::Parse:U \ex, Str $msg?, *%p) {
 # Method must return configuration source to be included with `include` directive as a text chunk.
 method include-source(IO:D(Str:D) $file, Match:D $cursor --> Str:D) {
     unless $file.e {
-        fail X::FileNotFound.new(file => ~$file, :$cursor)
+        fail Config::BINDish::X::FileNotFound.new(file => ~$file, :$cursor)
     }
     unless $file.r {
-        fail X::FileOp.new(file => ~$file, :op('read from'), :$cursor)
+        fail Config::BINDish::X::FileOp.new(file => ~$file, :op('read from'), :$cursor)
     }
     $file.slurp
 }
@@ -813,7 +813,7 @@ multi rule statement:sym<option> {
             my $ctx = $*CFG-CTX.cur-block-ctx;
             my $ok = True;
             if $ctx.props andthen .value-only {
-                $<err-pos>.panic( X::Parse::Context,
+                $<err-pos>.panic( Config::BINDish::X::Parse::Context,
                                   :what<option>,
                                   :keyword($*CFG-KEYWORD),
                                   :$ctx ) with $<option-value>;
@@ -1007,7 +1007,7 @@ method maybe-specific-value(Str:D $what --> Mu) is raw {
                 self."statement:sym<option>"();
                 $expected-specific = True;
             }
-            self.panic: X::Parse::SpecificValue, :$what, :$ctx, :keyword( $ctx.keyword ) if $expected-specific;
+            self.panic: Config::BINDish::X::Parse::SpecificValue, :$what, :$ctx, :keyword( $ctx.keyword ) if $expected-specific;
             return self.new(:$.from, to => -3);
         }
     }
@@ -1063,7 +1063,7 @@ multi token value:sym<int> {
     $<err-pos>=<?before <[-+]>? \d>
     [ $<icard>=[ <[-+]>?: <natural_num> ]
         [ [<num_suffix>? <.wb> ]
-          | { $<err-pos>.panic: X::Parse::BadNum } ]
+          | { $<err-pos>.panic: Config::BINDish::X::Parse::BadNum } ]
     ]
     <!before <[.e]>>
     { self.set-value: Int, :int($/) }

@@ -294,7 +294,7 @@ subtest "Multi" => {
               "iterated over multi blocks";
 
     throws-like { $top.block("multi", :name("1")) },
-                X::Block::Ambiguous,
+                Config::BINDish::X::Block::Ambiguous,
                 "can't get a single block when multiple are declared";
 
     is $top.blocks('multi', :name("1"), :class('extra')).eager.elems,

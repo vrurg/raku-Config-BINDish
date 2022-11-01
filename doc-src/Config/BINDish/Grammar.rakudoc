@@ -530,7 +530,7 @@ Records the location to which call of method C<panic> should be bound. In other 
 body where we make the decision about syntax validity is different from the location where the user would understand it
 best then C<panic> should be invoked as:
 
-    $<err-pos>.panic: X::Parse::AError, ...;
+    $<err-pos>.panic: Config::BINDish::X::Parse::AError, ...;
 
 For example, we parse an option like:
 

@@ -119,11 +119,15 @@ class Config::BINDish::X::Parse::SpecificValue
 {
     has Str $.guess;
     method message {
-        self.wrap-message: $.what.tc
-                            ~ " " ~ $.keyword.gist
-                            ~ " value must be a "
-                            ~ $.ctx.props.value-sym.join(", or a ")
-                            ~ ("\n" ~ .indent(4) with $.guess)
+        my @syms = $.ctx.props.value-sym;
+        self.wrap-message:
+            $.what.tc
+            ~ " " ~ $.keyword.gist
+            ~ " value must be "
+            ~ ( @syms > 1
+                ?? @syms.head(* - 1).join(", ") ~ ", or " ~ @syms.tail
+                !! @syms.head )
+            ~ ("\n" ~ .indent(4) with $.guess)
     }
 }
 
