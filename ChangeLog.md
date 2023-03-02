@@ -8,6 +8,8 @@ v0.0.15
 
   * Fix some issues with exceptions
 
+  * Set version of generated extension classes to compiler's default
+
 head
 ====
 

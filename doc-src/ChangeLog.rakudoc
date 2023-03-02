@@ -4,6 +4,7 @@
 =head v0.0.15
 
 =item Fix some issues with exceptions
+=item Set version of generated extension classes to compiler's default
 
 =head v0.0.14
 
