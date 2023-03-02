@@ -122,12 +122,12 @@ my $tests = S/^'<line>'/#line {$?LINE + 2} $?FILE/ with q:to/TEST-BODY/;
 
 subtest "Operator `∷` (unicode)" => {
     plan 26;
-    EVAL $tests;
+    EVAL $tests, :context(LEXICAL::);
 }
 
 subtest "Operator `::` (ASCII)" => {
     plan 26;
-    EVAL S:g:s/'∷'/::/ with $tests;
+    EVAL S:g:s/'∷'/::/, :context(LEXICAL::) with $tests;
 }
 
 done-testing;
