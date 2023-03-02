@@ -58,7 +58,7 @@ class Config::BINDish:ver($?DISTRIBUTION.meta<ver>):api($?DISTRIBUTION.meta<api>
             my \gmeta = obj.HOW.new;
             my $name = ( obj.^name, |@extensions.map( { '{' ~ .^name ~ '}' } ) ).join( "+" );
             my \extended = gmeta.new_type( :$name );
-            extended.^set_language_revision: 'd';
+            extended.^set_language_version;
             for @extensions -> \ext {
                 extended.^add_parent: ( ext.HOW ~~ Metamodel::ClassHOW ?? ext !! ext.^pun );
             }
