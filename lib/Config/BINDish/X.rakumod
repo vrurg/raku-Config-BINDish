@@ -64,17 +64,25 @@ class Config::BINDish::X::Parse::Unknown does Config::BINDish::X::Parse {
 
 class Config::BINDish::X::Parse::MissingPart does Config::BINDish::X::Parse {
     has Str:D $.what is required;
-    has Str:D $.block-spec is required;
+    has Str:D $.spec is required;
     method message {
-        self.wrap-message: $.what.tc ~ " is missing in declaration of block '" ~ $!block-spec ~ "'"
+        self.wrap-message: $.what.tc ~ " is missing in declaration of " ~ $.spec
     }
 }
 
+# class Config::BINDish::X::Parse::MissingValue does Config::BINDish::X::Parse {
+#     has Any:D $.ctx is required;
+
+#     method message {
+#         "Cannot find acceptable value for " ~ $.ctx.description
+#     }
+# }
+
 class Config::BINDish::X::Parse::ExtraPart does Config::BINDish::X::Parse {
     has Str:D $.what is required;
-    has Str:D $.block-spec is required;
+    has Str:D $.spec is required;
     method message {
-        self.wrap-message: $.what.tc ~ " is unexpected in declaration of block '" ~ $.block-spec ~ "'"
+        self.wrap-message: $.what.tc ~ " is unexpected in declaration of " ~ $.spec
     }
 }
 
@@ -141,7 +149,7 @@ role Config::BINDish::X::Ambiguous[Str:D $ast-type] is Config::BINDish::X {
     }
 }
 
-class Config::BINDish::X::Block::Ambiguous does Config::BINDish::X::Ambiguous["block"] {
+role Config::BINDish::X::Block {
     has $.type is required;
     has $.name;
     has $.class;
@@ -153,20 +161,16 @@ class Config::BINDish::X::Block::Ambiguous does Config::BINDish::X::Ambiguous["b
     }
 }
 
-class Config::BINDish::X::Block::DoesntExists is Config::BINDish::X {
-    has $.type is required;
-    has $.name;
-    has $.class;
+class Config::BINDish::X::Block::Ambiguous
+    does Config::BINDish::X::Ambiguous["block"]
+    does Config::BINDish::X::Block { }
 
+class Config::BINDish::X::Block::DoesntExists is Config::BINDish::X does Config::BINDish::X::Block {
     method message {
-        note $!name.WHICH, " // ", $!name ~~ Stringy;
         my $name = $!name
             ?? " " ~ ($!name ~~ Stringy ?? '"' ~ $!name ~ '"' !! $!name.gist )
             !! "";
-        "Block `" ~ $!type.gist
-        ~ $name
-        ~ ($!class ?? ", " ~ $!class.gist !! "")
-        ~ "` doesn't exists"
+        "Block `" ~ self.description ~ "` doesn't exists"
     }
 }
 

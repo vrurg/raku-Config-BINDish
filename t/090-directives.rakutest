@@ -16,6 +16,6 @@ throws-like {
             },
             Config::BINDish::X::Parse::General,
             "parsing failure reports as directed",
-            message => /'Unrecognized statement' \n '  file mock-file.cfg at line 102'/;
+            message => /'Unrecognized statement' <.wb> .*? \n '  file mock-file.cfg at line 102'/;
 
 done-testing;

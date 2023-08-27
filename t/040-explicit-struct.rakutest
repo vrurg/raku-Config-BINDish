@@ -85,17 +85,17 @@ subtest "Syntax" => {
     throws-like { $cfg.read: string => q<general "named" { }> },
         Config::BINDish::X::Parse::ExtraPart,
         "when block must be unnamed",
-        :message(/"Name is unexpected in declaration of block 'general'"/);
+        :message(/"Name is unexpected in declaration of block 'general" <.wb>/);
 
     throws-like { $cfg.read: string => q<blist "named" classified { }> },
         Config::BINDish::X::Parse::ExtraPart,
         "block can't be classified",
-        :message(/"Class is unexpected in declaration of block 'blist \"named\"'"/);
+        :message(/"Class is unexpected in declaration of block 'blist \"named\""/);
 
     throws-like { $cfg.read: string => q<classy "named" non-desc { desc "can't be here" }> },
         Config::BINDish::X::Parse::Context,
         "option bound to a classified block in a differently classified one",
-        :message(/"Option desc cannot be used in block 'classy \"named\" 'non-desc'"/);
+        :message(/"Option 'desc' cannot be used in block 'classy \"named\" 'non-desc'"/);
 }
 
 subtest "Structure" => {

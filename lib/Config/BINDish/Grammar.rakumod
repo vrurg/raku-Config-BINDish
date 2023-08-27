@@ -253,6 +253,15 @@ class Strictness {
     multi method COERCE(Pair:D $p) { self.new: |$p }
     multi method COERCE(Positional:D $l where { ? all .map(* ~~ Pair) }) { self.new: |%$l }
     multi method COERCE(Bool:D $default) { self.new: |%(<syntax options blocks warnings> X=> $default) }
+
+    proto method is-strict(Str:D) {*}
+    multi method is-strict('option') { $!options }
+    multi method is-strict('options') { $!options }
+    multi method is-strict('block') { $!blocks }
+    multi method is-strict('blocks') { $!blocks }
+    multi method is-strict('warning') { $!warnings }
+    multi method is-strict('warnings') { $!warnings }
+    multi method is-strict('syntax') { $!syntax }
 }
 
 # Where we read from
@@ -552,6 +561,24 @@ method autogen-id {
     ".auto-" ~ ++⚛$decl-id
 }
 
+method may-be-tried(Str:D $type, Str:D $keyword --> Bool:D) {
+    my Context $parent-ctx = $_ with $*CFG-PARENT-CTX;
+    my $non-strict = ?$*CFG-NON-STRICT;
+    if !$non-strict && $keyword ∈ self.keywords{$type} {
+        for $parent-ctx.cur-block-ctx.id, ".ANYWHERE" -> $parent-id {
+            with self.prop-relations{$parent-id} andthen .{$type} andthen .{$keyword} {
+                # If there are properties for this keyword then we can try parsing it in this context
+                $*CFG-CTX-PROPS = $_;
+                return True
+            }
+        }
+        # When the keyword of $type is known but not valid for this context we must not try it even if strictness is off
+        # for the $type.
+        return False;
+    }
+    $non-strict || !self.strict.is-strict($type)
+}
+
 method enter-ctx(Value:D :$keyword, Str:D :$type, *%profile --> Context:D) {
     self.panic: Config::BINDish::X::Parse::ContextOverwrite, :ctx($_) with $*CFG-CTX;
     my ::?CLASS:D $grammar = $*CFG-GRAMMAR;
@@ -565,20 +592,19 @@ method enter-ctx(Value:D :$keyword, Str:D :$type, *%profile --> Context:D) {
         my $id;
         my StatementProps $props;
         if $kwd ∈ $grammar.keywords{$type} {
-            # We do have a pre-declaration for this keyword. Try to locate it's properties for finding out its ID
-            for $parent-ctx.cur-block-ctx.id, ".ANYWHERE" -> $parent-id {
-                with $grammar.prop-relations{$parent-id} andthen .{$type} andthen .{$kwd} {
-                    $props = $_;
-                }
-                last if $props;
+            # We do have a pre-declaration for this keyword. Try to locate it's properties for finding out its ID.
+            with $*CFG-CTX-PROPS {
+                $props = $_;
+                $id = .id;
             }
-            self.panic: Config::BINDish::X::Parse::Context,
-                        :what($type),
-                        :$keyword,
-                        :ctx($parent-ctx) without $props;
-            $id = $props.id;
+            elsif $grammar.strict.is-strict($type) {
+                self.panic: Config::BINDish::X::Parse::Context,
+                            :what($type),
+                            :$keyword,
+                            :ctx($parent-ctx)
+            }
         }
-        else {
+        without $id {
             # Use a fake ID for undeclared statements
             $id = self.autogen-id;
         }
@@ -604,58 +630,52 @@ method backtrack-option {
 method validate-option {
     my $grammar = $*CFG-GRAMMAR;
     my $keyword = $*CFG-KEYWORD.coerced;
-    if $keyword ∈ $grammar.keywords<option> {
-        my $ctx = $*CFG-CTX;
-        my $blk-ctx = $ctx.cur-block-ctx;
-        my StatementProps $props = $ctx.props;
-        self.panic: Config::BINDish::X::Parse::Context, :what<option>, :keyword($keyword), :ctx($blk-ctx)
-            unless $props.defined && $props ~~ $blk-ctx && !$blk-ctx.props.value-only;
-        my $value = $*CFG-VALUE // Value.new: :type(Bool), :type-name('bool'), :payload<True>;
-        unless $value ~~ $props {
-            self.panic:
-                Config::BINDish::X::Parse::Value,
-                :what<option>,
-                :keyword($*CFG-KEYWORD),
-                :$ctx,
-                :$value
+    unless $*CFG-NON-STRICT {
+        if $keyword ∈ $grammar.keywords<option> {
+            my $ctx = $*CFG-CTX;
+            my $blk-ctx = $ctx.cur-block-ctx;
+            my StatementProps $props = $ctx.props;
+            self.panic: Config::BINDish::X::Parse::Context, :what<option>, :keyword($*CFG-KEYWORD), :ctx($blk-ctx)
+                unless $props.defined && $props ~~ $blk-ctx && !$blk-ctx.props.value-only;
+            my $value = $*CFG-VALUE // Value.new: :type(Bool), :type-name('bool'), :payload<True>;
+            unless $value ~~ $props {
+                self.panic: Config::BINDish::X::Parse::Value, :what<option>, :keyword($*CFG-KEYWORD), :$ctx, :$value
+            }
         }
-    }
-    elsif $grammar.strict.options {
-        self.panic: Config::BINDish::X::Parse::Unknown, :what<option>, :$keyword
+        elsif $grammar.strict.options {
+            self.panic: Config::BINDish::X::Parse::Unknown, :what<option>, :keyword($*CFG-KEYWORD)
+        }
     }
 }
 
 method validate-block {
     my $grammar = $*CFG-GRAMMAR;
+
+    return unless $grammar.strict.blocks;
+
     my $keyword = $*CFG-BLOCK-TYPE.coerced;
     if $keyword ∈ $grammar.keywords<block> {
         my $ctx = $*CFG-CTX;
         my $parent-ctx = $*CFG-PARENT-CTX;
         my StatementProps $props = $ctx.props;
-        self.panic: Config::BINDish::X::Parse::Context, :what<block>, :$keyword, :ctx($parent-ctx)
+        self.panic: Config::BINDish::X::Parse::Context, :what<block>, :keyword($*CFG-KEYWORD), :ctx($parent-ctx)
             unless $props.defined && ($parent-ctx ~~ $props);
         with $props.named {
-            self.panic: Config::BINDish::X::Parse::MissingPart, :what<name>, :block-spec($keyword)
+            self.panic: Config::BINDish::X::Parse::MissingPart, :what<name>, :spec($ctx.description)
                 unless !$_ || $*CFG-BLOCK-NAME.defined;
-            self.panic: Config::BINDish::X::Parse::ExtraPart, :what<name>, :block-spec($keyword)
+            self.panic: Config::BINDish::X::Parse::ExtraPart, :what<name>, :spec($ctx.description)
                 if !$_ && $*CFG-BLOCK-NAME.defined;
         }
         if $props.named {
             with $props.classified {
-                self.panic: Config::BINDish::X::Parse::MissingPart,
-                            :what<class>,
-                            :block-spec( $keyword ~
-                                         ~( $*CFG-BLOCK-NAME ?? " " ~ $*CFG-BLOCK-NAME.gist !! '' ) )
+                self.panic: Config::BINDish::X::Parse::MissingPart, :what<class>, :spec($ctx.description)
                     unless !$_ || $*CFG-BLOCK-CLASS.defined;
-                self.panic: Config::BINDish::X::Parse::ExtraPart,
-                            :what<class>,
-                            :block-spec( $keyword ~
-                                         ~( $*CFG-BLOCK-NAME ?? " " ~ $*CFG-BLOCK-NAME.gist !! '' ) )
+                self.panic: Config::BINDish::X::Parse::ExtraPart, :what<class>, :spec($ctx.description)
                     if !$_ && $*CFG-BLOCK-CLASS.defined;
             }
         }
     }
-    elsif $grammar.strict.blocks {
+    else {
         self.panic: Config::BINDish::X::Parse::Unknown, :what('block type'), :keyword($keyword)
     }
 }
@@ -748,8 +768,10 @@ rule statement-list {
     <?>
     [
     | $
-    | <?before '}'>
-    | [ $<statements>=<.statement> || <bad-statement> ]*? <?before '}' | $>
+    | <?before \}>
+    | [ $<statements>=<.statement>
+        || <bad-statement(:contextish)> ]*?
+      <?before '}' | $>
     ]
 }
 
@@ -794,20 +816,31 @@ token option-name {
 multi rule statement:sym<option> {
     :my Value $*CFG-KEYWORD;
     :my Value $*CFG-VALUE;
+    :my OptionProps $*CFG-CTX-PROPS;
     :my Context:D $*CFG-PARENT-CTX = $*CFG-CTX;
     :temp $*CFG-CTX = Nil;
     :temp $*CFG-INNER-PARENT;
     $<err-pos>=<?> <option-name>
-    <?{ ! $*CFG-GRAMMAR.is-reserved(option => $*CFG-KEYWORD.coerced) }>
+    <?{
+        my $kwd = $*CFG-KEYWORD.coerced;
+        ! .is-reserved( :option($kwd) ) && .may-be-tried(<option>, $kwd)
+            given $*CFG-GRAMMAR
+    }>
     {
-        $<err-pos>.enter-ctx: :type<option>,
-                        :keyword( $*CFG-KEYWORD )
+        $<err-pos>.enter-ctx: :type<option>, :keyword( $*CFG-KEYWORD )
     }
-    <.enter-option>
+    [ <?{ ? $*CFG-SIMULATION }> || <.enter-option> ]
     [
-        $<option-value>=<.maybe-specific-value("option")>?
-        <?before <.statement-terminator>>
-        <statement-terminate>
+        [
+          [ $<option-value>=<.maybe-specific-value("option")>?
+            [  [ <?before <.statement-terminator>> <statement-terminate> ]
+                 || [ <?{ $*CFG-CTX-PROPS.defined }>
+                      <!before <.ws> \{> <bad-statement(:expected("statement terminator"))> ] ] ]
+          || [
+              # If it's a pre-declared option (its properties are known already)  or doesn't look like a block
+              <!{ $<option-value> }>
+              [ <?{ $*CFG-CTX-PROPS.defined }> || <!before <.ws> \{> ]
+              <bad-statement( :expected("option value or statement terminator") )> ] ]
         <?{ # Inside a value-only block we skip boolean-only option because it will be re-parsed as a keyword.
             # But options with a value must cause a panic.
             my $ctx = $*CFG-CTX.cur-block-ctx;
@@ -822,27 +855,40 @@ multi rule statement:sym<option> {
             $ok
         }>
         {
-            $<err-pos>.validate-option;
-            self.leave-option;
+            unless $*CFG-SIMULATION {
+                $<err-pos>.validate-option;
+                self.leave-option;
+            }
         }
     ]
-    || <?{
+    || [ <?{
         self.backtrack-option with $*CFG-KEYWORD;
         False
-    }>
+    }> ]
 }
 
 multi rule statement:sym<block> {
     :my Value $*CFG-BLOCK-TYPE;
     :my Value $*CFG-BLOCK-NAME;
     :my Value $*CFG-BLOCK-CLASS;
+    :my BlockProps $*CFG-CTX-PROPS;
     :my $*CFG-BLOCK-ERR-POS;
     :my Context:D $*CFG-PARENT-CTX = $*CFG-CTX;
     :temp $*CFG-CTX = Nil;
     :temp $*CFG-INNER-PARENT;
     $<err-pos>=<?> { $*CFG-BLOCK-ERR-POS = $<err-pos> }
     <block-head>
-    [ <block-body> || <?{ self.backtrack-block; False }> ]
+    [ <block-body>
+      || <?{
+            self.backtrack-block;
+            with $*CFG-CTX-PROPS {
+                # If properties of this block are known then the declaration just missing its body
+                $<err-pos>.panic:
+                    Config::BINDish::X::Parse::MissingPart,
+                    :what('body'),
+                    :spec($*CFG-CTX.description)
+            }
+            False }> ]
 }
 
 multi rule statement:sym<empty> {
@@ -852,8 +898,8 @@ multi rule statement:sym<empty> {
 token statement-terminator {
     [
     | [ <.ws> $ ]
-    | [ <.ws> <?before '}'> ]
-    | [ <?after '}'> <.ws> $<terminator>=';'? ]
+    | [ <.ws> <?before \}> ]
+    | [ <?after \}> <.ws> $<terminator>=';'? ]
     | [ <.ws> $<terminator>=';' ]
     ]
 }
@@ -871,9 +917,54 @@ token statement-terminate {
     }
 }
 
-token bad-statement {
-    <?> <.panic: "Unrecognized statement">
-#    [ .*? [ ';' || $$ || '}' ] ] <.panic: "Unrecognized statement">
+token bad-block {
+    :my Value $*CFG-BLOCK-TYPE;
+    :my Value $*CFG-BLOCK-NAME;
+    :my Value $*CFG-BLOCK-CLASS;
+    :my $*CFG-CTX = Nil;
+    <block-head>
+}
+
+token bad-option {
+    :my Value $*CFG-VALUE;
+    <statement:sym<option>>
+}
+
+token bad-statement(:$expected, Bool :$contextish) {
+    :my $*CFG-KEYWORD;
+    :my $*CFG-NON-STRICT = True;
+    :my $*CFG-SIMULATION = True;
+    :my $*CFG-CTX-PROPS;
+    $<err-pos> = <?>
+    [
+      [
+        [ <?{ $contextish }> && <?before <.keyword>> ]
+        [
+            [ <?before <bad-block>>
+              {
+                  my $keyword = $*CFG-KEYWORD.coerced;
+                  my \exception = $keyword ∈ $*CFG-GRAMMAR.keywords<block>
+                                      ?? Config::BINDish::X::Parse::Context
+                                      !! Config::BINDish::X::Parse::Unknown;
+                  $<err-pos>.panic: exception, :what<block>, :keyword($*CFG-KEYWORD), :ctx($*CFG-CTX)
+              } ]
+            || [ <?before <bad-option>>
+              {
+                  my $keyword = $*CFG-KEYWORD.coerced;
+                  my \exception = $keyword ∈ $*CFG-GRAMMAR.keywords<option>
+                                      ?? Config::BINDish::X::Parse::Context
+                                      !! Config::BINDish::X::Parse::Unknown;
+                  $<err-pos>.panic: exception, :what<option>, :keyword($*CFG-KEYWORD), :ctx($*CFG-CTX)
+              } ]
+            || [ <keyword> <?{ $*CFG-KEYWORD.coerced ∈ $*CFG-GRAMMAR.keywords{'option'|'block'} }>
+              {
+                   $<err-pos>.panic:
+                       Config::BINDish::X::Parse::Context, :what<keyword>, :keyword($*CFG-KEYWORD), :ctx($*CFG-CTX)
+              } ]
+        ]
+      ]
+      || { $<err-pos>.panic: "Unrecognized statement" ~ ($expected andthen ", expected $_") }
+    ]
 }
 
 token enter-option { <?> }
@@ -881,11 +972,16 @@ token enter-option { <?> }
 token block-head {
     :my Value $*CFG-KEYWORD;
     $<block-type>=<.keyword> <.ws>
-    <?{ ! $*CFG-GRAMMAR.is-reserved(block => $*CFG-KEYWORD.coerced) }>
+    <?{
+        my $kwd = $*CFG-KEYWORD.coerced;
+        ! $*CFG-GRAMMAR.is-reserved( :block($kwd) )
+        && $*CFG-GRAMMAR.may-be-tried('block', $kwd)
+    }>
     { $*CFG-BLOCK-TYPE = $*CFG-KEYWORD }
     [ <block-name> <.ws> [<block-class> <.ws>]? ]?
-    <?before '{'>
-    <.enter-block>
+    # If we know properties then this block keyword was found
+    [ <?{ $*CFG-CTX-PROPS.defined }> || <?before \{> ]
+    [ <?{ ? $*CFG-SIMULATION }> || <.enter-block> ]
 }
 
 token block-name {
@@ -901,7 +997,7 @@ token block-class {
 }
 
 token block-body {
-    [ '{' <.ws> ] ~ [ <.ws> '}' <.statement-terminate> ]
+    [ \{ <.ws> ] ~ [ <.ws> \} <.statement-terminate> ]
     <statement-list>
     { self.leave-block }
 }
@@ -915,7 +1011,7 @@ token enter-block {
             :keyword( $block-type ),
             :name( $*CFG-BLOCK-NAME ),
             :class( $*CFG-BLOCK-CLASS );
-        $*CFG-BLOCK-ERR-POS.validate-block;
+        .validate-block with $*CFG-BLOCK-ERR-POS;
     }
 }
 

@@ -1,0 +1,38 @@
+use v6.e.PREVIEW;
+use Test::Async;
+use Config::BINDish;
+use Config::BINDish::Grammar;
+
+plan 1;
+
+my $cfg = Config::BINDish.new:
+        :strict{:blocks, :options},
+        blocks => (
+            :general => { :in<.TOP>, :named },
+            :subsystem => { :in<.TOP>, :named },
+            :options => ( :in<.TOP>, :!named, :!classified ),
+            :misc => ( :in<.TOP> ),
+            :gen-srv<service> => ( :in<general>, :named ),
+        ),
+        options => (
+            :subsystem-srv<service> => ( :in<subsystem>, :type(Str) ),
+            :opt-srv<service> => ( :in<options>, :type(Bool) ),
+        );
+
+lives-ok { $cfg.read: string => q:to/CFG/;
+                                general "any" {
+                                    service "test" { }
+                                }
+
+                                subsystem "some" {
+                                    service "test";
+                                }
+
+                                options {
+                                    service off;
+                                }
+                                CFG
+         },
+         "same keyword is allowed to be used for blocks and option in different contexts";
+
+done-testing;

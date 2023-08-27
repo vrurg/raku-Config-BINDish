@@ -3,7 +3,7 @@ use Test::Async <Config::BINDish::Test Base>;
 use Config::BINDish::Grammar;
 use Config::BINDish::X;
 
-plan 3, :parallel;
+plan 3, :!parallel;
 
 subtest "Grammar Basics", {
     my @tests =
@@ -684,7 +684,7 @@ subtest "Explicit Structure" => {
                 },
                 Config::BINDish::X::Parse::Unknown,
                 "undeclared block in strict mode throws",
-                message => /:s Unknown block type/;
+                message => /:s Unknown block/;
 
     throws-like {
                     Config::BINDish::Grammar.parse(q<subblock 'not here' { };>, :@blocks, :strict).sink;
