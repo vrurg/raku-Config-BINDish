@@ -4,6 +4,25 @@ VERSIONS
 head
 ====
 
+v0.0.17
+
+  * Allow use of the same keyword for blocks and options. It only works when the keyword is used in different blocks, apparently:
+
+        services {
+            service "mail" {
+                # parameters of the service
+            }
+        }
+        client "foo" {
+            # Use this service for reporting
+            service "mail";
+        }
+
+  * Improved error reporting
+
+head
+====
+
 v0.0.15
 
   * Fix some issues with exceptions

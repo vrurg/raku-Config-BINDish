@@ -1,6 +1,26 @@
 =begin pod
 =head1 VERSIONS
 
+=head v0.0.17
+
+=begin item
+Allow use of the same keyword for blocks and options. It only works when the keyword is used in different blocks,
+apparently:
+
+=begin code
+services {
+    service "mail" {
+        # parameters of the service
+    }
+}
+client "foo" {
+    # Use this service for reporting
+    service "mail";
+}
+=end code
+=end item
+=item Improved error reporting
+
 =head v0.0.15
 
 =item Fix some issues with exceptions

@@ -49,7 +49,7 @@ But extensions can add their own types via overriding C<build-prop-keys> method.
 
 =head3 L<C<Hash>|https://docs.raku.org/type/Hash>C<[>L<C<Config::BINDish::Grammar::StatementProps:D>|Grammar/StatementProps.md>C<]> C<%.props>
 
-I<Lazy>. Registry of all pre-declared statement properties. The first level keys of the hash are values in 
+I<Lazy>. Registry of all pre-declared statement properties. The first level keys of the hash are values in
 C<@.prop-keys>, the second level keys are statement IDs.
 
 =head3 L<C<SetHash>|https://docs.raku.org/type/SetHash> C<%.keywords>
@@ -111,10 +111,10 @@ and the actions object.
 
 =head3 C<$*CFG-GRAMMAR>
 
-The primary grammar object. Due to the way the L<C<Grammar>|https://docs.raku.org/type/Grammar> is implemented C<self> does not always point to the same
-object created by the initial C<parse> method. These instances are not full clones of the original grammar and do not
-inherit all attribute values from it. For this reason when access to the user-set attributes is needed the original
-grammar is better be easily available.
+The primary grammar object. Due to the way the L<C<Grammar>|https://docs.raku.org/type/Grammar> is implemented C<self>
+does not always point to the same object created by the initial C<parse> method. These instances are not full clones of
+the original grammar and do not inherit all attribute values from it. For this reason when access to the user-set
+attributes is needed the original grammar is better be easily available.
 
 =head3 C<$*CFG-CTX>
 
@@ -123,6 +123,11 @@ Current block or option context.
 =head3 C<$*CFG-PARENT-CTX>
 
 Parent block context.
+
+=head3 C<$*CFG-CTX-PROPS>
+
+If a keyword in declaration position has been encountered and there is a pre-declaration entry for it then this variable
+would contain properties of the keyword. It's type will depend on what the keyword is registered as: block or option.
 
 =head3 C<$*CFG-AS-INCLUDE>
 
@@ -141,6 +146,18 @@ L<C<Config::BINDish::AST::Node>|AST/Node.md>.
 
 Provided for actions convenience. Intended to hold an instance of
 L<C<Config::BINDish::AST::TOP>|AST/TOP.md>.
+
+=head3 C<$*CFG-NON-STRICT>
+
+If exists and is a I<true> value then all strict checks are to be temporarily disabled in this context. Mainly makes
+sense for guessing what kind of a statement we have at our hands. I.e. if an option declaration would normally fail
+if value type doesn't match the constraint, with this variable set it is likely to parse the statement successfully and
+let us make a grounded guess that the statement is an option, event if invalid one.
+
+=head3 C<$*CFG-SIMULATION>
+
+Having this variable set to a I<true> disables processing of C«<enter-option>» and C«<enter-block>» tokens. Normally
+is used in conjuction with C<$*CFG-NON-STRICT>.
 
 =head3 L<C<Config::BINDish::Grammar::Value>|Grammar/Value.md> C<$*CFG-VALUE>
 

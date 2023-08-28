@@ -1,7 +1,7 @@
 {
   "name": "Config::BINDish",
   "description": "Extensible BIND9-like Configuration Files Support",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "meta-version": "0",
   "authors": [
     "Vadim Belman <vrurg@lflat.org>"
@@ -34,7 +34,7 @@
     "CONFIG",
     "BIND9"
   ],
-  "api": "0.0.6",
+  "api": "0.0.7",
   "production": true,
   "source-url": "https://github.com/vrurg/raku-Config-BINDish.git",
   "raku": "6.d"

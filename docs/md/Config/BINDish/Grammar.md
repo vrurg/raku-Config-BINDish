@@ -97,6 +97,10 @@ Current block or option context.
 
 Parent block context.
 
+### `$*CFG-CTX-PROPS`
+
+If a keyword in declaration position has been encountered and there is a pre-declaration entry for it then this variable would contain properties of the keyword. It's type will depend on what the keyword is registered as: block or option.
+
 ### `$*CFG-AS-INCLUDE`
 
 If set to *True* then it means that the current grammar is parsing included source.
@@ -112,6 +116,14 @@ Provided for actions convenience. Intended to hold an instance of [`Config::BIND
 ### `$*CFG-TOP`
 
 Provided for actions convenience. Intended to hold an instance of [`Config::BINDish::AST::TOP`](AST/TOP.md).
+
+### `$*CFG-NON-STRICT`
+
+If exists and is a *true* value then all strict checks are to be temporarily disabled in this context. Mainly makes sense for guessing what kind of a statement we have at our hands. I.e. if an option declaration would normally fail if value type doesn't match the constraint, with this variable set it is likely to parse the statement successfully and let us make a grounded guess that the statement is an option, event if invalid one.
+
+### `$*CFG-SIMULATION`
+
+Having this variable set to a *true* disables processing of `<enter-option>` and `<enter-block>` tokens. Normally is used in conjuction with `$*CFG-NON-STRICT`.
 
 ### [`Config::BINDish::Grammar::Value`](Grammar/Value.md) `$*CFG-VALUE`
 
