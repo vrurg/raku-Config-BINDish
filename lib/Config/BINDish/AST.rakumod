@@ -467,7 +467,7 @@ role Config::BINDish::AST::Blockish {
             // traverse-default($blk, :$keyword, :block)
     }
     multi traverse(Config::BINDish::AST::Block:D $blk,
-                   Pair:D $path ( :key($keyword), :value($subpath))
+                   Pair:D $path (:key($keyword), :value($subpath))
                         where { $path.value ~~ Pair:D | Str:D | Bool:D | Positional:D | Code:D },
                    *%c)
     {

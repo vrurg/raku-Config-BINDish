@@ -1,6 +1,7 @@
 use v6.d;
 #use Config::BINDish::Ops;
 class Config::BINDish:ver($?DISTRIBUTION.meta<ver>):api($?DISTRIBUTION.meta<api>):auth($?DISTRIBUTION.meta<auth>) {
+    use nqp;
 
     BEGIN {
         Config::BINDish.HOW does role ExtensibleHOW {
@@ -8,10 +9,14 @@ class Config::BINDish:ver($?DISTRIBUTION.meta<ver>):api($?DISTRIBUTION.meta<api>
             my Mu @actions-extensions;
 
             method extend-grammar( Mu \ext ) {
-                @grammar-extensions.push: ext;
+                nqp::scwbdisable();
+                @grammar-extensions[+@grammar-extensions] := ext;
+                nqp::scwbenable();
             }
             method extend-actions( Mu \ext ) {
-                @actions-extensions.push: ext;
+                nqp::scwbdisable();
+                @actions-extensions[+@actions-extensions] := ext;
+                nqp::scwbenable();
             }
 
             method grammar-extensions {
