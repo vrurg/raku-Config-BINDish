@@ -14,7 +14,7 @@
     "license": "Artistic-2.0",
     "meta-version": "0",
     "name": "Config::BINDish",
-    "production": true,
+    "production": false,
     "provides": {
         "Config::BINDish": "lib/Config/BINDish.rakumod",
         "Config::BINDish::Actions": "lib/Config/BINDish/Actions.rakumod",
@@ -37,5 +37,5 @@
         "BIND9"
     ],
     "test-depends": [],
-    "version": "0.0.18"
+    "version": "0.0.19"
 }
