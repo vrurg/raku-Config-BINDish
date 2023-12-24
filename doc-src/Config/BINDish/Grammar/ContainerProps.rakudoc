@@ -37,14 +37,22 @@ Returns I<True> if C<$val> matches this container constraints on data type and t
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|rakudoc:Config::BINDish>,
-L<C<Config::BINDish::Grammar>|rakudoc:Config::BINDish::Grammar>,
-L<C<Config::BINDish::Grammar::BlockProps>|rakudoc:Config::BINDish::Grammar::BlockProps>,
-L<C<Config::BINDish::Grammar::OptionProps>|rakudoc:Config::BINDish::Grammar::OptionProps>
+=item L<C<Config::BINDish>|rakudoc:Config::BINDish>
+=item L<C<Config::BINDish::Grammar>|rakudoc:Config::BINDish::Grammar>
+=item L<C<Config::BINDish::Grammar::BlockProps>|rakudoc:Config::BINDish::Grammar::BlockProps>
+=item L<C<Config::BINDish::Grammar::OptionProps>|rakudoc:Config::BINDish::Grammar::OptionProps>
+=item L<C<README>|rakudoc:..::README>
+=item L<C<INDEX>|rakudoc:..::INDEX>
 
-=head1 AUTHOR
+=head1 COPYRIGHT
 
-Vadim Belman <vrurg@cpan.org>
+(c) 2023, Vadim Belman <vrurg@cpan.org>
+
+=head1 LICENSE
+
+Artistic License 2.0
+
+See the L<I<LICENSE>|file:LICENSE> file in this distribution.
 
 =end pod
 

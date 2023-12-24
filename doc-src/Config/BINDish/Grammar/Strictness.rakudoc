@@ -1,8 +1,10 @@
 =begin pod
-=CLASS 
+=head1 CLASS
+
 C<Config::BINDish::Grammar::Strictness> - strict mode options
 
-=DESCRIPTION 
+=head1 DESCRIPTION
+
 This class defines what parts of the parser should operate in strict mode. See L<#ATTRIBUTES>.
 
 The most simple way to initialize an instance of this class is to coerce it from a L<C<Bool>|https://docs.raku.org/type/Bool> value:
@@ -14,7 +16,7 @@ From the perspective of creating a new grammar it would be done as:
     Config::BINDish::Grammar.parse(..., :strict);   # All strict
     Config::BINDish::Grammar.parse(..., :!strict);  # All non-strict
 
-=ATTRIBUTES 
+=head1 ATTRIBUTES
 =head3 L<C<Bool:D>|https://docs.raku.org/type/Bool> C<$.syntax = False>
 
 When set the parser will require a semi-colon (C<;>) after all statements. Otherwise semi-colon is optional after
@@ -56,11 +58,20 @@ which is an invalid keyword.
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|rakudoc:Config::BINDish>,
-L<C<Config::BINDish::Grammar>|rakudoc:Config::BINDish::Grammar>
+=item L<C<Config::BINDish>|rakudoc:Config::BINDish>
+=item L<C<Config::BINDish::Grammar>|rakudoc:Config::BINDish::Grammar>
+=item L<C<README>|rakudoc:..::README>
+=item L<C<INDEX>|rakudoc:..::INDEX>
 
-=AUTHOR Vadim Belman <vrurg@cpan.org>
+=head1 COPYRIGHT
 
+(c) 2023, Vadim Belman <vrurg@cpan.org>
+
+=head1 LICENSE
+
+Artistic License 2.0
+
+See the L<I<LICENSE>|file:LICENSE> file in this distribution.
 
 =end pod
 

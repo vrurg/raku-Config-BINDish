@@ -62,8 +62,24 @@ Returns *True* if a pre-declared statement can be used in the enclosing block co
 
 # SEE ALSO
 
-[`Config::BINDish`](../../BINDish.md), [`Config::BINDish::Grammar`](../Grammar.md), [`Config::BINDish::Grammar::BlockProps`](BlockProps.md), [`Config::BINDish::Grammar::OptionProps`](OptionProps.md)
+  - [`Config::BINDish`](../../BINDish.md)
 
-# AUTHOR
+  - [`Config::BINDish::Grammar`](../Grammar.md)
 
-Vadim Belman <vrurg@cpan.org>
+  - [`Config::BINDish::Grammar::BlockProps`](BlockProps.md)
+
+  - [`Config::BINDish::Grammar::OptionProps`](OptionProps.md)
+
+  - [`README`](../../../../../README.md)
+
+  - [`INDEX`](../../../../../INDEX.md)
+
+# COPYRIGHT
+
+(c) 2023, Vadim Belman <vrurg@cpan.org>
+
+# LICENSE
+
+Artistic License 2.0
+
+See the [*LICENSE*](../../../../../LICENSE) file in this distribution.

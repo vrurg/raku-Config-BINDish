@@ -50,7 +50,7 @@ But extensions can add their own types via overriding C<build-prop-keys> method.
 =head3 L<C<Hash>|https://docs.raku.org/type/Hash>C<[>L<C<Config::BINDish::Grammar::StatementProps:D>|rakudoc:Config::BINDish::Grammar::StatementProps:D>C<]> C<%.props>
 
 I<Lazy>. Registry of all pre-declared statement properties. The first level keys of the hash are values in
-C<@.prop-keys>, the second level keys are statement IDs.
+C<@.prop-keys> the second level keys are statement IDs.
 
 =head3 L<C<SetHash>|https://docs.raku.org/type/SetHash> C<%.keywords>
 
@@ -997,7 +997,8 @@ C<.ANYWHERE { }>, even though technically and formally the config file looks lik
 As it was stated in the L<Names|#Names> section any ID string starting with a dot is reserved. Use method C<autogen-id>
 if you need a unique one.
 
-=EXTENSIONS
+=head1 EXTENSIONS
+
 This section provides tips for writing own grammar extensions. See
 L<C<Config::BINDish::Actions>|rakudoc:Config::BINDish::Actions>
 to find more about action extensions.
@@ -1050,15 +1051,24 @@ easy as adding new rules or tokens akin to the following example:
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|rakudoc:Config::BINDish>,
-L<C<Config::BINDish::Grammar::Strictness>|rakudoc:Config::BINDish::Grammar::Strictness>,
-L<C<Config::BINDish::Grammar::StatementProps>|rakudoc:Config::BINDish::Grammar::StatementProps>,
-L<C<Config::BINDish::Grammar::ContainerProps>|rakudoc:Config::BINDish::Grammar::ContainerProps>,
-L<C<Config::BINDish::Grammar::OptionProps>|rakudoc:Config::BINDish::Grammar::OptionProps>,
-L<C<Config::BINDish::Grammar::BlockProps>|rakudoc:Config::BINDish::Grammar::BlockProps>
+=item L<C<Config::BINDish>|rakudoc:Config::BINDish>
+=item L<C<Config::BINDish::Grammar::Strictness>|rakudoc:Config::BINDish::Grammar::Strictness>
+=item L<C<Config::BINDish::Grammar::StatementProps>|rakudoc:Config::BINDish::Grammar::StatementProps>
+=item L<C<Config::BINDish::Grammar::ContainerProps>|rakudoc:Config::BINDish::Grammar::ContainerProps>
+=item L<C<Config::BINDish::Grammar::OptionProps>|rakudoc:Config::BINDish::Grammar::OptionProps>
+=item L<C<Config::BINDish::Grammar::BlockProps>|rakudoc:Config::BINDish::Grammar::BlockProps>
+=item L<C<README>|rakudoc:..::README>
+=item L<C<INDEX>|rakudoc:..::INDEX>
 
-=AUTHOR Vadim Belman <vrurg@cpan.org>
+=head1 COPYRIGHT
 
+(c) 2023, Vadim Belman <vrurg@cpan.org>
+
+=head1 LICENSE
+
+Artistic License 2.0
+
+See the L<I<LICENSE>|file:LICENSE> file in this distribution.
 
 =end pod
 

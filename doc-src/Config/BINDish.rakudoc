@@ -3,7 +3,7 @@
 
 C<Config::BINDish> - parse BIND9/named kind of config files
 
-=SYNOPSIS 
+=head1 SYNOPSIS
     my $cfg = Config::BINDish.new;
     $cfg.read: string => q:to/CFG/;
     server "s1" {
@@ -210,13 +210,18 @@ More information about the operator can be found in L<C<Config::BINDish::Ops>|ra
 =item L<C<Config::BINDish::Ops>|rakudoc:Config::BINDish::Ops>
 =item L<C<Config::BINDish::Expandable>|rakudoc:Config::BINDish::Expandable>
 =item L<C<Config::BINDish::INET>|rakudoc:Config::BINDish::INET>
-=item L<C<..::README>|rakudoc:..::README>
-=item L<C<..::INDEX>|rakudoc:..::INDEX>
+=item L<C<README>|rakudoc:..::README>
+=item L<C<INDEX>|rakudoc:..::INDEX>
 
-=AUTHOR Vadim Belman <vrurg@cpan.org>
+=head1 COPYRIGHT
 
+(c) 2023, Vadim Belman <vrurg@cpan.org>
 
+=head1 LICENSE
 
+Artistic License 2.0
+
+See the L<I<LICENSE>|file:LICENSE> file in this distribution.
 
 =end pod
 

@@ -1,4 +1,5 @@
 =begin pod
+=config :title<Changes>
 =head1 VERSIONS
 
 =begin item
@@ -159,6 +160,10 @@ B<v0.0.2>
 =item Added a new standard value type: file path
 =item API version bumped to v0.0.2
 =end item
+
+=head1 SEE ALSO
+
+=item L<C<INDEX>|rakudoc:..::INDEX>
 
 =end pod
 

@@ -36,7 +36,7 @@ Defines what strictness modes are activated. See [`Config::BINDish::Grammar::Str
 
 ### [`Hash`](https://docs.raku.org/type/Hash)`[`[`Config::BINDish::Grammar::StatementProps:D`](Grammar/StatementProps.md)`]` `%.props`
 
-*Lazy*. Registry of all pre-declared statement properties. The first level keys of the hash are values in `@.prop-keys`, the second level keys are statement IDs.
+*Lazy*. Registry of all pre-declared statement properties. The first level keys of the hash are values in `@.prop-keys` the second level keys are statement IDs.
 
 ### [`SetHash`](https://docs.raku.org/type/SetHash) `%.keywords`
 
@@ -1008,8 +1008,28 @@ role MyExtension is BINDish-grammar {
 
 # SEE ALSO
 
-[`Config::BINDish`](../BINDish.md), [`Config::BINDish::Grammar::Strictness`](Grammar/Strictness.md), [`Config::BINDish::Grammar::StatementProps`](Grammar/StatementProps.md), [`Config::BINDish::Grammar::ContainerProps`](Grammar/ContainerProps.md), [`Config::BINDish::Grammar::OptionProps`](Grammar/OptionProps.md), [`Config::BINDish::Grammar::BlockProps`](Grammar/BlockProps.md)
+  - [`Config::BINDish`](../BINDish.md)
 
-# AUTHOR
+  - [`Config::BINDish::Grammar::Strictness`](Grammar/Strictness.md)
 
-Vadim
+  - [`Config::BINDish::Grammar::StatementProps`](Grammar/StatementProps.md)
+
+  - [`Config::BINDish::Grammar::ContainerProps`](Grammar/ContainerProps.md)
+
+  - [`Config::BINDish::Grammar::OptionProps`](Grammar/OptionProps.md)
+
+  - [`Config::BINDish::Grammar::BlockProps`](Grammar/BlockProps.md)
+
+  - [`README`](../../../../README.md)
+
+  - [`INDEX`](../../../../INDEX.md)
+
+# COPYRIGHT
+
+(c) 2023, Vadim Belman <vrurg@cpan.org>
+
+# LICENSE
+
+Artistic License 2.0
+
+See the [*LICENSE*](../../../../LICENSE) fi

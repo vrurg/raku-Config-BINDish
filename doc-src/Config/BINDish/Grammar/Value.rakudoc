@@ -1,8 +1,9 @@
 =begin pod
-=CLASS 
+=head1 CLASS
+
 C<Config::BINDish::Grammar::Value> - grammar representation of a value
 
-=ATTRIBUTES 
+=head1 ATTRIBUTES
 =head3 L<C<Match:D>|https://docs.raku.org/type/Match>C< | >L<C<Str:D>|https://docs.raku.org/type/Str>C< $.payload>
 
 The actual value representation. Most of the time it would be a L<C<Match>|https://docs.raku.org/type/Match> obtained from parsed down source. But
@@ -18,13 +19,22 @@ Value type object.
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|rakudoc:Config::BINDish>,
-L<C<Config::BINDish::Grammar>|rakudoc:Config::BINDish::Grammar>,
-L<C<Config::BINDish::Grammar::TypeStringify>|rakudoc:Config::BINDish::Grammar::TypeStringify>,
-L<C<Config::BINDish::Grammar::ContainerProps>|rakudoc:Config::BINDish::Grammar::ContainerProps>
+=item L<C<Config::BINDish>|rakudoc:Config::BINDish>
+=item L<C<Config::BINDish::Grammar>|rakudoc:Config::BINDish::Grammar>
+=item L<C<Config::BINDish::Grammar::TypeStringify>|rakudoc:Config::BINDish::Grammar::TypeStringify>
+=item L<C<Config::BINDish::Grammar::ContainerProps>|rakudoc:Config::BINDish::Grammar::ContainerProps>
+=item L<C<README>|rakudoc:..::README>
+=item L<C<INDEX>|rakudoc:..::INDEX>
 
-=AUTHOR Vadim Belman <vrurg@cpan.org>
+=head1 COPYRIGHT
 
+(c) 2023, Vadim Belman <vrurg@cpan.org>
+
+=head1 LICENSE
+
+Artistic License 2.0
+
+See the L<I<LICENSE>|file:LICENSE> file in this distribution.
 
 =end pod
 

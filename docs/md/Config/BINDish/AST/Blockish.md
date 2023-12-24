@@ -276,8 +276,20 @@ Returns a block object defined by a path. Shorcut for `$blk.get($block, :block, 
 
 # SEE ALSO
 
-[`Config::BINDish`](../../BINDish.md), [`Config::BINDish::AST`](../AST.md)
+  - item [`Config::BINDish`](../../BINDish.md)
 
-# AUTHOR
+  - item [`Config::BINDish::AST`](../AST.md)
 
-Vadim Belman <vrurg@cpan.org>
+  - [`README`](../../../../../README.md)
+
+  - [`INDEX`](../../../../../INDEX.md)
+
+# COPYRIGHT
+
+(c) 2023, Vadim Belman <vrurg@cpan.org>
+
+# LICENSE
+
+Artistic License 2.0
+
+See the [*LICENSE*](../../../../../LICENSE) file in this distribution.

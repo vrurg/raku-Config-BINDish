@@ -128,8 +128,20 @@ Returns the topmost node, or, in other words, the root of the AST tree.
 
 # SEE ALSO
 
-[`Config::BINDish`](../BINDish.md), [`Config::BINDish::Actions`](Actions.md)
+  - [`Config::BINDish`](../BINDish.md)
 
-# AUTHOR
+  - [`Config::BINDish::Actions`](Actions.md)
 
-Vadim Belman <vrurg@cpan.org>
+  - [`README`](../../../../README.md)
+
+  - [`INDEX`](../../../../INDEX.md)
+
+# COPYRIGHT
+
+(c) 2023, Vadim Belman <vrurg@cpan.org>
+
+# LICENSE
+
+Artistic License 2.0
+
+See the [*LICENSE*](../../../../LICENSE) file in this distribution.

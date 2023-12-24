@@ -2,29 +2,7 @@
 
 `Config::BINDish` - parse BIND9/named kind of config files
 
-# SYNOPSIS
-
-``` 
-my $cfg = Config::BINDish.new;
-$cfg.read: string => q:to/CFG/;
-server "s1" {
-    name "my.server";
-    paths {
-        base "/opt/myapp";
-        pool "files" static {
-            "pub/img";
-            "static/img";
-            "docs";
-        };
-        pool "files" dynamic {
-            "users/reports";
-            "system/reports"
-        }
-    }
-}
-CFG
-say $cfg.top.get( :server("s1") => :paths => :pool("images") => 'root' ); # ./pub/img
-```
+# SYNOPSIS my $cfg = Config::BINDish.new; $cfg.read: string =\> q:to/CFG/; server "s1" { name "my.server"; paths { base "/opt/myapp"; pool "files" static { "pub/img"; "static/img"; "docs"; }; pool "files" dynamic { "users/reports"; "system/reports" } } } CFG say $cfg.top.get( :server("s1") =\> :paths =\> :pool("images") =\> 'root' ); \# ./pub/img
 
 $cfg.read: file =\> $my-config-filename;
 
@@ -191,10 +169,16 @@ More information about the operator can be found in [`Config::BINDish::Ops`](BIN
 
   - [`Config::BINDish::INET`](BINDish/INET.md)
 
-  - [`..::README`](../../../README.md)
+  - [`README`](../../../README.md)
 
-  - [`..::INDEX`](../../../INDEX.md)
+  - [`INDEX`](../../../INDEX.md)
 
-# AUTHOR
+# COPYRIGHT
 
-Vadim Belman \<vrurg@cpan.or
+(c) 2023, Vadim Belman <vrurg@cpan.org>
+
+# LICENSE
+
+Artistic License 2.0
+
+See the [*LICENSE*](../../../LICENSE) file in this distributio

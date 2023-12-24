@@ -94,4 +94,18 @@ Also, because of the operator reliance upon the `get` method, it can return defa
 
 # SEE ALSO
 
-[`Config::BINDish`](../BINDish.md), \[`Config::BINDish::AST`\](rakudoc:C
+  - [`Config::BINDish`](../BINDish.md)
+
+  - [`Config::BINDish::AST`](AST.md)
+
+  - [`README`](../../../../README.md)
+
+  - [`INDEX`](../../../../INDEX.md)
+
+# COPYRIGHT
+
+(c) 2023, Vadim Belman <vrurg@cpan.org>
+
+# LICENSE
+
+Artistic License

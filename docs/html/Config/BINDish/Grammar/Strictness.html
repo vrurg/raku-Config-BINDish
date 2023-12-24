@@ -378,24 +378,32 @@ li > .pod-block-code { margin-top: 16px; }
     <nav class="indexgroup">
 <table id="TOC">
 <caption><h2 id="TOC_Title">Table of Contents</h2></caption>
-<tr class="toc-level-3"><td class="toc-number">0.0.1</td><td class="toc-text"><a href="#Bool:D_%24.syntax_=_False"><code class="pod-code-inline">Bool:D</code> <code class="pod-code-inline">$.syntax = False</code></a></td></tr>
-<tr class="toc-level-3"><td class="toc-number">0.0.2</td><td class="toc-text"><a href="#Bool:D_%24.options_=_False"><code class="pod-code-inline">Bool:D</code> <code class="pod-code-inline">$.options = False</code></a></td></tr>
-<tr class="toc-level-3"><td class="toc-number">0.0.3</td><td class="toc-text"><a href="#Bool:D_%24.blocks_=_False"><code class="pod-code-inline">Bool:D</code> <code class="pod-code-inline">$.blocks = False</code></a></td></tr>
-<tr class="toc-level-3"><td class="toc-number">0.0.4</td><td class="toc-text"><a href="#Bool:D_%24.warnings_=_True"><code class="pod-code-inline">Bool:D</code> <code class="pod-code-inline">$.warnings = True</code></a></td></tr>
-<tr class="toc-level-1"><td class="toc-number">1</td><td class="toc-text"><a href="#SEE_ALSO">SEE ALSO</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">1</td><td class="toc-text"><a href="#CLASS">CLASS</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">2</td><td class="toc-text"><a href="#DESCRIPTION">DESCRIPTION</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">3</td><td class="toc-text"><a href="#ATTRIBUTES">ATTRIBUTES</a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">3.0.1</td><td class="toc-text"><a href="#Bool:D_$.syntax_=_False"><code class="pod-code-inline">Bool:D</code> <code class="pod-code-inline">$.syntax = False</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">3.0.2</td><td class="toc-text"><a href="#Bool:D_$.options_=_False"><code class="pod-code-inline">Bool:D</code> <code class="pod-code-inline">$.options = False</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">3.0.3</td><td class="toc-text"><a href="#Bool:D_$.blocks_=_False"><code class="pod-code-inline">Bool:D</code> <code class="pod-code-inline">$.blocks = False</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">3.0.4</td><td class="toc-text"><a href="#Bool:D_$.warnings_=_True"><code class="pod-code-inline">Bool:D</code> <code class="pod-code-inline">$.warnings = True</code></a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">4</td><td class="toc-text"><a href="#SEE_ALSO">SEE ALSO</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">5</td><td class="toc-text"><a href="#COPYRIGHT">COPYRIGHT</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">6</td><td class="toc-text"><a href="#LICENSE">LICENSE</a></td></tr>
 
 </table>
 </nav>
 
 
     <div class="pod-body">
-    <p>The most simple way to initialize an instance of this class is to coerce it from a <a href="https://docs.raku.org/type/Bool"><code>Bool</code></a> value:</p>
+    <h1 id="CLASS"><a class="u" href="#___top" title="go to top of document">CLASS</a></h1>
+<p><code>Config::BINDish::Grammar::Strictness</code> - strict mode options</p>
+<h1 id="DESCRIPTION"><a class="u" href="#___top" title="go to top of document">DESCRIPTION</a></h1>
+<p>This class defines what parts of the parser should operate in strict mode. See <a href="#ATTRIBUTES">ATTRIBUTES</a>.</p>
+<p>The most simple way to initialize an instance of this class is to coerce it from a <a href="https://docs.raku.org/type/Bool"><code>Bool</code></a> value:</p>
 <pre class="pod-block-code">Config::BINDish::Grammar::Strictness(True); # All strict</pre>
 <p>From the perspective of creating a new grammar it would be done as:</p>
 <pre class="pod-block-code">Config::BINDish::Grammar.parse(..., :strict);   # All strict
 Config::BINDish::Grammar.parse(..., :!strict);  # All non-strict</pre>
-<section><h1>ATTRIBUTES</h1>
-</section>
+<h1 id="ATTRIBUTES"><a class="u" href="#___top" title="go to top of document">ATTRIBUTES</a></h1>
 <h3 id="Bool:D_$.syntax_=_False"><a href="https://docs.raku.org/type/Bool"><code>Bool:D</code></a> <code>$.syntax = False</code></h3>
 <p>When set the parser will require a semi-colon (<code>;</code>) after all statements. Otherwise semi-colon is optional after block's closing curly brace, and after an option if it is followed by a closing brace. The following example is ok when syntax is non-strict:</p>
 <pre class="pod-block-code">block {
@@ -416,7 +424,20 @@ Config::BINDish::Grammar.parse(..., :!strict);  # All non-strict</pre>
 <pre class="pod-block-code">Config::BINDish.new: options =&gt; { :op1&lt;op&gt; =&gt; { ... } };</pre>
 <p>Because by default Raku uses hashes with <a href="https://docs.raku.org/type/Str"><code>Str</code></a> keys, <code>:op1&lt;op&gt;</code> will be coerced and instead a <a href="https://docs.raku.org/type/Pair"><code>Pair</code></a>, representing option <code>op</code> ID and keyword, the grammar will find a string <em>"op1\top"</em> which is an invalid keyword.</p>
 <h1 id="SEE_ALSO"><a class="u" href="#___top" title="go to top of document">SEE ALSO</a></h1>
-<p><a href="../../BINDish.html"><code>Config::BINDish</code></a>, <a href="../Grammar.html"><code>Config::BINDish::Grammar</code></a></p>
+<ul><li><p><a href="../../BINDish.html"><code>Config::BINDish</code></a></p>
+</li>
+<li><p><a href="../Grammar.html"><code>Config::BINDish::Grammar</code></a></p>
+</li>
+<li><p><a href="../../../../../README.html"><code>README</code></a></p>
+</li>
+<li><p><a href="../../../../../INDEX.html"><code>INDEX</code></a></p>
+</li>
+</ul>
+<h1 id="COPYRIGHT"><a class="u" href="#___top" title="go to top of document">COPYRIGHT</a></h1>
+<p>(c) 2023, Vadim Belman &lt;vrurg@cpan.org&gt;</p>
+<h1 id="LICENSE"><a class="u" href="#___top" title="go to top of document">LICENSE</a></h1>
+<p>Artistic License 2.0</p>
+<p>See the <a href="../../../../../LICENSE"><em>LICENSE</em></a> file in this distribution.</p>
 
     </div>
 

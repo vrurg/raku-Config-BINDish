@@ -16,6 +16,20 @@ This methods cleans up `@.children` to prevent accidental manipulation with any 
 
 # SEE ALSO
 
-# AUTHOR
+  - [`Config::BINDish`](../../BINDish.md)
 
-Vadim Belman <vrurg@cpan.org>
+  - [`Config::BINDish::AST`](../AST.md)
+
+  - [`README`](../../../../../README.md)
+
+  - [`INDEX`](../../../../../INDEX.md)
+
+# COPYRIGHT
+
+(c) 2023, Vadim Belman <vrurg@cpan.org>
+
+# LICENSE
+
+Artistic License 2.0
+
+See the [*LICENSE*](../../../../../LICENSE) file in this distribution.

@@ -3,7 +3,7 @@
 
 =head1 Config::BINDish Document Pages
 
-=item L«C«..::ChangeLog»|rakudoc:..::ChangeLog»
+=item L«C«Changes»|rakudoc:..::ChangeLog»
 =item L«C«Config::BINDish»|rakudoc:Config::BINDish»
 =item L«C«Config::BINDish::AST»|rakudoc:Config::BINDish::AST»
 =item L«C«Config::BINDish::AST::Block»|rakudoc:Config::BINDish::AST::Block»

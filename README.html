@@ -379,24 +379,27 @@ li > .pod-block-code { margin-top: 16px; }
 <table id="TOC">
 <caption><h2 id="TOC_Title">Table of Contents</h2></caption>
 <tr class="toc-level-1"><td class="toc-number">1</td><td class="toc-text"><a href="#NAME">NAME</a></td></tr>
-<tr class="toc-level-1"><td class="toc-number">2</td><td class="toc-text"><a href="#DISCLAIMER">DISCLAIMER</a></td></tr>
-<tr class="toc-level-1"><td class="toc-number">3</td><td class="toc-text"><a href="#DESCRIPTION">DESCRIPTION</a></td></tr>
-<tr class="toc-level-1"><td class="toc-number">4</td><td class="toc-text"><a href="#EXTENSIONS">EXTENSIONS</a></td></tr>
-<tr class="toc-level-1"><td class="toc-number">5</td><td class="toc-text"><a href="#ATTRIBUTES">ATTRIBUTES</a></td></tr>
-<tr class="toc-level-2"><td class="toc-number">5.1</td><td class="toc-text"><a href="#Config::BINDish::Grammar::Strictness_%24.strict"><code class="pod-code-inline">Config::BINDish::Grammar::Strictness</code> <code class="pod-code-inline">$.strict</code></a></td></tr>
-<tr class="toc-level-2"><td class="toc-number">5.2</td><td class="toc-text"><a href="#Pair:D_@.blocks,_Pair:D_@.options"><code class="pod-code-inline">Pair:D</code> <code class="pod-code-inline">@.blocks</code>, <code class="pod-code-inline">Pair:D</code> <code class="pod-code-inline">@.options</code></a></td></tr>
-<tr class="toc-level-2"><td class="toc-number">5.3</td><td class="toc-text"><a href="#%24.grammar,_%24.actions"><code class="pod-code-inline">$.grammar</code>, <code class="pod-code-inline">$.actions</code></a></td></tr>
-<tr class="toc-level-2"><td class="toc-number">5.4</td><td class="toc-text"><a href="#IO::Path_%24.file"><code class="pod-code-inline">IO::Path</code> <code class="pod-code-inline">$.file</code></a></td></tr>
-<tr class="toc-level-2"><td class="toc-number">5.5</td><td class="toc-text"><a href="#Bool_%24.flat_=_False"><code class="pod-code-inline">Bool</code> <code class="pod-code-inline">$.flat = False</code></a></td></tr>
-<tr class="toc-level-2"><td class="toc-number">5.6</td><td class="toc-text"><a href="#%24.top"><code class="pod-code-inline">$.top</code></a></td></tr>
-<tr class="toc-level-2"><td class="toc-number">5.7</td><td class="toc-text"><a href="#%24.match"><code class="pod-code-inline">$.match</code></a></td></tr>
-<tr class="toc-level-1"><td class="toc-number">6</td><td class="toc-text"><a href="#METHODS">METHODS</a></td></tr>
-<tr class="toc-level-2"><td class="toc-number">6.1</td><td class="toc-text"><a href="#extend-grammar(_+@ext_),_extend-actions(_+@ext_)"><code class="pod-code-inline">extend-grammar( +@ext )</code>, <code class="pod-code-inline">extend-actions( +@ext )</code></a></td></tr>
-<tr class="toc-level-2"><td class="toc-number">6.2</td><td class="toc-text"><a href="#build-grammar(),_build-actions()"><code class="pod-code-inline">build-grammar()</code>, <code class="pod-code-inline">build-actions()</code></a></td></tr>
-<tr class="toc-level-2"><td class="toc-number">6.3</td><td class="toc-text"><a href="#multi_method_read(IO:D(Str:D)_:%24file,_%7Cargs),_multi_method_read(Str:D_:%24string,_%7Cargs)"><code class="pod-code-inline">multi method read(IO:D(Str:D) :$file, |args)</code>, <code class="pod-code-inline">multi method read(Str:D :$string, |args)</code></a></td></tr>
-<tr class="toc-level-3"><td class="toc-number">6.3.1</td><td class="toc-text"><a href="#multi_get(...)"><code class="pod-code-inline">multi get(...)</code></a></td></tr>
-<tr class="toc-level-1"><td class="toc-number">7</td><td class="toc-text"><a href="#EXPORTS">EXPORTS</a></td></tr>
-<tr class="toc-level-1"><td class="toc-number">8</td><td class="toc-text"><a href="#SEE_ALSO">SEE ALSO</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">2</td><td class="toc-text"><a href="#SYNOPSIS_my_$cfg_=_Config::BINDish.new;_$cfg.read:_string_=&gt;_q:to/CFG/;_server_&quot;s1&quot;_{_name_&quot;my.server&quot;;_paths_{_base_&quot;/opt/myapp&quot;;_pool_&quot;files&quot;_static_{_&quot;pub/img&quot;;_&quot;static/img&quot;;_&quot;docs&quot;;_};_pool_&quot;files&quot;_dynamic_{_&quot;users/reports&quot;;_&quot;system/reports&quot;_}_}_}_CFG_say_$cfg.top.get(_:server(&quot;s1&quot;)_=&gt;_:paths_=&gt;_:pool(&quot;images&quot;)_=&gt;_'root'_);_#_./pub/img">SYNOPSIS my $cfg = Config::BINDish.new; $cfg.read: string =&gt; q:to/CFG/; server "s1" { name "my.server"; paths { base "/opt/myapp"; pool "files" static { "pub/img"; "static/img"; "docs"; }; pool "files" dynamic { "users/reports"; "system/reports" } } } CFG say $cfg.top.get( :server("s1") =&gt; :paths =&gt; :pool("images") =&gt; 'root' ); # ./pub/img</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">3</td><td class="toc-text"><a href="#DISCLAIMER">DISCLAIMER</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">4</td><td class="toc-text"><a href="#DESCRIPTION">DESCRIPTION</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">5</td><td class="toc-text"><a href="#EXTENSIONS">EXTENSIONS</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">6</td><td class="toc-text"><a href="#ATTRIBUTES">ATTRIBUTES</a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">6.1</td><td class="toc-text"><a href="#Config::BINDish::Grammar::Strictness_$.strict"><code class="pod-code-inline">Config::BINDish::Grammar::Strictness</code> <code class="pod-code-inline">$.strict</code></a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">6.2</td><td class="toc-text"><a href="#Pair:D_@.blocks,_Pair:D_@.options"><code class="pod-code-inline">Pair:D</code> <code class="pod-code-inline">@.blocks</code>, <code class="pod-code-inline">Pair:D</code> <code class="pod-code-inline">@.options</code></a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">6.3</td><td class="toc-text"><a href="#$.grammar,_$.actions"><code class="pod-code-inline">$.grammar</code>, <code class="pod-code-inline">$.actions</code></a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">6.4</td><td class="toc-text"><a href="#IO::Path_$.file"><code class="pod-code-inline">IO::Path</code> <code class="pod-code-inline">$.file</code></a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">6.5</td><td class="toc-text"><a href="#Bool_$.flat_=_False"><code class="pod-code-inline">Bool</code> <code class="pod-code-inline">$.flat = False</code></a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">6.6</td><td class="toc-text"><a href="#$.top"><code class="pod-code-inline">$.top</code></a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">6.7</td><td class="toc-text"><a href="#$.match"><code class="pod-code-inline">$.match</code></a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">7</td><td class="toc-text"><a href="#METHODS">METHODS</a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">7.1</td><td class="toc-text"><a href="#extend-grammar(_+@ext_),_extend-actions(_+@ext_)"><code class="pod-code-inline">extend-grammar( +@ext )</code>, <code class="pod-code-inline">extend-actions( +@ext )</code></a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">7.2</td><td class="toc-text"><a href="#build-grammar(),_build-actions()"><code class="pod-code-inline">build-grammar()</code>, <code class="pod-code-inline">build-actions()</code></a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">7.3</td><td class="toc-text"><a href="#multi_method_read(IO:D(Str:D)_:$file,_|args),_multi_method_read(Str:D_:$string,_|args)"><code class="pod-code-inline">multi method read(IO:D(Str:D) :$file, |args)</code>, <code class="pod-code-inline">multi method read(Str:D :$string, |args)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">7.3.1</td><td class="toc-text"><a href="#multi_get(...)"><code class="pod-code-inline">multi get(...)</code></a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">8</td><td class="toc-text"><a href="#EXPORTS">EXPORTS</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">9</td><td class="toc-text"><a href="#SEE_ALSO">SEE ALSO</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">10</td><td class="toc-text"><a href="#COPYRIGHT">COPYRIGHT</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">11</td><td class="toc-text"><a href="#LICENSE">LICENSE</a></td></tr>
 
 </table>
 </nav>
@@ -405,27 +408,7 @@ li > .pod-block-code { margin-top: 16px; }
     <div class="pod-body">
     <h1 id="NAME"><a class="u" href="#___top" title="go to top of document">NAME</a></h1>
 <p><code>Config::BINDish</code> - parse BIND9/named kind of config files</p>
-<section><h1>SYNOPSIS</h1>
-<pre class="pod-block-code">my $cfg = Config::BINDish.new;
-$cfg.read: string =&gt; q:to/CFG/;
-server "s1" {
-    name "my.server";
-    paths {
-        base "/opt/myapp";
-        pool "files" static {
-            "pub/img";
-            "static/img";
-            "docs";
-        };
-        pool "files" dynamic {
-            "users/reports";
-            "system/reports"
-        }
-    }
-}
-CFG
-say $cfg.top.get( :server("s1") =&gt; :paths =&gt; :pool("images") =&gt; 'root' ); # ./pub/img</pre>
-</section>
+<h1 id="SYNOPSIS_my_$cfg_=_Config::BINDish.new;_$cfg.read:_string_=&gt;_q:to/CFG/;_server_&quot;s1&quot;_{_name_&quot;my.server&quot;;_paths_{_base_&quot;/opt/myapp&quot;;_pool_&quot;files&quot;_static_{_&quot;pub/img&quot;;_&quot;static/img&quot;;_&quot;docs&quot;;_};_pool_&quot;files&quot;_dynamic_{_&quot;users/reports&quot;;_&quot;system/reports&quot;_}_}_}_CFG_say_$cfg.top.get(_:server(&quot;s1&quot;)_=&gt;_:paths_=&gt;_:pool(&quot;images&quot;)_=&gt;_'root'_);_#_./pub/img"><a class="u" href="#___top" title="go to top of document">SYNOPSIS my $cfg = Config::BINDish.new; $cfg.read: string =&gt; q:to/CFG/; server "s1" { name "my.server"; paths { base "/opt/myapp"; pool "files" static { "pub/img"; "static/img"; "docs"; }; pool "files" dynamic { "users/reports"; "system/reports" } } } CFG say $cfg.top.get( :server("s1") =&gt; :paths =&gt; :pool("images") =&gt; 'root' ); # ./pub/img</a></h1>
 <p>$cfg.read: file =&gt; $my-config-filename;</p>
 <h1 id="DISCLAIMER"><a class="u" href="#___top" title="go to top of document">DISCLAIMER</a></h1>
 <p>This module is very much experimental in the sense of the API methods it provides. The grammar is expected to be more stable, yet no warranties can be given at the moment.</p>
@@ -522,11 +505,16 @@ say $cfg :: :top-block&lt;name&gt; :: "option";</pre>
 </li>
 <li><p><a href="docs/html/Config/BINDish/INET.html"><code>Config::BINDish::INET</code></a></p>
 </li>
-<li><p><a href="README.html"><code>..::README</code></a></p>
+<li><p><a href="README.html"><code>README</code></a></p>
 </li>
-<li><p><a href="INDEX.html"><code>..::INDEX</code></a></p>
+<li><p><a href="INDEX.html"><code>INDEX</code></a></p>
 </li>
 </ul>
+<h1 id="COPYRIGHT"><a class="u" href="#___top" title="go to top of document">COPYRIGHT</a></h1>
+<p>(c) 2023, Vadim Belman &lt;vrurg@cpan.org&gt;</p>
+<h1 id="LICENSE"><a class="u" href="#___top" title="go to top of document">LICENSE</a></h1>
+<p>Artistic License 2.0</p>
+<p>See the <a href="LICENSE"><em>LICENSE</em></a> file in this distribution.</p>
 
     </div>
 

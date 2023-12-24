@@ -1,6 +1,6 @@
 # Config::BINDish Document Pages
 
-  - [`..::ChangeLog`](ChangeLog.md)
+  - [`Changes`](ChangeLog.md)
 
   - [`Config::BINDish`](docs/md/Config/BINDish.md)
 
