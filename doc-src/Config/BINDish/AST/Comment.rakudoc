@@ -5,7 +5,7 @@ C<class Config::BINDish::AST::Comment> - a comment
 
 =head1 DESCRIPTION
 
-Is L<C<Config::BINDish::AST>|../AST.md>.
+Is L<C<Config::BINDish::AST>|rakudoc:Config::BINDish::AST>.
 
 =head1 ATTRIBUTES
 
@@ -19,11 +19,12 @@ The actual content of the comment.
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|../../BINDish.md>,
-L<C<Config::BINDish::AST>|../AST.md>
+L<C<Config::BINDish>|rakudoc:Config::BINDish>,
+L<C<Config::BINDish::AST>|rakudoc:Config::BINDish::AST>
 
 =head1 AUTHOR
 
 Vadim Belman <vrurg@cpan.org>
 
 =end pod
+

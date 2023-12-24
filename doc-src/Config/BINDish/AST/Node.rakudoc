@@ -23,7 +23,7 @@ Returns C<self>.
 =head3 C<multi add(Config::BINDish::AST::Stmts:D $child --> Config::BINDish::AST:D)>
 
 This candidate pulls all
-L<C<Config::BINDish::AST::Stmts>|Stmts.md>
+L<C<Config::BINDish::AST::Stmts>|rakudoc:Config::BINDish::AST::Stmts>
 children and re-plants them under C<self>. When all children moved method C<dismiss> is invoked on C<$child>.
 
 Returns C<self>.
@@ -73,16 +73,17 @@ Another shortcut candidate to find all options declared with C<$option>. For exa
 
 will return a lazy L<C<Seq>|https://docs.raku.org/type/Seq> of all options in the configuration whose name ends with I<-gw>. Note that the sequence
 will contain objects of
-L<C<Config::BINDish::AST::Option>|Option.md>
+L<C<Config::BINDish::AST::Option>|rakudoc:Config::BINDish::AST::Option>
 type, not their values.
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|../../BINDish.md>,
-L<C<Config::BINDish::AST>|../AST.md>
+L<C<Config::BINDish>|rakudoc:Config::BINDish>,
+L<C<Config::BINDish::AST>|rakudoc:Config::BINDish::AST>
 
 =head1 AUTHOR
 
 Vadim Belman <vrurg@cpan.org>
 
 =end pod
+

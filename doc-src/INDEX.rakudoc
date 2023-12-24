@@ -1,0 +1,35 @@
+=begin pod
+=config :!index :title("Config::BINDish Document Pages")
+
+=head1 Config::BINDish Document Pages
+
+=item L«C«..::ChangeLog»|rakudoc:..::ChangeLog»
+=item L«C«Config::BINDish»|rakudoc:Config::BINDish»
+=item L«C«Config::BINDish::AST»|rakudoc:Config::BINDish::AST»
+=item L«C«Config::BINDish::AST::Block»|rakudoc:Config::BINDish::AST::Block»
+=item L«C«Config::BINDish::AST::Blockish»|rakudoc:Config::BINDish::AST::Blockish»
+=item L«C«Config::BINDish::AST::Comment»|rakudoc:Config::BINDish::AST::Comment»
+=item L«C«Config::BINDish::AST::Container»|rakudoc:Config::BINDish::AST::Container»
+=item L«C«Config::BINDish::AST::NOP»|rakudoc:Config::BINDish::AST::NOP»
+=item L«C«Config::BINDish::AST::Node»|rakudoc:Config::BINDish::AST::Node»
+=item L«C«Config::BINDish::AST::Option»|rakudoc:Config::BINDish::AST::Option»
+=item L«C«Config::BINDish::AST::Stmts»|rakudoc:Config::BINDish::AST::Stmts»
+=item L«C«Config::BINDish::AST::TOP»|rakudoc:Config::BINDish::AST::TOP»
+=item L«C«Config::BINDish::AST::Value»|rakudoc:Config::BINDish::AST::Value»
+=item L«C«Config::BINDish::Actions»|rakudoc:Config::BINDish::Actions»
+=item L«C«Config::BINDish::Expandable»|rakudoc:Config::BINDish::Expandable»
+=item L«C«Config::BINDish::Grammar»|rakudoc:Config::BINDish::Grammar»
+=item L«C«Config::BINDish::Grammar::BlockProps»|rakudoc:Config::BINDish::Grammar::BlockProps»
+=item L«C«Config::BINDish::Grammar::ContainerProps»|rakudoc:Config::BINDish::Grammar::ContainerProps»
+=item L«C«Config::BINDish::Grammar::Context»|rakudoc:Config::BINDish::Grammar::Context»
+=item L«C«Config::BINDish::Grammar::DeclarationProps»|rakudoc:Config::BINDish::Grammar::DeclarationProps»
+=item L«C«Config::BINDish::Grammar::OptionProps»|rakudoc:Config::BINDish::Grammar::OptionProps»
+=item L«C«Config::BINDish::Grammar::StatementProps»|rakudoc:Config::BINDish::Grammar::StatementProps»
+=item L«C«Config::BINDish::Grammar::Strictness»|rakudoc:Config::BINDish::Grammar::Strictness»
+=item L«C«Config::BINDish::Grammar::TypeStringify»|rakudoc:Config::BINDish::Grammar::TypeStringify»
+=item L«C«Config::BINDish::Grammar::Value»|rakudoc:Config::BINDish::Grammar::Value»
+=item L«C«Config::BINDish::INET»|rakudoc:Config::BINDish::INET»
+=item L«C«Config::BINDish::Ops»|rakudoc:Config::BINDish::Ops»
+=item L«C«README»|rakudoc:..::README»
+
+=end pod

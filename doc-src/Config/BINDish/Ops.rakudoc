@@ -1,7 +1,7 @@
 =begin pod
 =head1 NAME
 
-C<Config::BINDish::Ops> - operators for L<C<Config::BINDish>|../BINDish.md>
+C<Config::BINDish::Ops> - operators for L<C<Config::BINDish>|rakudoc:Config::BINDish>
 
 =head1 SYNOPSIS
 
@@ -29,7 +29,7 @@ C<Config::BINDish::Ops> - operators for L<C<Config::BINDish>|../BINDish.md>
 
 =head2 Request Operator C<∷>
 
-Request operator is a front-end to L<C<Config::BINDish::AST::Block>|AST/Block.md> C<get> method. It is available in
+Request operator is a front-end to L<C<Config::BINDish::AST::Block>|rakudoc:Config::BINDish::AST::Block> C<get> method. It is available in
 either Unicode (C<∷>) or ASCI (C<::>) form. Both are totally identical. But since the ASCI form also serves as name
 space separator for long names like C<Config::BINDish::Ops>, there is a slight chance that it would clash that. For
 this reason the Unicode version is preferable.
@@ -37,7 +37,7 @@ this reason the Unicode version is preferable.
 The operator has C<list> associativity making it follow any rules that apply to
 L<the comma operator|https://docs.raku.org/routine/,>.
 
-To import any form of the operator into your code namespace, use L<C<Config::BINDish>|../BINDish.md> with either of both
+To import any form of the operator into your code namespace, use L<C<Config::BINDish>|rakudoc:Config::BINDish> with either of both
 arguments:
 
     use Config::BINDish <op>; # Import Unicode version
@@ -63,8 +63,8 @@ referring an option.
 
 In a multi-component path all elements between the first and the last ones are always treated as block references.
 
-The first element must be either an L<C<Config::BINDish>|../BINDish.md> instance, or a
-L<C<Config::BINDish::AST::Block>|AST/Block.md>.
+The first element must be either an L<C<Config::BINDish>|rakudoc:Config::BINDish> instance, or a
+L<C<Config::BINDish::AST::Block>|rakudoc:Config::BINDish::AST::Block>.
 
 The last path element defines the kind of request. If it is a string, or a
 L<C<Positional>|https://docs.raku.org/type/Positional>, or a L<C<Code>|https://docs.raku.org/type/Code> then the
@@ -85,7 +85,7 @@ block is turned into a L<C<List>|https://docs.raku.org/type/List> to be used as 
 
 will return a list with a single element being C<42> integer.
 
-The operator can be adverbed with L<C<Config::BINDish::AST::Block>|AST/Block.md> method C<get> named parameters:
+The operator can be adverbed with L<C<Config::BINDish::AST::Block>|rakudoc:Config::BINDish::AST::Block> method C<get> named parameters:
 
     $cfg ∷ :cluster<generic> ∷ <the-answer> :raw; # returns an option object
     $cfg :: :cluster<generic> ∷ <group> :block;   # returns a block object
@@ -95,11 +95,12 @@ the configuration file.
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|../BINDish.md>,
-L<C<Config::BINDish::AST>|AST.md>
+L<C<Config::BINDish>|rakudoc:Config::BINDish>,
+L<C<Config::BINDish::AST>|rakudoc:Config::BINDish::AST>
 
 =head1 AUTHOR
 
 Vadim Belman <vrurg@cpan.org>
 
 =end pod
+

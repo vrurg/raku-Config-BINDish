@@ -18,18 +18,19 @@ A unique identifier.
 
 A keyword associated with statement. Not necessarily unique as same keyword may be used in different block contexts
 and be mapped to different IDs. See
-L<C<Config::BINDish::Grammar::StatementProps>|StatementProps.md>,
+L<C<Config::BINDish::Grammar::StatementProps>|rakudoc:Config::BINDish::Grammar::StatementProps>,
 C<$.in> attribute.
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|../../BINDish.md>,
-L<C<Config::BINDish::Grammar>|../Grammar.md>,
-L<C<Config::BINDish::Grammar::BlockProps>|BlockProps.md>,
-L<C<Config::BINDish::Grammar::OptionProps>|OptionProps.md>
+L<C<Config::BINDish>|rakudoc:Config::BINDish>,
+L<C<Config::BINDish::Grammar>|rakudoc:Config::BINDish::Grammar>,
+L<C<Config::BINDish::Grammar::BlockProps>|rakudoc:Config::BINDish::Grammar::BlockProps>,
+L<C<Config::BINDish::Grammar::OptionProps>|rakudoc:Config::BINDish::Grammar::OptionProps>
 
 =head1 AUTHOR
 
 Vadim Belman <vrurg@cpan.org>
 
 =end pod
+

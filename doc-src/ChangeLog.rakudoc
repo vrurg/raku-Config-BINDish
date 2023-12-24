@@ -1,7 +1,14 @@
 =begin pod
 =head1 VERSIONS
 
-=head v0.0.17
+=begin item
+B<v0.0.18>
+
+=item Fix list of registered extensions getting reset by bytecode deserialization
+=end item
+
+=begin item
+B<v0.0.17>
 
 =begin item
 Allow use of the same keyword for blocks and options. It only works when the keyword is used in different blocks,
@@ -18,57 +25,79 @@ client "foo" {
     service "mail";
 }
 =end code
-=end item
-=item Improved error reporting
 
-=head v0.0.15
+=end item
+
+=item Improved error reporting
+=end item
+
+=begin item
+B<v0.0.15>
 
 =item Fix some issues with exceptions
 =item Set version of generated extension classes to compiler's default
+=end item
 
-=head v0.0.14
+=begin item
+B<v0.0.14>
 
 =item Fix testing on Windows platforms where there is no $HOME
+=end item
 
-=head v0.0.13
+=begin item
+B<v0.0.13>
 
 =item Make macro expansion work for option default value
 =item Add support for environment variables in macro expansion
+=end item
 
-=head v0.0.12
+=begin item
+B<v0.0.12>
 
 =item A new C<no-values> block property in pre-declarations to declare option-only blocks
 =item Implemented value constraints via a new C<where> pre-declaration property
 =item Fixed a race condition which allowed for non-values to be parsed as values
 =item Fixed a problem when a type cannot coerce from a C<Match> object
+=end item
 
-=head v0.0.11
+=begin item
+B<v0.0.11>
 
 =item Fix C<AttrX::Mooish> dependency version
+=end item
 
-=head v0.0.10'
+=begin item
+B<v0.0.10'>
 
 =item Added support for classified blocks for `:in` key of block and option declarations
+=end item
 
-=head v0.0.9
+=begin item
+B<v0.0.9>
 
 =item Fix node dumping
 =item Fix expandable strings not considered standalone values
 =item C<find-all> results sequence is not lazy anymore
 =item Make dump output a little bit prettier
+=end item
 
-=head v0.0.8
+=begin item
+B<v0.0.8>
 
 =item Fix parsing of paths of C<dir/path> kind in value only blocks
 =item Fix a copypasto in export of ASCII version of C<::> operator
 =item Some improvements in error reporting
+=end item
 
-=head v0.0.7
+=begin item
+B<v0.0.7>
 
 =item Change some identity/value methods from returning an `AST::Container` to its value instead [b7ece317](https://github.com/vrurg/raku-Config-BINDish/commit/b7ece3173f156e94c8d42d3a12edc44cd33b8b26)
 =item Use more legit approach in registering phasers
+=end item
 
-=head v0.0.6
+=begin item
+B<v0.0.6>
 
 Bugfix release:
 
@@ -76,35 +105,41 @@ Bugfix release:
 =item Fixed boolean values conflicting and racing with keywords. Booleans now have higher-priority over keywords
 =item Fix wrong line number reported for errors pointing at a line start
 =item Fixed `Expandable` loosing values and causing weird parsing errors
+=end item
 
-=head v0.0.5
+=begin item
+B<v0.0.5>
 
 =item Added support for default values
 =item Multi-option queries
 =item Request operator(s): `∷` and `::`
 =item Clarified `.get` API
 =item Minor technical cleanups
+=end item
 
-=head2 v0.0.4
+=begin item
+B<v0.0.4>
 
 =item Added support for context-dependent declarations.
 
 This is a major change in the module logic. Whereas the previous versions considered each pre-declared keyword unique
 per its type (i.e. per options or blocks) and per configuration, they can now be made unique per individual block. See
-L<C<Config::BINDish::Grammar>|docs/md/Config/BINDish/Grammar.md>
+L<C<Config::BINDish::Grammar>|rakudoc:Config::BINDish::Grammar>
 for more information.
 
 =item Added two implicitly pre-declared blocks: C<.TOP> and C<.ANYWHERE>
-=item L<C<Config::BINDish::Grammar::StatementProps>|docs/md/Config/BINDish/Grammar/StatementProps.md>
+=item L<C<Config::BINDish::Grammar::StatementProps>|rakudoc:Config::BINDish::Grammar::StatementProps>
 attribute C<$.top-only> is deprecated;
 C«:in<.TOP>» must be used instead of C<:top-only> in a statement properties hash
-=item L<C<Config::BINDish::Grammar::Strictness>|docs/md/Config/BINDish/Grammar/Strictness.md>
+=item L<C<Config::BINDish::Grammar::Strictness>|rakudoc:Config::BINDish::Grammar::Strictness>
 got one more mode: C<warnings>
-=item L<C<Config::BINDish::INET>|docs/md/Config/BINDish/INET.md> extension now sets C<$*CFG-VALUE>
+=item L<C<Config::BINDish::INET>|rakudoc:Config::BINDish::INET> extension now sets C<$*CFG-VALUE>
 =item Fixed some error reports
 =item Improved handling of context leaving
+=end item
 
-=head2 v0.0.3
+=begin item
+B<v0.0.3>
 
 =item Implemented support for `include`, see README for more details
 =item Implemented support for `#line` directive, see README too
@@ -113,13 +148,17 @@ got one more mode: C<warnings>
 
 https://github.com/vrurg/raku-Config-BINDish/commit/b9b4fd97af431dae703e3b6d7c3afd5cfe8e195f contains detailed
 list of changes.
+=end item
 
-=head2 v0.0.2
+=begin item
+B<v0.0.2>
 
 =item Implemented grammar value type (C«value:sym<type>») specification
 =item Replaced dot (C<.>) separator with slash (C</>) in macros: C<"{block.option}"> is now C<"{block/option}">
 =item Implemented parent block reference in macros: C<"{../../option}">
 =item Added a new standard value type: file path
 =item API version bumped to v0.0.2
+=end item
 
 =end pod
+

@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Config::BINDish::AST</title>
+    <meta charset="UTF-8">
+    <style>hr,
+img {
+    box-sizing: content-box
+}
+body::after,
+body::before,
+hr::after,
+hr::before {
+    display: table;
+    content: ""
+}
+a,
+a:not([href]) {
+    text-decoration: none
+}
+
+hr,
+svg:not(:root) {
+    overflow: hidden
+}
+
+img,
+table tr {
+    background-color: #fff
+}
+
+pre,
+table {
+    overflow: auto
+}
+
+dl,
+dl dt,
+hr,
+pre code,
+pre>code,
+td,
+th {
+    padding: 0
+}
+
+input,
+pre code {
+    overflow: visible
+}
+
+pre,
+pre code {
+    word-wrap: normal
+}
+
+body {
+    -ms-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+    color: #333;
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-size: 16px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    width: 820px;
+    margin: 2em auto;
+}
+
+a {
+    background-color: transparent;
+    -webkit-text-decoration-skip: objects;
+    color: #4078c0
+}
+
+a:active,
+a:hover {
+    outline-width: 0;
+    text-decoration: underline
+}
+
+h1 {
+    margin: .67em 0
+}
+
+img {
+    border-style: none;
+    max-width: 100%
+}
+
+h1,
+h2 {
+    padding-bottom: .3em;
+    border-bottom: 1px solid #eee
+}
+
+input {
+    font: inherit;
+    margin: 0;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit
+}
+
+* {
+    box-sizing: border-box
+}
+
+strong {
+    font-weight: 600
+}
+
+body::after,
+hr::after {
+    clear: both
+}
+
+table {
+    border-spacing: 0;
+    border-collapse: collapse;
+    display: block;
+    width: 100%
+}
+
+blockquote {
+    margin: 0;
+    padding: 0 1em;
+    color: #777;
+    border-left: .25em solid #ddd
+}
+
+ol ol,
+ul ol {
+    list-style-type: lower-roman
+}
+
+ol ol ol,
+ol ul ol,
+ul ol ol,
+ul ul ol {
+    list-style-type: lower-alpha
+}
+
+dd {
+    margin-left: 0
+}
+
+code {
+    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace
+}
+
+pre {
+    font: 12px Consolas, "Liberation Mono", Menlo, Courier, monospace
+}
+
+input {
+    -webkit-font-feature-settings: "liga" 0;
+    font-feature-settings: "liga" 0
+}
+
+body>:first-child {
+    margin-top: 0!important
+}
+
+body>:last-child {
+    margin-bottom: 0!important
+}
+
+a:not([href]) {
+    color: inherit
+}
+
+blockquote,
+dl,
+ol,
+p,
+pre,
+table,
+ul {
+    margin-top: 0;
+    margin-bottom: 16px
+}
+
+hr {
+    background: #e7e7e7;
+    height: .25em;
+    margin: 24px 0;
+    border: 0
+}
+
+blockquote>:first-child {
+    margin-top: 0
+}
+
+blockquote>:last-child {
+    margin-bottom: 0
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin-top: 24px;
+    margin-bottom: 16px;
+    font-weight: 600;
+    line-height: 1.25
+}
+
+dl dt,
+table th {
+    font-weight: 700
+}
+
+h1 code,
+h1 tt,
+h2 code,
+h2 tt,
+h3 code,
+h3 tt,
+h4 code,
+h4 tt,
+h5 code,
+h5 tt,
+h6 code,
+h6 tt {
+    font-size: inherit
+}
+
+h1 {
+    font-size: 2em
+}
+
+h2 {
+    font-size: 1.5em
+}
+
+h3 {
+    font-size: 1.25em
+}
+
+h4 {
+    font-size: 1em
+}
+
+h5 {
+    font-size: .875em
+}
+
+h6 {
+    font-size: .85em;
+    color: #777
+}
+
+ol,
+ul {
+    padding-left: 2em
+}
+
+ol ol,
+ol ul,
+ul ol,
+ul ul {
+    margin-top: 0;
+    margin-bottom: 0
+}
+
+li>p {
+    margin-top: 16px
+}
+
+li+li {
+    margin-top: .25em
+}
+
+dl dt {
+    margin-top: 16px;
+    font-size: 1em;
+    font-style: italic
+}
+
+dl dd {
+    padding: 0 16px;
+    margin-bottom: 16px
+}
+
+table td,
+table th {
+    padding: 6px 13px;
+    border: 1px solid #ddd
+}
+
+table tr {
+    border-top: 1px solid #ccc
+}
+
+table tr:nth-child(2n) {
+    background-color: #f8f8f8
+}
+
+code {
+    padding: .2em 0;
+    margin: 0;
+    font-size: 85%;
+    background-color: rgba(0, 0, 0, .04);
+    border-radius: 3px
+}
+
+code::after,
+code::before {
+    letter-spacing: -.2em;
+    content: "\00a0"
+}
+
+pre>code {
+    margin: 0;
+    font-size: 100%;
+    word-break: normal;
+    white-space: pre;
+    background: 0 0;
+    border: 0
+}
+
+pre {
+    padding: 16px;
+    font-size: 85%;
+    line-height: 1.45;
+    background-color: #f7f7f7;
+    border-radius: 3px
+}
+
+pre code {
+    display: inline;
+    max-width: auto;
+    margin: 0;
+    line-height: inherit;
+    background-color: transparent;
+    border: 0
+}
+
+pre code::after,
+pre code::before {
+    content: normal
+}
+
+kbd {
+    display: inline-block;
+    padding: 3px 5px;
+    font: 11px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    line-height: 10px;
+    color: #555;
+    vertical-align: middle;
+    background-color: #fcfcfc;
+    border: 1px solid #ccc;
+    border-bottom-color: #bbb;
+    border-radius: 3px;
+    box-shadow: inset 0 -1px 0 #bbb
+}
+
+hr {
+    border-bottom-color: #eee
+}
+</style>
+
+    
+<style class="build-tools-gen-doc">.toc-level-1 .toc-text { padding-left: 1.5em; }
+.toc-level-2 .toc-text { padding-left: 2.5em; }
+.toc-level-3 .toc-text { padding-left: 3.5em; }
+.toc-level-4 .toc-text { padding-left: 4.5em; }
+.toc-level-5 .toc-text { padding-left: 5.5em; }
+#TOC * { border-width: 0; }
+li > p { margin: inherit; }
+li > .pod-block-code { margin-top: 16px; }
+</style></head>
+
+<body class="pod">
+    <div id="___top"></div>
+    <nav class="indexgroup">
+<table id="TOC">
+<caption><h2 id="TOC_Title">Table of Contents</h2></caption>
+<tr class="toc-level-1"><td class="toc-number">1</td><td class="toc-text"><a href="#CLASS">CLASS</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">2</td><td class="toc-text"><a href="#DESCRIPTION">DESCRIPTION</a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">2.1</td><td class="toc-text"><a href="#Labels">Labels</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">3</td><td class="toc-text"><a href="#METHODS">METHODS</a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">3.0.1</td><td class="toc-text"><a href="#dup(*%twiddles)"><code class="pod-code-inline">dup(*%twiddles)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">3.0.2</td><td class="toc-text"><a href="#set-parent(Config::BINDish::AST::Node:D_%24parent)"><code class="pod-code-inline">set-parent(Config::BINDish::AST::Node:D $parent)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">3.0.3</td><td class="toc-text"><a href="#multi_parent()"><code class="pod-code-inline">multi parent()</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">3.0.4</td><td class="toc-text"><a href="#multi_parent(Config::BINDish::AST:U_%5Cparent-type)"><code class="pod-code-inline">multi parent(Config::BINDish::AST:U \parent-type)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">3.0.5</td><td class="toc-text"><a href="#multi_mark-as(*@labels)"><code class="pod-code-inline">multi mark-as(*@labels)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">3.0.6</td><td class="toc-text"><a href="#is-marked(Str:D_%24label_--_Bool:D)&gt;"><code class="pod-code-inline">is-marked(Str:D $label --</code> Bool:D)&gt;</a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">3.0.7</td><td class="toc-text"><a href="#labels()"><code class="pod-code-inline">labels()</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">3.0.8</td><td class="toc-text"><a href="#ast-name()"><code class="pod-code-inline">ast-name()</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">3.0.9</td><td class="toc-text"><a href="#dump(Int:D_:%24level_=_0_--_Str:D)&gt;"><code class="pod-code-inline">dump(Int:D :$level = 0 --</code> Str:D)&gt;</a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">3.0.10</td><td class="toc-text"><a href="#register-type(Str:D_%24ast-name,_Mu_%5Cast-type)"><code class="pod-code-inline">register-type(Str:D $ast-name, Mu \ast-type)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">3.0.11</td><td class="toc-text"><a href="#new-ast(Str:D_%24node-type,_%7Cprofile_--_Config::BINDish::AST:D)&gt;"><code class="pod-code-inline">new-ast(Str:D $node-type, |profile --</code> Config::BINDish::AST:D)&gt;</a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">3.0.12</td><td class="toc-text"><a href="#top-node(--&gt;_Config::BINDish::AST)"><code class="pod-code-inline">top-node(--&gt; Config::BINDish::AST)</code></a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">4</td><td class="toc-text"><a href="#AST_NODE_CLASSES_AND_ROLES">AST NODE CLASSES AND ROLES</a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">4.1</td><td class="toc-text"><a href="#Roles">Roles</a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">4.2</td><td class="toc-text"><a href="#Classes">Classes</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">5</td><td class="toc-text"><a href="#SEE_ALSO">SEE ALSO</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">6</td><td class="toc-text"><a href="#AUTHOR">AUTHOR</a></td></tr>
+
+</table>
+</nav>
+
+
+    <div class="pod-body">
+    <h1 id="CLASS"><a class="u" href="#___top" title="go to top of document">CLASS</a></h1>
+<p><code>Config::BINDish::AST</code> - the standard <code>Config::BINDish</code> AST tree representation</p>
+<h1 id="DESCRIPTION"><a class="u" href="#___top" title="go to top of document">DESCRIPTION</a></h1>
+<p>As a module <code>Config::BINDish::AST</code> defines all standard AST node classes used by <a href="Actions.html"><code>Config::BINDish::Actions</code></a> to build the resulting representation of the parsed configuration.</p>
+<p>As a class <code>Config::BINDish::AST</code> is the base class for all other AST classes.</p>
+<h2 id="Labels"><a class="u" href="#___top" title="go to top of document">Labels</a></h2>
+<p>A little bit of special attention must be paid to labeling functionality of AST. Let's consider how an option is parsed:</p>
+<pre class="pod-block-code">the-answer 42;</pre>
+<p>In the above example both `the-answer` and `42` are considered to be <em>values</em> and as such they result in two instances of <a href="AST/Value.html"><code>Config::BINDish::AST::Value</code></a>. Both objects then become children of an <a href="AST/Option.html"><code>Config::BINDish::AST::Option</code></a> instance. Roughly, the parsed tree will look like:</p>
+<pre class="pod-block-code">Option
+ `---- Value
+ `---- Value</pre>
+<p>To distinguish one value from another we can attach labels to them. So, the value representing option name will get tagged as <em>"option-name"</em>; and <em>42</em> will become <em>"option-value"</em>.</p>
+<p>See methods <code>mark-as</code>, <code>labels</code>, <code>is-marked</code>, <code>child</code>, <code>children</code> below.</p>
+<h1 id="METHODS"><a class="u" href="#___top" title="go to top of document">METHODS</a></h1>
+<h3 id="dup(*%twiddles)"><a class="u" href="#___top" title="go to top of document"><code>dup(*%twiddles)</code></a></h3>
+<p>This method is close in its functionality to the standard Raku <code>clone</code> method, but adjusted for the needs of AST class family.</p>
+<h3 id="set-parent(Config::BINDish::AST::Node:D_$parent)"><a class="u" href="#___top" title="go to top of document"><code>set-parent(Config::BINDish::AST::Node:D $parent)</code></a></h3>
+<p>Sets AST instance parent node.</p>
+<h3 id="multi_parent()"><a class="u" href="#___top" title="go to top of document"><code>multi parent()</code></a></h3>
+<p>Returns current parent node.</p>
+<h3 id="multi_parent(Config::BINDish::AST:U_\parent-type)"><a class="u" href="#___top" title="go to top of document"><code>multi parent(Config::BINDish::AST:U \parent-type)</code></a></h3>
+<p>Returns the closest parent node of type <code>parent-type</code>. For example, to get the enclosing block of a <a href="AST/Value.html"><code>Config::BINDish::AST::Value</code></a> one can do:</p>
+<pre class="pod-block-code">$value.parent(Config::BINDish::AST::Block);</pre>
+<h3 id="multi_mark-as(*@labels)"><a class="u" href="#___top" title="go to top of document"><code>multi mark-as(*@labels)</code></a></h3>
+<p>Sets labels for AST instance.</p>
+<h3 id="is-marked(Str:D_$label_--_Bool:D)&gt;"><a class="u" href="#___top" title="go to top of document"><code>is-marked(Str:D $label --</code> Bool:D)&gt;</a></h3>
+<p>Returns <em>True</em> if AST object is marked with <code>$label</code>.</p>
+<h3 id="labels()"><a class="u" href="#___top" title="go to top of document"><code>labels()</code></a></h3>
+<p>Returns a list of all AST object labels.</p>
+<h3 id="ast-name()"><a class="u" href="#___top" title="go to top of document"><code>ast-name()</code></a></h3>
+<p>Returns current node name, based on the node class name. If the name starts with <em>Config::BINDish::AST::</em> then this part is stripped off. Otherwise the class name is considered to be the name.</p>
+<h3 id="dump(Int:D_:$level_=_0_--_Str:D)&gt;"><a class="u" href="#___top" title="go to top of document"><code>dump(Int:D :$level = 0 --</code> Str:D)&gt;</a></h3>
+<p>Returns current node' string representation which consists of its <code>ast-name</code> and <code>gist</code>. The string would be indented by <code>$level</code> white spaces.</p>
+<h3 id="register-type(Str:D_$ast-name,_Mu_\ast-type)"><a class="u" href="#___top" title="go to top of document"><code>register-type(Str:D $ast-name, Mu \ast-type)</code></a></h3>
+<p>Method registers an <code>ast-type</code> class under <code>$ast-name</code>. <code>new-ast</code> method (see below) can later create a node instance based on its registered name.</p>
+<h3 id="new-ast(Str:D_$node-type,_|profile_--_Config::BINDish::AST:D)&gt;"><a class="u" href="#___top" title="go to top of document"><code>new-ast(Str:D $node-type, |profile --</code> Config::BINDish::AST:D)&gt;</a></h3>
+<p>Creates a new instance of ast node based on its name. The name can be either a registered AST node name, see <code>register-type</code> method above; or a short name under <code>Config::BINDish::AST::</code> namespace. If no associated AST type object is found then a failure wrapped around <code>Config::BINDish::X::AST::DoesnExists</code> is returned.</p>
+<p>For example, with the following statement:</p>
+<pre class="pod-block-code">Config::BINDish::AST.register-type("MyAppNode", MyApp::Config::AST::Node);</pre>
+<p>it is then possible to:</p>
+<pre class="pod-block-code">Config::BINDish::AST.new-ast("MyAppNode", :foo(42), :bar("The Answer")); # An instance of My::App::Config::AST::Node</pre>
+<p>For one of the standard AST nodes one can:</p>
+<pre class="pod-block-code">Config::BINDish::AST.new-ast('Block', :name(...), :class(...), ...); # An instance of Config::BINDish::AST::Block</pre>
+<h3 id="top-node(--&gt;_Config::BINDish::AST)"><a class="u" href="#___top" title="go to top of document"><code>top-node(--&gt; Config::BINDish::AST)</code></a></h3>
+<p>Returns the topmost node, or, in other words, the root of the AST tree.</p>
+<h1 id="AST_NODE_CLASSES_AND_ROLES"><a class="u" href="#___top" title="go to top of document">AST NODE CLASSES AND ROLES</a></h1>
+<h2 id="Roles"><a class="u" href="#___top" title="go to top of document">Roles</a></h2>
+<ul><li><p><a href="AST/Container.html"><code>Config::BINDish::AST::Container</code></a></p>
+</li>
+<li><p><a href="AST/Blockish.html"><code>Config::BINDish::AST::Blockish</code></a></p>
+</li>
+</ul>
+<h2 id="Classes"><a class="u" href="#___top" title="go to top of document">Classes</a></h2>
+<ul><li><p><a href="AST/Block.html"><code>Config::BINDish::AST::Block</code></a></p>
+</li>
+<li><p><a href="AST/Comment.html"><code>Config::BINDish::AST::Comment</code></a></p>
+</li>
+<li><p><a href="AST/Option.html"><code>Config::BINDish::AST::Option</code></a></p>
+</li>
+<li><p><a href="AST/Node.html"><code>Config::BINDish::AST::Node</code></a></p>
+</li>
+<li><p><a href="AST/NOP.html"><code>Config::BINDish::AST::NOP</code></a></p>
+</li>
+<li><p><a href="AST/Stmts.html"><code>Config::BINDish::AST::Stmts</code></a></p>
+</li>
+<li><p><a href="AST/TOP.html"><code>Config::BINDish::AST::TOP</code></a></p>
+</li>
+<li><p><a href="AST/Value.html"><code>Config::BINDish::AST::Value</code></a></p>
+</li>
+</ul>
+<h1 id="SEE_ALSO"><a class="u" href="#___top" title="go to top of document">SEE ALSO</a></h1>
+<p><a href="../BINDish.html"><code>Config::BINDish</code></a>, <a href="Actions.html"><code>Config::BINDish::Actions</code></a></p>
+<h1 id="AUTHOR"><a class="u" href="#___top" title="go to top of document">AUTHOR</a></h1>
+<p>Vadim Belman &lt;vrurg@cpan.org&gt;</p>
+
+    </div>
+
+    
+</body>
+</html>

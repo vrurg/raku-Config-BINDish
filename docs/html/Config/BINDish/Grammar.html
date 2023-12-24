@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Config::BINDish::Grammar</title>
+    <meta charset="UTF-8">
+    <style>hr,
+img {
+    box-sizing: content-box
+}
+body::after,
+body::before,
+hr::after,
+hr::before {
+    display: table;
+    content: ""
+}
+a,
+a:not([href]) {
+    text-decoration: none
+}
+
+hr,
+svg:not(:root) {
+    overflow: hidden
+}
+
+img,
+table tr {
+    background-color: #fff
+}
+
+pre,
+table {
+    overflow: auto
+}
+
+dl,
+dl dt,
+hr,
+pre code,
+pre>code,
+td,
+th {
+    padding: 0
+}
+
+input,
+pre code {
+    overflow: visible
+}
+
+pre,
+pre code {
+    word-wrap: normal
+}
+
+body {
+    -ms-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+    color: #333;
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-size: 16px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    width: 820px;
+    margin: 2em auto;
+}
+
+a {
+    background-color: transparent;
+    -webkit-text-decoration-skip: objects;
+    color: #4078c0
+}
+
+a:active,
+a:hover {
+    outline-width: 0;
+    text-decoration: underline
+}
+
+h1 {
+    margin: .67em 0
+}
+
+img {
+    border-style: none;
+    max-width: 100%
+}
+
+h1,
+h2 {
+    padding-bottom: .3em;
+    border-bottom: 1px solid #eee
+}
+
+input {
+    font: inherit;
+    margin: 0;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit
+}
+
+* {
+    box-sizing: border-box
+}
+
+strong {
+    font-weight: 600
+}
+
+body::after,
+hr::after {
+    clear: both
+}
+
+table {
+    border-spacing: 0;
+    border-collapse: collapse;
+    display: block;
+    width: 100%
+}
+
+blockquote {
+    margin: 0;
+    padding: 0 1em;
+    color: #777;
+    border-left: .25em solid #ddd
+}
+
+ol ol,
+ul ol {
+    list-style-type: lower-roman
+}
+
+ol ol ol,
+ol ul ol,
+ul ol ol,
+ul ul ol {
+    list-style-type: lower-alpha
+}
+
+dd {
+    margin-left: 0
+}
+
+code {
+    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace
+}
+
+pre {
+    font: 12px Consolas, "Liberation Mono", Menlo, Courier, monospace
+}
+
+input {
+    -webkit-font-feature-settings: "liga" 0;
+    font-feature-settings: "liga" 0
+}
+
+body>:first-child {
+    margin-top: 0!important
+}
+
+body>:last-child {
+    margin-bottom: 0!important
+}
+
+a:not([href]) {
+    color: inherit
+}
+
+blockquote,
+dl,
+ol,
+p,
+pre,
+table,
+ul {
+    margin-top: 0;
+    margin-bottom: 16px
+}
+
+hr {
+    background: #e7e7e7;
+    height: .25em;
+    margin: 24px 0;
+    border: 0
+}
+
+blockquote>:first-child {
+    margin-top: 0
+}
+
+blockquote>:last-child {
+    margin-bottom: 0
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin-top: 24px;
+    margin-bottom: 16px;
+    font-weight: 600;
+    line-height: 1.25
+}
+
+dl dt,
+table th {
+    font-weight: 700
+}
+
+h1 code,
+h1 tt,
+h2 code,
+h2 tt,
+h3 code,
+h3 tt,
+h4 code,
+h4 tt,
+h5 code,
+h5 tt,
+h6 code,
+h6 tt {
+    font-size: inherit
+}
+
+h1 {
+    font-size: 2em
+}
+
+h2 {
+    font-size: 1.5em
+}
+
+h3 {
+    font-size: 1.25em
+}
+
+h4 {
+    font-size: 1em
+}
+
+h5 {
+    font-size: .875em
+}
+
+h6 {
+    font-size: .85em;
+    color: #777
+}
+
+ol,
+ul {
+    padding-left: 2em
+}
+
+ol ol,
+ol ul,
+ul ol,
+ul ul {
+    margin-top: 0;
+    margin-bottom: 0
+}
+
+li>p {
+    margin-top: 16px
+}
+
+li+li {
+    margin-top: .25em
+}
+
+dl dt {
+    margin-top: 16px;
+    font-size: 1em;
+    font-style: italic
+}
+
+dl dd {
+    padding: 0 16px;
+    margin-bottom: 16px
+}
+
+table td,
+table th {
+    padding: 6px 13px;
+    border: 1px solid #ddd
+}
+
+table tr {
+    border-top: 1px solid #ccc
+}
+
+table tr:nth-child(2n) {
+    background-color: #f8f8f8
+}
+
+code {
+    padding: .2em 0;
+    margin: 0;
+    font-size: 85%;
+    background-color: rgba(0, 0, 0, .04);
+    border-radius: 3px
+}
+
+code::after,
+code::before {
+    letter-spacing: -.2em;
+    content: "\00a0"
+}
+
+pre>code {
+    margin: 0;
+    font-size: 100%;
+    word-break: normal;
+    white-space: pre;
+    background: 0 0;
+    border: 0
+}
+
+pre {
+    padding: 16px;
+    font-size: 85%;
+    line-height: 1.45;
+    background-color: #f7f7f7;
+    border-radius: 3px
+}
+
+pre code {
+    display: inline;
+    max-width: auto;
+    margin: 0;
+    line-height: inherit;
+    background-color: transparent;
+    border: 0
+}
+
+pre code::after,
+pre code::before {
+    content: normal
+}
+
+kbd {
+    display: inline-block;
+    padding: 3px 5px;
+    font: 11px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    line-height: 10px;
+    color: #555;
+    vertical-align: middle;
+    background-color: #fcfcfc;
+    border: 1px solid #ccc;
+    border-bottom-color: #bbb;
+    border-radius: 3px;
+    box-shadow: inset 0 -1px 0 #bbb
+}
+
+hr {
+    border-bottom-color: #eee
+}
+</style>
+
+    
+<style class="build-tools-gen-doc">.toc-level-1 .toc-text { padding-left: 1.5em; }
+.toc-level-2 .toc-text { padding-left: 2.5em; }
+.toc-level-3 .toc-text { padding-left: 3.5em; }
+.toc-level-4 .toc-text { padding-left: 4.5em; }
+.toc-level-5 .toc-text { padding-left: 5.5em; }
+#TOC * { border-width: 0; }
+li > p { margin: inherit; }
+li > .pod-block-code { margin-top: 16px; }
+</style></head>
+
+<body class="pod">
+    <div id="___top"></div>
+    <nav class="indexgroup">
+<table id="TOC">
+<caption><h2 id="TOC_Title">Table of Contents</h2></caption>
+<tr class="toc-level-1"><td class="toc-number">1</td><td class="toc-text"><a href="#NAME">NAME</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">2</td><td class="toc-text"><a href="#DESCRIPTION">DESCRIPTION</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">3</td><td class="toc-text"><a href="#ATTRIBUTES">ATTRIBUTES</a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">3.0.1</td><td class="toc-text"><a href="#Bool:D_%24.flat"><code class="pod-code-inline">Bool:D</code> <code class="pod-code-inline">$.flat</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">3.0.2</td><td class="toc-text"><a href="#Config::BINDish::Grammar::Strictness_%24.strict_=_False"><code class="pod-code-inline">Config::BINDish::Grammar::Strictness</code> <code class="pod-code-inline">$.strict = False</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">3.0.3</td><td class="toc-text"><a href="#@.prop-keys"><code class="pod-code-inline">@.prop-keys</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">3.0.4</td><td class="toc-text"><a href="#Hash%5BConfig::BINDish::Grammar::StatementProps:D%5D_%.props"><code class="pod-code-inline">Hash</code><code class="pod-code-inline">[</code><code class="pod-code-inline">Config::BINDish::Grammar::StatementProps:D</code><code class="pod-code-inline">]</code> <code class="pod-code-inline">%.props</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">3.0.5</td><td class="toc-text"><a href="#SetHash_%.keywords"><code class="pod-code-inline">SetHash</code> <code class="pod-code-inline">%.keywords</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">3.0.6</td><td class="toc-text"><a href="#%.prop-relations"><code class="pod-code-inline">%.prop-relations</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">3.0.7</td><td class="toc-text"><a href="#Pair:D_@.blocks"><code class="pod-code-inline">Pair:D</code> <code class="pod-code-inline">@.blocks</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">3.0.8</td><td class="toc-text"><a href="#Pair:D_@.options"><code class="pod-code-inline">Pair:D</code> <code class="pod-code-inline">@.options</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">3.0.9</td><td class="toc-text"><a href="#%.reserved-opts"><code class="pod-code-inline">%.reserved-opts</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">3.0.10</td><td class="toc-text"><a href="#Int:D_%24.line-delta_=_0">Int:D <code class="pod-code-inline">$.line-delta = 0</code></a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">4</td><td class="toc-text"><a href="#DYNAMIC_VARIABLES">DYNAMIC VARIABLES</a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.0.1</td><td class="toc-text"><a href="#%24*CFG-GRAMMAR"><code class="pod-code-inline">$*CFG-GRAMMAR</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.0.2</td><td class="toc-text"><a href="#%24*CFG-CTX"><code class="pod-code-inline">$*CFG-CTX</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.0.3</td><td class="toc-text"><a href="#%24*CFG-PARENT-CTX"><code class="pod-code-inline">$*CFG-PARENT-CTX</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.0.4</td><td class="toc-text"><a href="#%24*CFG-CTX-PROPS"><code class="pod-code-inline">$*CFG-CTX-PROPS</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.0.5</td><td class="toc-text"><a href="#%24*CFG-AS-INCLUDE"><code class="pod-code-inline">$*CFG-AS-INCLUDE</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.0.6</td><td class="toc-text"><a href="#%24*CFG-FLAT-BLOCKS"><code class="pod-code-inline">$*CFG-FLAT-BLOCKS</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.0.7</td><td class="toc-text"><a href="#%24*CFG-INNER-PARENT"><code class="pod-code-inline">$*CFG-INNER-PARENT</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.0.8</td><td class="toc-text"><a href="#%24*CFG-TOP"><code class="pod-code-inline">$*CFG-TOP</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.0.9</td><td class="toc-text"><a href="#%24*CFG-NON-STRICT"><code class="pod-code-inline">$*CFG-NON-STRICT</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.0.10</td><td class="toc-text"><a href="#%24*CFG-SIMULATION"><code class="pod-code-inline">$*CFG-SIMULATION</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.0.11</td><td class="toc-text"><a href="#Config::BINDish::Grammar::Value_%24*CFG-VALUE"><code class="pod-code-inline">Config::BINDish::Grammar::Value</code> <code class="pod-code-inline">$*CFG-VALUE</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.0.12</td><td class="toc-text"><a href="#Config::BINDish::Grammar::Value_%24*CFG-KEYWORD"><code class="pod-code-inline">Config::BINDish::Grammar::Value</code> <code class="pod-code-inline">$*CFG-KEYWORD</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.0.13</td><td class="toc-text"><a href="#%24*CFG-BLOCK-TYPE,_%24*CFG-BLOCK-NAME,_%24*CFG-BLOCK-CLASS"><code class="pod-code-inline">$*CFG-BLOCK-TYPE</code>, <code class="pod-code-inline">$*CFG-BLOCK-NAME</code>, <code class="pod-code-inline">$*CFG-BLOCK-CLASS</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.0.14</td><td class="toc-text"><a href="#%24*CFG-BLOCK-ERR-POS"><code class="pod-code-inline">$*CFG-BLOCK-ERR-POS</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.0.15</td><td class="toc-text"><a href="#%24*CFG-SPECIFIC-VALUE-SYM"><code class="pod-code-inline">$*CFG-SPECIFIC-VALUE-SYM</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.0.16</td><td class="toc-text"><a href="#%24*CFG-BACKTRACK-OPTION,_%24*CFG-BACKTRACK-BLOCK"><code class="pod-code-inline">$*CFG-BACKTRACK-OPTION</code>, <code class="pod-code-inline">$*CFG-BACKTRACK-BLOCK</code></a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">5</td><td class="toc-text"><a href="#METHODS">METHODS</a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.1</td><td class="toc-text"><a href="#set-value(Mu_%5Ctype,_*%value)"><code class="pod-code-inline">set-value(Mu \type, *%value)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.2</td><td class="toc-text"><a href="#set-line-relative(Int:D_%24from-line,_Int:D_:%24to-line_=_self.line(:absolute))"><code class="pod-code-inline">set-line-relative(Int:D $from-line, Int:D :$to-line = self.line(:absolute))</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.3</td><td class="toc-text"><a href="#set-file(%24file)"><code class="pod-code-inline">set-file($file)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.4</td><td class="toc-text"><a href="#file()"><code class="pod-code-inline">file()</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.5</td><td class="toc-text"><a href="#line(Bool_:%24absolute_=_False)"><code class="pod-code-inline">line(Bool :$absolute = False)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.6</td><td class="toc-text"><a href="#submethod_setup-BINDish"><code class="pod-code-inline">submethod setup-BINDish</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.7</td><td class="toc-text"><a href="#multi_reserve-keywords(Str:D_%24what,_@keywords)"><code class="pod-code-inline">multi reserve-keywords(Str:D $what, @keywords)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.8</td><td class="toc-text"><a href="#multi_reserve-keywords(*%what-keywords)"><code class="pod-code-inline">multi reserve-keywords(*%what-keywords)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.9</td><td class="toc-text"><a href="#multi_is-reserved(Str:D_%24what,_Str:D_%24keyword)"><code class="pod-code-inline">multi is-reserved(Str:D $what, Str:D $keyword)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.10</td><td class="toc-text"><a href="#multi_is-reserved(*%p_where_*.elems_==_1)"><code class="pod-code-inline">multi is-reserved(*%p where *.elems == 1)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.11</td><td class="toc-text"><a href="#proto_statement-props(Str:D_%24what)"><code class="pod-code-inline">proto statement-props(Str:D $what)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.12</td><td class="toc-text"><a href="#declare-statement(Str:D_%24what,_Any:D_%24id_=_self.autogen-id,_%24keyword_where_Str:D_%7C_Bool,_:%props,_Bool_:%24cleanup_=_True)"><code class="pod-code-inline">declare-statement(Str:D $what, Any:D $id = self.autogen-id, $keyword where Str:D | Bool, :%props, Bool :$cleanup = True)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.13</td><td class="toc-text"><a href="#multi_declare-block(Any:D_%24id,_Str:D_%24keyword,_%props,_Bool_:%24cleanup_=_True_--&gt;_BlockProps:D)"><code class="pod-code-inline">multi declare-block(Any:D $id, Str:D $keyword, %props, Bool :$cleanup = True --&gt; BlockProps:D)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.14</td><td class="toc-text"><a href="#multi_declare-block(Any:D_%24id,_Str:D_%24keyword,_Bool_:%24cleanup_=_True,_*%props_--&gt;_BlockProps:D)"><code class="pod-code-inline">multi declare-block(Any:D $id, Str:D $keyword, Bool :$cleanup = True, *%props --&gt; BlockProps:D)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.15</td><td class="toc-text"><a href="#multi_declare-block(Pair:D_%24identity,_%props,_Bool_:%24cleanup_=_True_--&gt;_BlockProps:D)"><code class="pod-code-inline">multi declare-block(Pair:D $identity, %props, Bool :$cleanup = True --&gt; BlockProps:D)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.16</td><td class="toc-text"><a href="#multi_declare-block(Str:D_%24keyword,_%props,_Bool_:%24cleanup_=_True_--&gt;_BlockProps:D)"><code class="pod-code-inline">multi declare-block(Str:D $keyword, %props, Bool :$cleanup = True --&gt; BlockProps:D)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.17</td><td class="toc-text"><a href="#multi_declare-block(Str:D_%24keyword,_Bool_:%24cleanup_=_True,_*%props_--&gt;_BlockProps:D)"><code class="pod-code-inline">multi declare-block(Str:D $keyword, Bool :$cleanup = True, *%props --&gt; BlockProps:D)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.18</td><td class="toc-text"><a href="#multi_declare-block(*%params_--&gt;_BlockProps:D)"><code class="pod-code-inline">multi declare-block(*%params --&gt; BlockProps:D)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.19</td><td class="toc-text"><a href="#multi_declare-blocks(@blocks,_Bool_:%24cleanup_=_True_--&gt;_Nil)"><code class="pod-code-inline">multi declare-blocks(@blocks, Bool :$cleanup = True --&gt; Nil)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.20</td><td class="toc-text"><a href="#multi_declare-blocks(%blocks,_Bool_:%24cleanup_=_True_--&gt;_Nil)"><code class="pod-code-inline">multi declare-blocks(%blocks, Bool :$cleanup = True --&gt; Nil)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.21</td><td class="toc-text"><a href="#multi_declare-option(Any:D_%24id,_Str:D_%24keyword,_%props,_Bool_:%24cleanup_=_True_--&gt;_OptionProps:D)"><code class="pod-code-inline">multi declare-option(Any:D $id, Str:D $keyword, %props, Bool :$cleanup = True --&gt; OptionProps:D)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.22</td><td class="toc-text"><a href="#multi_declare-option(Pair:D_%24identity,_%props,_Bool_:%24cleanup_=_True_--&gt;_OptionProps:D)"><code class="pod-code-inline">multi declare-option(Pair:D $identity, %props, Bool :$cleanup = True --&gt; OptionProps:D)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.23</td><td class="toc-text"><a href="#multi_declare-option(Str:D_%24keyword,_%props,_Bool_:%24cleanup_=_True_--&gt;_OptionProps:D)"><code class="pod-code-inline">multi declare-option(Str:D $keyword, %props, Bool :$cleanup = True --&gt; OptionProps:D)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.24</td><td class="toc-text"><a href="#multi_declare-option(Str:D_%24keyword,_Bool_:%24cleanup_=_True,_*%props_--&gt;_OptionProps:D)"><code class="pod-code-inline">multi declare-option(Str:D $keyword, Bool :$cleanup = True, *%props --&gt; OptionProps:D)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.25</td><td class="toc-text"><a href="#multi_declare-option(*%params_--&gt;_OptionProps:D)"><code class="pod-code-inline">multi declare-option(*%params --&gt; OptionProps:D)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.26</td><td class="toc-text"><a href="#multi_declare-options(@options)"><code class="pod-code-inline">multi declare-options(@options)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.27</td><td class="toc-text"><a href="#multi_declare-options(%options)"><code class="pod-code-inline">multi declare-options(%options)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.28</td><td class="toc-text"><a href="#autogen-id()"><code class="pod-code-inline">autogen-id()</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.29</td><td class="toc-text"><a href="#enter-ctx(Value:D_:%24keyword,_Str:D_:%24type,_*%profile)"><code class="pod-code-inline">enter-ctx(Value:D :$keyword, Str:D :$type, *%profile)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.30</td><td class="toc-text"><a href="#backtrack-option()"><code class="pod-code-inline">backtrack-option()</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.31</td><td class="toc-text"><a href="#backtrack-block()"><code class="pod-code-inline">backtrack-block()</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.32</td><td class="toc-text"><a href="#leave-option()"><code class="pod-code-inline">leave-option()</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.33</td><td class="toc-text"><a href="#leave-block()"><code class="pod-code-inline">leave-block()</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.34</td><td class="toc-text"><a href="#validate-option()"><code class="pod-code-inline">validate-option()</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.35</td><td class="toc-text"><a href="#validate-block()"><code class="pod-code-inline">validate-block()</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.36</td><td class="toc-text"><a href="#validate-value()"><code class="pod-code-inline">validate-value()</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.37</td><td class="toc-text"><a href="#multi_method_panic(Str:D_%24msg)"><code class="pod-code-inline">multi method panic(Str:D $msg)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.38</td><td class="toc-text"><a href="#multi_method_panic(Config::BINDish::X::Parse:U_%5Cexception,_Str_%24msg?,_*%profile)"><code class="pod-code-inline">multi method panic(Config::BINDish::X::Parse:U \exception, Str $msg?, *%profile)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">5.0.39</td><td class="toc-text"><a href="#include-source(IO:D(Str:D_%24file,_Match:D_%24cursor_--_Str:D)&gt;"><code class="pod-code-inline">include-source(IO:D(Str:D $file, Match:D $cursor --</code> Str:D)&gt;</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">6</td><td class="toc-text"><a href="#GRAMMAR_ELEMENTS">GRAMMAR ELEMENTS</a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">6.1</td><td class="toc-text"><a href="#Rules_And_Tokens">Rules And Tokens</a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">6.1.1</td><td class="toc-text"><a href="#rule_TOP"><code class="pod-code-inline">rule TOP</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">6.1.2</td><td class="toc-text"><a href="#token_enter-TOP"><code class="pod-code-inline">token enter-TOP</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">6.1.3</td><td class="toc-text"><a href="#rule_statement-list"><code class="pod-code-inline">rule statement-list</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">6.1.4</td><td class="toc-text"><a href="#proto_statement"><code class="pod-code-inline">proto statement</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">6.1.5</td><td class="toc-text"><a href="#token_statement-terminator"><code class="pod-code-inline">token statement-terminator</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">6.1.6</td><td class="toc-text"><a href="#token_statement-terminate"><code class="pod-code-inline">token statement-terminate</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">6.1.7</td><td class="toc-text"><a href="#token_block-head"><code class="pod-code-inline">token block-head</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">6.1.8</td><td class="toc-text"><a href="#token_block-name"><code class="pod-code-inline">token block-name</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">6.1.9</td><td class="toc-text"><a href="#token_block-class"><code class="pod-code-inline">token block-class</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">6.1.10</td><td class="toc-text"><a href="#token_block-body"><code class="pod-code-inline">token block-body</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">6.1.11</td><td class="toc-text"><a href="#C-comment,_CPP-comment,_UNIX-comment"><code class="pod-code-inline">C-comment</code>, <code class="pod-code-inline">CPP-comment</code>, <code class="pod-code-inline">UNIX-comment</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">6.1.12</td><td class="toc-text"><a href="#keyword"><code class="pod-code-inline">keyword</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">6.1.13</td><td class="toc-text"><a href="#token_dq-string,_token_sq-string"><code class="pod-code-inline">token dq-string</code>, <code class="pod-code-inline">token sq-string</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">6.1.14</td><td class="toc-text"><a href="#proto_token_value"><code class="pod-code-inline">proto token value</code></a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">6.2</td><td class="toc-text"><a href="#Named_captures">Named captures</a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">6.2.1</td><td class="toc-text"><a href="#%24&lt;err-pos&gt;"><code class="pod-code-inline">$&lt;err-pos&gt;</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">6.2.2</td><td class="toc-text"><a href="#%24&lt;option-name&gt;,_%24&lt;option-value&gt;"><code class="pod-code-inline">$&lt;option-name&gt;</code>, <code class="pod-code-inline">$&lt;option-value&gt;</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">6.2.3</td><td class="toc-text"><a href="#%24&lt;block-type&gt;"><code class="pod-code-inline">$&lt;block-type&gt;</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">6.2.4</td><td class="toc-text"><a href="#%24&lt;string&gt;"><code class="pod-code-inline">$&lt;string&gt;</code></a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">7</td><td class="toc-text"><a href="#GRAMMAR_OPERATION">GRAMMAR OPERATION</a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">7.1</td><td class="toc-text"><a href="#Pre-declaration">Pre-declaration</a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">7.1.1</td><td class="toc-text"><a href="#Statement_Pre-declaration_Syntax">Statement Pre-declaration Syntax</a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">7.1.2</td><td class="toc-text"><a href="#Statement_Descriptor">Statement Descriptor</a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">7.1.3</td><td class="toc-text"><a href="#Statement_Properties">Statement Properties</a></td></tr>
+<tr class="toc-level-4"><td class="toc-number">7.1.3.1</td><td class="toc-text"><a href="#in"><code class="pod-code-inline">in</code></a></td></tr>
+<tr class="toc-level-4"><td class="toc-number">7.1.3.2</td><td class="toc-text"><a href="#type"><code class="pod-code-inline">type</code></a></td></tr>
+<tr class="toc-level-4"><td class="toc-number">7.1.3.3</td><td class="toc-text"><a href="#type-name"><code class="pod-code-inline">type-name</code></a></td></tr>
+<tr class="toc-level-4"><td class="toc-number">7.1.3.4</td><td class="toc-text"><a href="#value-sym"><code class="pod-code-inline">value-sym</code></a></td></tr>
+<tr class="toc-level-4"><td class="toc-number">7.1.3.5</td><td class="toc-text"><a href="#named"><code class="pod-code-inline">named</code></a></td></tr>
+<tr class="toc-level-4"><td class="toc-number">7.1.3.6</td><td class="toc-text"><a href="#classified"><code class="pod-code-inline">classified</code></a></td></tr>
+<tr class="toc-level-4"><td class="toc-number">7.1.3.7</td><td class="toc-text"><a href="#value-only"><code class="pod-code-inline">value-only</code></a></td></tr>
+<tr class="toc-level-4"><td class="toc-number">7.1.3.8</td><td class="toc-text"><a href="#no-values"><code class="pod-code-inline">no-values</code></a></td></tr>
+<tr class="toc-level-4"><td class="toc-number">7.1.3.9</td><td class="toc-text"><a href="#default"><code class="pod-code-inline">default</code></a></td></tr>
+<tr class="toc-level-4"><td class="toc-number">7.1.3.10</td><td class="toc-text"><a href="#where"><code class="pod-code-inline">where</code></a></td></tr>
+<tr class="toc-level-4"><td class="toc-number">7.1.3.11</td><td class="toc-text"><a href="#why"><code class="pod-code-inline">why</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">7.1.4</td><td class="toc-text"><a href="#Reservations">Reservations</a></td></tr>
+<tr class="toc-level-4"><td class="toc-number">7.1.4.1</td><td class="toc-text"><a href="#Names">Names</a></td></tr>
+<tr class="toc-level-4"><td class="toc-number">7.1.4.2</td><td class="toc-text"><a href="#Option_And_Block_Keywords">Option And Block Keywords</a></td></tr>
+<tr class="toc-level-4"><td class="toc-number">7.1.4.3</td><td class="toc-text"><a href="#Blocks">Blocks</a></td></tr>
+<tr class="toc-level-4"><td class="toc-number">7.1.4.4</td><td class="toc-text"><a href="#IDs">IDs</a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">7.2</td><td class="toc-text"><a href="#Context">Context</a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">7.3</td><td class="toc-text"><a href="#Extending_The_Grammar">Extending The Grammar</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">8</td><td class="toc-text"><a href="#SEE_ALSO">SEE ALSO</a></td></tr>
+
+</table>
+</nav>
+
+
+    <div class="pod-body">
+    <h1 id="NAME"><a class="u" href="#___top" title="go to top of document">NAME</a></h1>
+<p><code>Config::BINDish::Grammar</code> - the central class of everything in <code>Config::BINDish</code></p>
+<h1 id="DESCRIPTION"><a class="u" href="#___top" title="go to top of document">DESCRIPTION</a></h1>
+<p>This class is responsible for the actual parsing of the configuration. It is not recommended for direct use. <a href="../BINDish.html"><code>Config::BINDish</code></a> <code>read</code> method must be used instead.</p>
+<p>The class inherits from the standard <a href="https://docs.raku.org/type/Grammar"><code>Grammar</code></a> class.</p>
+<h1 id="ATTRIBUTES"><a class="u" href="#___top" title="go to top of document">ATTRIBUTES</a></h1>
+<p>Some attributes are declared with help of <a href="https://modules.raku.org/dist/AttrX::Mooish"><code>AttrX::Mooish</code></a>. For <code>lazy</code> attributes it means that method <code>build-attribute-name</code> is used to get the initial value. These methods can be overridden by extensions if necessary.</p>
+<h3 id="Bool:D_$.flat"><a href="https://docs.raku.org/type/Bool"><code>Bool:D</code></a> <code>$.flat</code></h3>
+<p>If set this attribute expects blocks to be flattened down. I.e. whenever a block has a duplicate declaration in the config the later declaration must be applied on top of the first one. This doesn't change grammar's behavior but rather serves as a note for the actions class to take care of the situation. One way or another, if this attribute is <em>True</em> then the user expects a single block <code>foo "bar"</code> representation to exists after the following sample is parsed:</p>
+<pre class="pod-block-code">foo "bar" { fubar 1; }
+baz { }
+foo "bar" { fubar 2; fubaz 3.14; }</pre>
+<p>How the options are dealt with is the sole prerogative of the actions implementation. <a href="Actions.html"><code>Config::BINDish::Actions</code></a> re-delegates handling of flattening to the underlying <a href="AST.html"><code>Config::BINDish::AST</code></a> class. It, in turn, will overwrite earlier option declarations with latter ones. So, when one queries for <code>fubar</code> the value returned will be <em>2</em>.</p>
+<p>See <a href="#%24%2ACFG-FLAT-BLOCKS">$*CFG-FLAT-BLOCKS</a>.</p>
+<h3 id="Config::BINDish::Grammar::Strictness_$.strict_=_False"><a href="Grammar/Strictness.html"><code>Config::BINDish::Grammar::Strictness</code></a> <code>$.strict = False</code></h3>
+<p>Defines what strictness modes are activated. See <a href="Grammar/Strictness.html"><code>Config::BINDish::Grammar::Strictness</code></a>.</p>
+<h3 id="@.prop-keys"><a class="u" href="#___top" title="go to top of document"><code>@.prop-keys</code></a></h3>
+<p><em>Lazy</em>. Defines the types of statements supported by pre-declaration. Currently it is set to <em>block</em> and <em>option</em>. But extensions can add their own types via overriding <code>build-prop-keys</code> method.</p>
+<h3 id="Hash[Config::BINDish::Grammar::StatementProps:D]_%.props"><a href="https://docs.raku.org/type/Hash"><code>Hash</code></a><code>[</code><a href="Grammar/StatementProps.html"><code>Config::BINDish::Grammar::StatementProps:D</code></a><code>]</code> <code>%.props</code></h3>
+<p><em>Lazy</em>. Registry of all pre-declared statement properties. The first level keys of the hash are values in <code>@.prop-keys</code>, the second level keys are statement IDs.</p>
+<h3 id="SetHash_%.keywords"><a href="https://docs.raku.org/type/SetHash"><code>SetHash</code></a> <code>%.keywords</code></h3>
+<p><em>Lazy</em>. Registry of all registered keywords. Keys are the values in <code>@.prop-keys</code>. Values are <code>SetHash</code>'es of pre-declared keywords. The purpose of the attribute is to let code know if a keyword is used by a pre-declaration.</p>
+<h3 id="%.prop-relations"><a class="u" href="#___top" title="go to top of document"><code>%.prop-relations</code></a></h3>
+<p><em>Lazy</em>. First level keys are IDs of blocks ever mentioned with <code>in</code> key in statement pre-declaraions. For example:</p>
+<pre class="pod-block-code">Config::BINDish.new: blocks =&gt; ( :srv-cloud&lt;service&gt; =&gt; { ... },
+                                 :srv-local&lt;service&gt; =&gt; { ... }
+                     ),
+                     options =&gt; ( :loc-url&lt;location&gt; =&gt; { :in&lt;srv-cloud&gt; } );</pre>
+<p><code>srv-cloud</code> will become a key on <code>%.prop-relations</code>, contrary to <code>srv-local</code> which is not referenced by any pre-declaration.</p>
+<p>The second level keys are types listed in <code>@.prop-keys</code>.</p>
+<p>The third level keys of the hash are keywords allowed in the block. In the above example there will be just one key: <code>location</code> under <code>option</code>. It's value will be properties object of the option with ID <code>loc-url</code>.</p>
+<p>Note that the keyword, not the ID, is used in this case. This is because a keyword must be unique per block per statement type. I.e. we can have a block <code>location</code>, and an option <code>location</code>. But we can't have two different <code>location</code> options.</p>
+<h3 id="Pair:D_@.blocks"><a href="https://docs.raku.org/type/Pair"><code>Pair:D</code></a> <code>@.blocks</code></h3>
+<p>List of user-defined blocks. Passed to <code>declare-blocks</code> method at object construction time.</p>
+<p>See <a href="Grammar/BlockProps.html"><code>Config::BINDish::Grammar::BlockProps</code></a> and <a href="#Pre-declaration">Pre-declaration</a> section for more information.</p>
+<h3 id="Pair:D_@.options"><a href="https://docs.raku.org/type/Pair"><code>Pair:D</code></a> <code>@.options</code></h3>
+<p>List of user-defined options. Passed to <code>declare-options</code> method at object construction time.</p>
+<p>See <a href="Grammar/OptionProps.html"><code>Config::BINDish::Grammar::OptionProps</code></a> and <a href="#Pre-declaration">Pre-declaration</a> section for more information.</p>
+<h3 id="%.reserved-opts"><a class="u" href="#___top" title="go to top of document"><code>%.reserved-opts</code></a></h3>
+<p>Keys of this hash are names of options which are reserved for <code>Config::BINDish</code> own use. An extension module can add more keys to the hash if it needs to.</p>
+<h3 id="Int:D_$.line-delta_=_0"><a class="u" href="#___top" title="go to top of document">Int:D <code>$.line-delta = 0</code></a></h3>
+<p>Contains the delta to be subtracted from the actual line number when it is reported to the user. For example, if set to 2 and the actual location is at line 10 then the user will be reported with number 8. Used by <code>#line</code> directive.</p>
+<h1 id="DYNAMIC_VARIABLES"><a class="u" href="#___top" title="go to top of document">DYNAMIC VARIABLES</a></h1>
+<p>The grammar declares and uses a set of dynamic variables to pass certain information between its rules, tokens, methods, and the actions object.</p>
+<h3 id="$*CFG-GRAMMAR"><a class="u" href="#___top" title="go to top of document"><code>$*CFG-GRAMMAR</code></a></h3>
+<p>The primary grammar object. Due to the way the <a href="https://docs.raku.org/type/Grammar"><code>Grammar</code></a> is implemented <code>self</code> does not always point to the same object created by the initial <code>parse</code> method. These instances are not full clones of the original grammar and do not inherit all attribute values from it. For this reason when access to the user-set attributes is needed the original grammar is better be easily available.</p>
+<h3 id="$*CFG-CTX"><a class="u" href="#___top" title="go to top of document"><code>$*CFG-CTX</code></a></h3>
+<p>Current block or option context.</p>
+<h3 id="$*CFG-PARENT-CTX"><a class="u" href="#___top" title="go to top of document"><code>$*CFG-PARENT-CTX</code></a></h3>
+<p>Parent block context.</p>
+<h3 id="$*CFG-CTX-PROPS"><a class="u" href="#___top" title="go to top of document"><code>$*CFG-CTX-PROPS</code></a></h3>
+<p>If a keyword in declaration position has been encountered and there is a pre-declaration entry for it then this variable would contain properties of the keyword. It's type will depend on what the keyword is registered as: block or option.</p>
+<h3 id="$*CFG-AS-INCLUDE"><a class="u" href="#___top" title="go to top of document"><code>$*CFG-AS-INCLUDE</code></a></h3>
+<p>If set to <em>True</em> then it means that the current grammar is parsing included source.</p>
+<h3 id="$*CFG-FLAT-BLOCKS"><a class="u" href="#___top" title="go to top of document"><code>$*CFG-FLAT-BLOCKS</code></a></h3>
+<p>Set to <code>$.flat</code> attribute value.</p>
+<h3 id="$*CFG-INNER-PARENT"><a class="u" href="#___top" title="go to top of document"><code>$*CFG-INNER-PARENT</code></a></h3>
+<p>Provided for actions convenience. Intended to hold an instance of <a href="AST/Node.html"><code>Config::BINDish::AST::Node</code></a>.</p>
+<h3 id="$*CFG-TOP"><a class="u" href="#___top" title="go to top of document"><code>$*CFG-TOP</code></a></h3>
+<p>Provided for actions convenience. Intended to hold an instance of <a href="AST/TOP.html"><code>Config::BINDish::AST::TOP</code></a>.</p>
+<h3 id="$*CFG-NON-STRICT"><a class="u" href="#___top" title="go to top of document"><code>$*CFG-NON-STRICT</code></a></h3>
+<p>If exists and is a <em>true</em> value then all strict checks are to be temporarily disabled in this context. Mainly makes sense for guessing what kind of a statement we have at our hands. I.e. if an option declaration would normally fail if value type doesn't match the constraint, with this variable set it is likely to parse the statement successfully and let us make a grounded guess that the statement is an option, event if invalid one.</p>
+<h3 id="$*CFG-SIMULATION"><a class="u" href="#___top" title="go to top of document"><code>$*CFG-SIMULATION</code></a></h3>
+<p>Having this variable set to a <em>true</em> disables processing of <code>&lt;enter-option&gt;</code> and <code>&lt;enter-block&gt;</code> tokens. Normally is used in conjuction with <code>$*CFG-NON-STRICT</code>.</p>
+<h3 id="Config::BINDish::Grammar::Value_$*CFG-VALUE"><a href="Grammar/Value.html"><code>Config::BINDish::Grammar::Value</code></a> <code>$*CFG-VALUE</code></h3>
+<p>Must be provided directly or indirectly by any rule or token invoking the <code>&lt;value&gt;</code> token. This variable will be set to a <a href="Grammar/Value.html"><code>Config::BINDish::Grammar::Value</code></a> instance created by <code>set-value</code> method.</p>
+<h3 id="Config::BINDish::Grammar::Value_$*CFG-KEYWORD"><a href="Grammar/Value.html"><code>Config::BINDish::Grammar::Value</code></a> <code>$*CFG-KEYWORD</code></h3>
+<p>Set by <code>&lt;keyword&gt;</code> token. The value stored will be of type <a href="https://docs.raku.org/type/Str"><code>Str</code></a> and have type name <em>"keyword"</em>.</p>
+<h3 id="$*CFG-BLOCK-TYPE,_$*CFG-BLOCK-NAME,_$*CFG-BLOCK-CLASS"><a class="u" href="#___top" title="go to top of document"><code>$*CFG-BLOCK-TYPE</code>, <code>$*CFG-BLOCK-NAME</code>, <code>$*CFG-BLOCK-CLASS</code></a></h3>
+<p>All three are of <a href="Grammar/Value.html"><code>Config::BINDish::Grammar::Value</code></a> type. When the following example is parsed:</p>
+<pre class="pod-block-code">foo "bar" baz { }</pre>
+<p>The variables will be set to:</p>
+<ul><li><p>type: "foo" of <a href="https://docs.raku.org/type/Str"><code>Str</code></a>, type-name <em>"keyword"</em></p>
+</li>
+<li><p>name: "bar" of <a href="https://docs.raku.org/type/Str"><code>Str</code></a>, type name <em>"dq-string"</em></p>
+</li>
+<li><p>class: "baz" of <a href="https://docs.raku.org/type/Str"><code>Str</code></a>, type name <em>"keyword"</em></p>
+</li>
+</ul>
+<p>Note that the name could be of any value, supported by the grammar. If an extension adds a new value type then the type can also be used as a type name. Say, with <a href="INET.html"><code>Config::BINDish::INET</code></a> loaded one can have the following valid declaration:</p>
+<pre class="pod-block-code">IP 192.168.1.42 { }</pre>
+<p>For which the name will be set to type <code>IP::Addr</code>, type-name <em>"IPv4"</em>.</p>
+<h3 id="$*CFG-BLOCK-ERR-POS"><a class="u" href="#___top" title="go to top of document"><code>$*CFG-BLOCK-ERR-POS</code></a></h3>
+<p>This variable is set to a <a href="https://docs.raku.org/type/Match"><code>Match</code></a> object pointing at the location where current block declaration starts. Can be used for error reporting.</p>
+<h3 id="$*CFG-SPECIFIC-VALUE-SYM"><a class="u" href="#___top" title="go to top of document"><code>$*CFG-SPECIFIC-VALUE-SYM</code></a></h3>
+<p>Set by the grammar whenever a specific value type is expected. See more details in <a href="#value-sym">value-sym</a> section below.</p>
+<h3 id="$*CFG-BACKTRACK-OPTION,_$*CFG-BACKTRACK-BLOCK"><a class="u" href="#___top" title="go to top of document"><code>$*CFG-BACKTRACK-OPTION</code>, <code>$*CFG-BACKTRACK-BLOCK</code></a></h3>
+<p>These variables are set by corresponding <code>backtrack-*</code> method to indicate the context in which <code>leave-*</code> methods are called. In other words, if <code>!$*CFG-BACKTRACK-OPTION</code> is <em>True</em> when <code>leave-option</code> is invoked then an option has been successfully parsed.</p>
+<h1 id="METHODS"><a class="u" href="#___top" title="go to top of document">METHODS</a></h1>
+<h3 id="set-value(Mu_\type,_*%value)"><a class="u" href="#___top" title="go to top of document"><code>set-value(Mu \type, *%value)</code></a></h3>
+<p>This methods creates a new <a href="Grammar/Value.html"><code>Config::BINDish::Grammar::Value</code></a> object and assigns it to <code>$*CFG-VALUE</code>. Takes value's type object as its single positional parameter. Type name and payload are passed as the only named argument of the method call. Here is how a single-quoted string is handled by the grammar:</p>
+<pre class="pod-block-code">token sq-string {
+    \' ~ \' $&lt;string&gt;=&lt;.qstring("'")&gt;
+    {
+        self.set-value: Str, :sq-string($&lt;string&gt;)
+    }
+}</pre>
+<p>In this example the new <a href="Grammar/Value.html"><code>Config::BINDish::Grammar::Value</code></a> object will be created with payload set from <code>$&lt;string&gt;</code>, type name set to <em>"sq-string"</em>, and type set to <a href="https://docs.raku.org/type/Str"><code>Str</code></a>.</p>
+<h3 id="set-line-relative(Int:D_$from-line,_Int:D_:$to-line_=_self.line(:absolute))"><a class="u" href="#___top" title="go to top of document"><code>set-line-relative(Int:D $from-line, Int:D :$to-line = self.line(:absolute))</code></a></h3>
+<p>Sets <code>$.line-delta</code> as a difference between <code>$from-line</code> to <code>$to-line</code> so that, when a line number is reported at some point in time after a call to this method, the user will see <code>$reported-line - ($to-line - $from-line + 1))</code>.</p>
+<h3 id="set-file($file)"><a class="u" href="#___top" title="go to top of document"><code>set-file($file)</code></a></h3>
+<p>Sets the file name to be reported to the user in messages.</p>
+<h3 id="file()"><a class="u" href="#___top" title="go to top of document"><code>file()</code></a></h3>
+<p>Returns file name to be reported in messages.</p>
+<h3 id="line(Bool_:$absolute_=_False)"><a class="u" href="#___top" title="go to top of document"><code>line(Bool :$absolute = False)</code></a></h3>
+<p>Returns either a line number to be reported in messages; or the absolute line number of the currently parsed buffer.</p>
+<h3 id="submethod_setup-BINDish"><a class="u" href="#___top" title="go to top of document"><code>submethod setup-BINDish</code></a></h3>
+<p>When the grammar is instantiated it iterates over all of its parents and roles and invokes each unique <code>setup-BINDish</code> submethod it finds. While it may seem to look as a duplicate of <code>TWEAK</code>, the purpose of using this approach is to eliminate the differences in handling of submethods by Raku versions 6.c/d and 6.e.</p>
+<p>See also <a href="#Pre-declaration">Pre-declaration</a> section.</p>
+<h3 id="multi_reserve-keywords(Str:D_$what,_@keywords)"><a class="u" href="#___top" title="go to top of document"><code>multi reserve-keywords(Str:D $what, @keywords)</code></a></h3>
+<h3 id="multi_reserve-keywords(*%what-keywords)"><a class="u" href="#___top" title="go to top of document"><code>multi reserve-keywords(*%what-keywords)</code></a></h3>
+<p>Registers a list of keywords as reserved. <code>$what</code> is statement type for which keywords are registered; must be one of <code>@.prop-keys</code> values.</p>
+<pre class="pod-block-code">$*CFG-GRAMMAR.reserve-keywords: "option", &lt;foo bar&gt;;
+$*CFG-GRAMMAR.reserve-keywords: option =&gt; &lt;foo bar&gt;,
+                                block  =&gt; &lt;bar baz&gt;;</pre>
+<h3 id="multi_is-reserved(Str:D_$what,_Str:D_$keyword)"><a class="u" href="#___top" title="go to top of document"><code>multi is-reserved(Str:D $what, Str:D $keyword)</code></a></h3>
+<h3 id="multi_is-reserved(*%p_where_*.elems_==_1)"><a class="u" href="#___top" title="go to top of document"><code>multi is-reserved(*%p where *.elems == 1)</code></a></h3>
+<p>Returns <em>True</em> is <code>$keyword</code> is registered for statement type <code>$what</code>. The second for is a convenience one, it accepts only a single named parameter with name being the statement type. The following two line are equivalent:</p>
+<pre class="pod-block-code">$*CFG-GRAMMAR.is-reserver: 'option', 'foo';
+$*CFG-GRAMMAR.is-reserver: :option&lt;foo&gt;;</pre>
+<h3 id="proto_statement-props(Str:D_$what)"><a class="u" href="#___top" title="go to top of document"><code>proto statement-props(Str:D $what)</code></a></h3>
+<p>Returns pre-declaration properties class depending on the value of <code>$what</code>. The candidates provided by the core only support <em>'option'</em> and <em>'block'</em> and return <a href="Grammar/OptionProps.html"><code>Config::BINDish::Grammar::OptionProps</code></a> or <a href="Grammar/BlockProps.html"><code>Config::BINDish::Grammar::BlockProps</code></a> respectively. An extension can add own candidate if it introduces additional statement type.</p>
+<h3 id="declare-statement(Str:D_$what,_Any:D_$id_=_self.autogen-id,_$keyword_where_Str:D_|_Bool,_:%props,_Bool_:$cleanup_=_True)"><a class="u" href="#___top" title="go to top of document"><code>declare-statement(Str:D $what, Any:D $id = self.autogen-id, $keyword where Str:D | Bool, :%props, Bool :$cleanup = True)</code></a></h3>
+<p>This is a low-level statement pre-declaration registration method. It creates a properties object with the class returned by <code>statement-props</code> method for statement type <code>$what</code> and using <code>%props</code> as constructor initialization profile. <code>$id</code> and <code>$keyword</code> are also used as initialization profile keys.</p>
+<p>If <code>$keyword</code> parameter is a <a href="https://docs.raku.org/type/Bool"><code>Bool</code></a> value then it is set to <code>$id</code> value. This is done to provide support for <code>:foo =</code> { ... }&gt; pre-declaration syntax where <code>:foo</code> represents both ID and keyword.</p>
+<p>Parameter <code>$cleanup</code> specifies if <code>$.prop-relations</code> attribute must be reset and rebuilt. It is unlikely a user would ever need it to be <em>False</em>.</p>
+<h3 id="multi_declare-block(Any:D_$id,_Str:D_$keyword,_%props,_Bool_:$cleanup_=_True_--&gt;_BlockProps:D)"><a class="u" href="#___top" title="go to top of document"><code>multi declare-block(Any:D $id, Str:D $keyword, %props, Bool :$cleanup = True --&gt; BlockProps:D)</code></a></h3>
+<h3 id="multi_declare-block(Any:D_$id,_Str:D_$keyword,_Bool_:$cleanup_=_True,_*%props_--&gt;_BlockProps:D)"><a class="u" href="#___top" title="go to top of document"><code>multi declare-block(Any:D $id, Str:D $keyword, Bool :$cleanup = True, *%props --&gt; BlockProps:D)</code></a></h3>
+<h3 id="multi_declare-block(Pair:D_$identity,_%props,_Bool_:$cleanup_=_True_--&gt;_BlockProps:D)"><a class="u" href="#___top" title="go to top of document"><code>multi declare-block(Pair:D $identity, %props, Bool :$cleanup = True --&gt; BlockProps:D)</code></a></h3>
+<h3 id="multi_declare-block(Str:D_$keyword,_%props,_Bool_:$cleanup_=_True_--&gt;_BlockProps:D)"><a class="u" href="#___top" title="go to top of document"><code>multi declare-block(Str:D $keyword, %props, Bool :$cleanup = True --&gt; BlockProps:D)</code></a></h3>
+<h3 id="multi_declare-block(Str:D_$keyword,_Bool_:$cleanup_=_True,_*%props_--&gt;_BlockProps:D)"><a class="u" href="#___top" title="go to top of document"><code>multi declare-block(Str:D $keyword, Bool :$cleanup = True, *%props --&gt; BlockProps:D)</code></a></h3>
+<h3 id="multi_declare-block(*%params_--&gt;_BlockProps:D)"><a class="u" href="#___top" title="go to top of document"><code>multi declare-block(*%params --&gt; BlockProps:D)</code></a></h3>
+<p>This method registers a single block. Parameters:</p>
+<ul><li><p><code>$id</code> – block ID</p>
+</li>
+<li><p><code>$keyword</code> – block keyword</p>
+</li>
+<li><p><code>$identity</code> - a <a href="https://docs.raku.org/type/Pair"><code>Pair</code></a> where the key is <code>$id</code>, and the value is <code>$keyword</code></p>
+</li>
+<li><p><code>%props</code> – hash of block properties; see <a href="#Pre-declaration">Pre-declaration</a></p>
+</li>
+<li><p><code>$cleanup</code> – see <code>declare-statement</code> method</p>
+</li>
+<li><p><code>%params</code> - hash of named parameters for <code>declare-statement</code></p>
+</li>
+</ul>
+<p>Basically, all this method does it turns its parameters into named arguments for <code>declare-statement</code> and calls it as <code>self.declare-statement('block', |%params)</code>.</p>
+<h3 id="multi_declare-blocks(@blocks,_Bool_:$cleanup_=_True_--&gt;_Nil)"><a class="u" href="#___top" title="go to top of document"><code>multi declare-blocks(@blocks, Bool :$cleanup = True --&gt; Nil)</code></a></h3>
+<h3 id="multi_declare-blocks(%blocks,_Bool_:$cleanup_=_True_--&gt;_Nil)"><a class="u" href="#___top" title="go to top of document"><code>multi declare-blocks(%blocks, Bool :$cleanup = True --&gt; Nil)</code></a></h3>
+<p>Pre-declare blocks. <code>@blocks</code> is expected to be a list of <a href="https://docs.raku.org/type/Pair"><code>Pair</code></a> objects, as explained in <a href="#Pre-declaration">Pre-declaration</a> section.</p>
+<h3 id="multi_declare-option(Any:D_$id,_Str:D_$keyword,_%props,_Bool_:$cleanup_=_True_--&gt;_OptionProps:D)"><a class="u" href="#___top" title="go to top of document"><code>multi declare-option(Any:D $id, Str:D $keyword, %props, Bool :$cleanup = True --&gt; OptionProps:D)</code></a></h3>
+<h3 id="multi_declare-option(Pair:D_$identity,_%props,_Bool_:$cleanup_=_True_--&gt;_OptionProps:D)"><a class="u" href="#___top" title="go to top of document"><code>multi declare-option(Pair:D $identity, %props, Bool :$cleanup = True --&gt; OptionProps:D)</code></a></h3>
+<h3 id="multi_declare-option(Str:D_$keyword,_%props,_Bool_:$cleanup_=_True_--&gt;_OptionProps:D)"><a class="u" href="#___top" title="go to top of document"><code>multi declare-option(Str:D $keyword, %props, Bool :$cleanup = True --&gt; OptionProps:D)</code></a></h3>
+<h3 id="multi_declare-option(Str:D_$keyword,_Bool_:$cleanup_=_True,_*%props_--&gt;_OptionProps:D)"><a class="u" href="#___top" title="go to top of document"><code>multi declare-option(Str:D $keyword, Bool :$cleanup = True, *%props --&gt; OptionProps:D)</code></a></h3>
+<h3 id="multi_declare-option(*%params_--&gt;_OptionProps:D)"><a class="u" href="#___top" title="go to top of document"><code>multi declare-option(*%params --&gt; OptionProps:D)</code></a></h3>
+<p>This method registers a single option. Parameters:</p>
+<ul><li><p><code>$id</code> – option ID</p>
+</li>
+<li><p><code>$keyword</code> – option keyword</p>
+</li>
+<li><p><code>$identity</code> - a <a href="https://docs.raku.org/type/Pair"><code>Pair</code></a> where the key is <code>$id</code>, and the value is <code>$keyword</code></p>
+</li>
+<li><p><code>%props</code> – hash of option properties; see <a href="#Pre-declaration">Pre-declaration</a></p>
+</li>
+<li><p><code>$cleanup</code> – see <code>declare-statement</code> method</p>
+</li>
+<li><p><code>%params</code> - hash of named parameters for <code>declare-statement</code></p>
+</li>
+</ul>
+<p>Basically, all this method does it turns its parameters into named arguments for <code>declare-statement</code> and calls it as <code>self.declare-statement('option', |%params)</code>.</p>
+<h3 id="multi_declare-options(@options)"><a class="u" href="#___top" title="go to top of document"><code>multi declare-options(@options)</code></a></h3>
+<h3 id="multi_declare-options(%options)"><a class="u" href="#___top" title="go to top of document"><code>multi declare-options(%options)</code></a></h3>
+<p>Pre-declare options. <code>@options</code> is expected to be a list of <a href="https://docs.raku.org/type/Pair"><code>Pair</code></a> objects, as explained in <a href="#Pre-declaration">Pre-declaration</a> section.</p>
+<h3 id="autogen-id()"><a class="u" href="#___top" title="go to top of document"><code>autogen-id()</code></a></h3>
+<p>Returns a unique string to be used as a statement identifier.</p>
+<h3 id="enter-ctx(Value:D_:$keyword,_Str:D_:$type,_*%profile)"><a class="u" href="#___top" title="go to top of document"><code>enter-ctx(Value:D :$keyword, Str:D :$type, *%profile)</code></a></h3>
+<p>Creates a new <a href="Grammar/Context.html"><code>Config::BINDish::Grammar::Context</code></a> object. Returns the new context, which is also stored into <code>$*CFG-CTX</code>.</p>
+<p>This method expects <code>$*CFG-PARENT-CTX</code> to be set to the parent context instance, and <code>$*CFG-CTX</code> to be undefined. Normally a rule which plans to create a new context must have the following two lines in it:</p>
+<pre class="pod-block-code">:my Context:D $*CFG-PARENT-CTX = $*CFG-CTX;
+:temp $*CFG-CTX = Nil;</pre>
+<p>Method throws <code>Config::BINDish::X::Parse::ContextOverwrite</code> if <code>$*CFG-CTX</code> is already set.</p>
+<p>If <code>id</code> key in <code>%profile</code> is undefined then the method tries to guess it based on the <code>$keyword</code>. If it has at least one pre-declaration (i.e. it is recorded in <code>%.keywords</code>), then its properties are looked up either on enclosing block, or on <code>.ANYWHERE</code> block (see <code>%.prop-relations</code>). If neither lookup succeeds then it is assumed that the keyword cannot be used in the current block and <code>Config::BINDish::X::Parse::Context</code> is thrown.</p>
+<p>If the <code>$keyword</code> is not pre-declared then the method uses <code>autogen-id</code> method to produce a new unique ID for the statement. Note that for two subsequent statements of the same type used within the same block two different IDs would be produced in this case.</p>
+<h3 id="backtrack-option()"><a class="u" href="#___top" title="go to top of document"><code>backtrack-option()</code></a></h3>
+<p>A callback method invoked by <code>statement:sym&lt;option&gt;</code> rule if it fails to parse a keyword statement as an option. This does not necessarily mean that there was a syntax error in the configuration source. It could be just a normal backtracking.</p>
+<p>Set <code>$*CFG-BACKTRACK-OPTION</code> to <em>True</em> and invokes <code>leave-option</code> method.</p>
+<h3 id="backtrack-block()"><a class="u" href="#___top" title="go to top of document"><code>backtrack-block()</code></a></h3>
+<p>Similar to <code>backtrack-option</code> method above but for block declarations.</p>
+<p>Sets <code>$*CFG-BACKTRACK-BLOCK</code> to <em>True</em> and invokes <code>leave-block</code> method.</p>
+<h3 id="leave-option()"><a class="u" href="#___top" title="go to top of document"><code>leave-option()</code></a></h3>
+<p>Invoked when leaving option context.</p>
+<h3 id="leave-block()"><a class="u" href="#___top" title="go to top of document"><code>leave-block()</code></a></h3>
+<p>Invoked when leaving block context.</p>
+<h3 id="validate-option()"><a class="u" href="#___top" title="go to top of document"><code>validate-option()</code></a></h3>
+<p>Validates currently being parsed option based on its keyword. Uses pre-set variables <a href="#%24%2ACFG-KEYWORD"><code>$*CFG-KEYWORD</code></a> and <a href="#%24%2ACFG-VALUE"><code>$*CFG-VALUE</code></a>.</p>
+<p>Can throw one of <code>Config::BINDish::X::Parse::Context</code>, <code>Config::BINDish::X::Parse::ValueType</code>, or <code>Config::BINDish::X::Parse::Unknown</code>.</p>
+<h3 id="validate-block()"><a class="u" href="#___top" title="go to top of document"><code>validate-block()</code></a></h3>
+<p>Validates currently being parsed block based on its keyword (type), name, and, possibly, class. Uses pre-set variables &lt;<code>$*CFG-BLOCK-TYPE</code>|#$*CFG-BLOCK-TYPE&gt;, <a href="#%24%2ACFG-BLOCK-NAME"><code>$*CFG-BLOCK-NAME</code></a>, <a href="#%24%2ACFG-BLOCK-CLASS"><code>$*CFG-BLOCK-CLASS</code></a>. If block passes the validation then a new block context is pushed onto the context stack.</p>
+<p>Can throw one of <code>Config::BINDish::X::Parse::Context</code>, <code>Config::BINDish::X::Parse::ExtraPart</code>, <code>Config::BINDish::X::Parse::MissingPart</code>, or <code>Config::BINDish::X::Parse::Unknown</code>.</p>
+<h3 id="validate-value()"><a class="u" href="#___top" title="go to top of document"><code>validate-value()</code></a></h3>
+<p>Makes sure a value can be used in the current context. Uses variable <a href="#%24%2ACFG-VALUE"><code>$*CFG-VALUE</code></a>.</p>
+<p>Can throw <code>Config::BINDish::X::Parse::ValueType</code>.</p>
+<h3 id="multi_method_panic(Str:D_$msg)"><a class="u" href="#___top" title="go to top of document"><code>multi method panic(Str:D $msg)</code></a></h3>
+<p>Throws <code>Config::BINDish::X::Parse::General</code> with message <code>$msg</code>.</p>
+<h3 id="multi_method_panic(Config::BINDish::X::Parse:U_\exception,_Str_$msg?,_*%profile)"><a class="u" href="#___top" title="go to top of document"><code>multi method panic(Config::BINDish::X::Parse:U \exception, Str $msg?, *%profile)</code></a></h3>
+<p>Creates an object of type <code>exception</code> using <code>%profile</code> as named arguments for constructor and throws it. If $msg is specified then it is added to the profile as named argument <code>:$msg</code>.</p>
+<p>Both <code>panic</code> methods also pass the grammar object they're invoked upon as <code>cursor</code> named argument to provide the exception instance with error location and other useful information.</p>
+<h3 id="include-source(IO:D(Str:D_$file,_Match:D_$cursor_--_Str:D)&gt;"><a class="u" href="#___top" title="go to top of document"><code>include-source(IO:D(Str:D $file, Match:D $cursor --</code> Str:D)&gt;</a></h3>
+<p>This method provides source configuration to be included with <code>include</code> option. The default implementation tries to read <code>$file</code>. If it can't then either of two exceptions are thrown:</p>
+<ul><li><p><code>Config::BINDish::X::FileNotFound</code> if <code>$file</code> doesn't exists</p>
+</li>
+<li><p><code>Config::BINDish::X::FileOp</code> if <code>$file</code> is unreadable</p>
+</li>
+</ul>
+<h1 id="GRAMMAR_ELEMENTS"><a class="u" href="#___top" title="go to top of document">GRAMMAR ELEMENTS</a></h1>
+<p>Rules and tokens listed in this section are the ones considered public API of this module. Those not listed here but implemented by the grammar are considered implementation detail and can be changed or removed any time without prior notice.</p>
+<p>Description provided here would mostly be rather succinct. Checking with the grammar source is the most correct way of understanding it.</p>
+<h2 id="Rules_And_Tokens"><a class="u" href="#___top" title="go to top of document">Rules And Tokens</a></h2>
+<h3 id="rule_TOP"><a class="u" href="#___top" title="go to top of document"><code>rule TOP</code></a></h3>
+<p>See <a href="https://docs.raku.org/type/Grammar"><code>Grammar</code></a>.</p>
+<p>Pushes <em>"TOP"</em> context onto the stack and invokes <code>statement-list</code>.</p>
+<h3 id="token_enter-TOP"><a class="u" href="#___top" title="go to top of document"><code>token enter-TOP</code></a></h3>
+<p>Does nothing, used as anchor for <a href="Actions.html"><code>Config::BINDish::Actions</code></a>.</p>
+<h3 id="rule_statement-list"><a class="u" href="#___top" title="go to top of document"><code>rule statement-list</code></a></h3>
+<p>Used in the global and block contexts.</p>
+<h3 id="proto_statement"><a class="u" href="#___top" title="go to top of document"><code>proto statement</code></a></h3>
+<p>Currently defined statements are (as named within <code>:sym&lt;...&gt;</code> postfix):</p>
+<ul><li><p>comment</p>
+</li>
+<li><p>value</p>
+</li>
+<li><p>option</p>
+</li>
+<li><p>block</p>
+</li>
+<li><p>empty</p>
+</li>
+</ul>
+<h3 id="token_statement-terminator"><a class="u" href="#___top" title="go to top of document"><code>token statement-terminator</code></a></h3>
+<p>Matches a statement terminator. Doesn't take the current strictness mode into account and tries matching as if non-strict syntax mode is used.</p>
+<h3 id="token_statement-terminate"><a class="u" href="#___top" title="go to top of document"><code>token statement-terminate</code></a></h3>
+<p>A wrapper around <code>statement-terminator</code> which validates it against the current syntax strictness mode.</p>
+<h3 id="token_block-head"><a class="u" href="#___top" title="go to top of document"><code>token block-head</code></a></h3>
+<p>Parses the block type keyword. Sets <a href="#%24%2ACFG-BLOCK-TYPE"><code>$*CFG-BLOCK-TYPE</code></a>.</p>
+<h3 id="token_block-name"><a class="u" href="#___top" title="go to top of document"><code>token block-name</code></a></h3>
+<p>Parses the block name. Sets <a href="#%24%2ACFG-BLOCK-NAME"><code>$*CFG-BLOCK-NAME</code></a>.</p>
+<h3 id="token_block-class"><a class="u" href="#___top" title="go to top of document"><code>token block-class</code></a></h3>
+<p>Parses the block name. Sets <a href="#%24%2ACFG-BLOCK-CLASS"><code>$*CFG-BLOCK-CLASS</code></a>.</p>
+<h3 id="token_block-body"><a class="u" href="#___top" title="go to top of document"><code>token block-body</code></a></h3>
+<p>Validates the block and sets the current block context.</p>
+<h3 id="C-comment,_CPP-comment,_UNIX-comment"><a class="u" href="#___top" title="go to top of document"><code>C-comment</code>, <code>CPP-comment</code>, <code>UNIX-comment</code></a></h3>
+<p>Three types of comments</p>
+<h3 id="keyword"><a class="u" href="#___top" title="go to top of document"><code>keyword</code></a></h3>
+<p>Parses a keyword which is defined as an alpha-numeric identifier starting and ending with a word boundary. Sets <a href="#%24%2ACFG-KEYWORD"><code>$*CFG-KEYWORD</code></a>.</p>
+<h3 id="token_dq-string,_token_sq-string"><a class="u" href="#___top" title="go to top of document"><code>token dq-string</code>, <code>token sq-string</code></a></h3>
+<p>Double- and single-quoted strings. The standard grammar and actions do not care about the exact nature of a string. But extensions could adjust their behavior based on the string type. For example, <a href="Expandable.html"><code>Config::BINDish::Expandable</code></a> implements macro expansion for double-quoted strings only.</p>
+<h3 id="proto_token_value"><a class="u" href="#___top" title="go to top of document"><code>proto token value</code></a></h3>
+<p>Umbrella-rule for all value types. If you plan an extension for a new value type then this is where you plug it into.</p>
+<p>The following value types are currently implemented, listed as named within <code>:sym&lt;...&gt;</code> postfix:</p>
+<ul><li><p>string</p>
+</li>
+<li><p>keyword</p>
+</li>
+<li><p>num</p>
+</li>
+<li><p>rat</p>
+</li>
+<li><p>int</p>
+</li>
+<li><p>bool</p>
+</li>
+</ul>
+<h2 id="Named_captures"><a class="u" href="#___top" title="go to top of document">Named captures</a></h2>
+<p>Some named captures are also considered public API.</p>
+<h3 id="$&lt;err-pos&gt;"><a class="u" href="#___top" title="go to top of document"><code>$&lt;err-pos&gt;</code></a></h3>
+<p>Records the location to which call of method <code>panic</code> should be bound. In other words, if the location within a rule body where we make the decision about syntax validity is different from the location where the user would understand it best then <code>panic</code> should be invoked as:</p>
+<pre class="pod-block-code">$&lt;err-pos&gt;.panic: Config::BINDish::X::Parse::AError, ...;</pre>
+<p>For example, we parse an option like:</p>
+<pre class="pod-block-code">pi 3.1415926;</pre>
+<p>When all the information we need to validate it is collected our grammar points at the position right after the terminating semi-colon. If we do <code>self.panic(...)</code> then the error message look kind of the following:</p>
+<pre class="pod-block-code">Option pi cannot be used in block...
+  at line N
+    pi 3.1415926;⏏</pre>
+<p>But with <code>$&lt;err-pos&gt;.panic(...)</code> it would rather be:</p>
+<pre class="pod-block-code">Option pi cannot be used in block...
+  at line N
+    ⏏pi 3.1415926;</pre>
+<p>Which certainly makes more sense to the user.</p>
+<h3 id="$&lt;option-name&gt;,_$&lt;option-value&gt;"><a class="u" href="#___top" title="go to top of document"><code>$&lt;option-name&gt;</code>, <code>$&lt;option-value&gt;</code></a></h3>
+<p>Point to parsed option name and value <a href="https://docs.raku.org/type/Match"><code>Match</code></a>es.</p>
+<h3 id="$&lt;block-type&gt;"><a class="u" href="#___top" title="go to top of document"><code>$&lt;block-type&gt;</code></a></h3>
+<p>Points to parsed block type <a href="https://docs.raku.org/type/Match"><code>Match</code></a> object.</p>
+<h3 id="$&lt;string&gt;"><a class="u" href="#___top" title="go to top of document"><code>$&lt;string&gt;</code></a></h3>
+<p>Points to actual string body of a stringy value. I.e. for <em>what "The answer is 42"</em> this capture will be a <a href="https://docs.raku.org/type/Match"><code>Match</code></a> object pointing at <em>The answer is 42</em> part of the source, quotes excluded.</p>
+<h1 id="GRAMMAR_OPERATION"><a class="u" href="#___top" title="go to top of document">GRAMMAR OPERATION</a></h1>
+<h2 id="Pre-declaration"><a class="u" href="#___top" title="go to top of document">Pre-declaration</a></h2>
+<p><em>DISCLAIMER. I don't like the term "pre-declaration", but fail to come up with something better so far. Ideas are welcome!</em></p>
+<p>In the default mode of operation the grammar accepts any blocks and options in a config file as long as they adhere to the syntax requirements. But often it is desirable to constrain the set of accepted block/option keywords. And even more often it is necessary to restrict certain syntax rules applied to them.</p>
+<p>For example, for options it would make sense to restrict acceptable types of their values; actually, sometimes this applies to blocks too. For blocks we may need to specify requirements for the name and class parts to be used or not.</p>
+<p>Another useful property of options and blocks is the context where they're allowed. By context the current grammar assumes the current enclosing block.</p>
+<p>Let's consider a network configuration file where we use <code>host</code> and <code>lan</code> blocks and some network-related options.</p>
+<p><em>NOTE</em> that the following example requires <a href="INET.html"><code>Config::BINDish::INET</code></a> module to be used.</p>
+<pre class="pod-block-code">ip 192.168.1.2; // Error, we don't know the host to apply this ip to
+lan { # Error, a LAN must be given a name
+}
+lan "office" {
+    network 192.168.42.0/24;
+}
+lan 192.168.1.0/24 {
+    name "Data Center";
+    ip 192.168.1.13; // Error, only a host can have an address
+    host "gw" {
+        ip 192.168.1.1; # This is default ip on the lan
+        interface "outside" {
+            ip 1.2.3.4/24;
+            gw 1.2.3.1;
+        }
+    }
+}
+host "rambler" { // Error, a host can only belong to a lan
+    ip "dhcp-pool"; // Good try, but – no, this is an error too!
+    free-form "with some text"; # This is an error if the option is not pre-declared and strict mode is in effect
+}</pre>
+<p>Next in this section we will find out how to tell the grammar about the constraints we'd like to apply. Keep in mind that this section talks about options and blocks. And that any 3rd party extension module can introduce their own kinds of statements and use their own approach to their pre-declaration.</p>
+<p>Statement pre-declaration consist of two parts:</p>
+<ul><li><p>statement descriptor which consists of its globally unique ID and a keyword</p>
+</li>
+<li><p>properties defining the actual constraints</p>
+</li>
+</ul>
+<p>There are also two ways to pre-declare:</p>
+<ul><li><p>via initializing <code>@.blocks</code> and <code>@.options</code> attributes with lists of <a href="https://docs.raku.org/type/Pairs"><code>Pairs</code></a> per each statement</p>
+</li>
+<li><p>via using <code>declare-</code> family of grammar methods</p>
+</li>
+</ul>
+<p>As a matter of fact, the grammar is using the attributes to eventually pass them to corresponding <code>declare-blocks</code> or <code>declare-options</code> methods in <code>setup-BINDish</code> submethod. This is also the recommended way for a 3rd party extension, would it need to utilize pre-declaration. But from the user perspective it is preferable to use the first way:</p>
+<pre class="pod-block-code">my $cfg = Config::BINDish.new: blocks =&gt; (...), options =&gt; (...);</pre>
+<h3 id="Statement_Pre-declaration_Syntax"><a class="u" href="#___top" title="go to top of document">Statement Pre-declaration Syntax</a></h3>
+<p>As it was stated before, blocks and options are pre-declared by pairs. For each <a href="https://docs.raku.org/type/Pair"><code>Pair</code></a> its key is statement descriptor, and its value is a hash of statement properties. The most generic statement pre-declaration would look like the following example:</p>
+<pre class="pod-block-code">:id1&lt;foo&gt; =&gt; { :prop1(...), :prop2(...), ... }</pre>
+<p>The particular properties will be listed later in this section. For now let's focus on the descriptor.</p>
+<h3 id="Statement_Descriptor"><a class="u" href="#___top" title="go to top of document">Statement Descriptor</a></h3>
+<p>There is a reason for the descriptor to consist of two elements. If we consider an option, its keyword might not be unique across config, but it can have different meaning within different blocks. Often it would mean different value types allowed for use too:</p>
+<pre class="pod-block-code">LAN "Data Center" {
+    server "microservices.my.net" {
+        location "Room C3, Rack 1234";
+    }
+    service "monitoring" {
+        location https://nagios.local;
+    }
+}</pre>
+<p>As you can see here, even though <code>location</code> keyword is used within both <code>server</code> and <code>service</code> blocks, it represents different options of which one specifies a physical location, and another is for a network location. Use of unique IDs allows the parse to distinguish them. In terms of creating an instance of <code>Config::BINDish</code> it would look like this:</p>
+<pre class="pod-block-code">my $cfg = Config::BINDish.new: ...,
+            options =&gt; (
+                :loc-phys&lt;location&gt; =&gt; { ... },
+                :loc-url&lt;location&gt; =&gt; { ... }
+            );</pre>
+<p>But what if we actually don't need those IDs? In this case they can be omitted:</p>
+<pre class="pod-block-code">my $cfg = Config::BINDish.new: ...,
+            options =&gt; (
+                location =&gt; { ... },
+                location =&gt; { ... }
+            );</pre>
+<p>When this notation is used the grammar will auto-generate unique IDs for each statement to still be able to distinguish one declaration from another. But <code>Config::BINDish::X::DuplicateKeyword</code> would be thrown if we attempt to use both variants in the same block.</p>
+<p>Another case is when we know that statement's keyword is inherently unique. In the above example we can say this about the <code>server</code> and the <code>service</code> blocks. It would be OK to use IDs which match respective keywords. To do so a boolean <a href="https://docs.raku.org/type/Pair"><code>Pair</code></a> notation can be used to declare the blocks:</p>
+<pre class="pod-block-code">my $cfg = Config::BINDish.new: ...,
+            blocks =&gt; (
+                :server =&gt; { ... },
+                :service =&gt; { ... },
+            );</pre>
+<p>The above is equivalent to <code>:server&lt;server&gt;</code> and <code>:service&lt;service&gt;</code> notations.</p>
+<h3 id="Statement_Properties"><a class="u" href="#___top" title="go to top of document">Statement Properties</a></h3>
+<p>Properties of a statement pre-declaration are specified as keys of a hash. For example, the last example of the previous section can be written as:</p>
+<pre class="pod-block-code">my $cfg = Config::BINDish.new: ...,
+            blocks =&gt; (
+                :server =&gt; { :named },
+                :service =&gt; { :named },
+            );</pre>
+<p>Detailed descriptions of each key follows.</p>
+<h4 id="in"><a class="u" href="#___top" title="go to top of document"><code>in</code></a></h4>
+<p>This key specifies a set of block IDs where use of the statement is allowed. If a block is not listed in this key then the statement can't be used in that block.</p>
+<pre class="pod-block-code">my $cfg = Config::BINDish.new: ...,
+            blocks =&gt; (
+                :server =&gt; { :named },
+                :service =&gt; { :named },
+            ),
+            options =&gt; (
+                ip =&gt; { :in&lt;server host&gt; },
+                location =&gt; { :in&lt;service&gt; },
+            );</pre>
+<p>With the above declaration:</p>
+<pre class="pod-block-code">server "gw" {
+    ip 192.168.42.1;
+}
+service "nagios" {
+    ip 192.168.42.13; # Error, only location can be used here
+    location https://nagios.local;
+}</pre>
+<p>Note how we use <code>host</code> alongside with <code>server</code> to pre-declare <code>ip</code>. This is not an error as the grammar will auto-vivify block pre-declaration for us. It will have both ID and keyword set to <code>host</code>. We can later re-declare it with non-default properties. If we do so the re-declaration will lost its <em>auto-vivified</em> status and any subsequent re-declaration will become an error.</p>
+<p>In a little bit more complex case a block can be presented as a pair of two strings where key would still be block's ID and the value would allow to narrow down block classes for which a declaration is allowed. In the most simple case we can limit to a single class by its name:</p>
+<pre class="pod-block-code">:keyword =&gt; { :in(:classy&lt;specific&gt;), ... }</pre>
+<p><code>keyword</code> would only be allowed within a <code>specific</code> block <code>classy</code>:</p>
+<pre class="pod-block-code">classy "a name" specific {
+    keyword ...;
+}</pre>
+<p>Since the value of block definition pair is used on right hand side of a smartmatch operator the class condition is not only limited to strings. Consider the following examples:</p>
+<pre class="pod-block-code">:in(:classy('specific' | 'special' | 'limited'))
+:in(:classy(/^ specif .* $/))
+:in(:classy(*.starts-with: 'specif'))</pre>
+<h4 id="type"><a class="u" href="#___top" title="go to top of document"><code>type</code></a></h4>
+<p>This key allows to constrain value type which can be used for values of the statement. This key is used as RHS of <a href="https://docs.raku.org/language/operators#index-entry-smartmatch_operator">smartmatch</a> operator.</p>
+<pre class="pod-block-code">my $cfg = Config::BINDish.new: ...,
+            options =&gt; (
+                multiplier =&gt; { :in&lt;measurements&gt;, :type(Num | Rat) },
+                ip =&gt; { :in&lt;server&gt;, type =&gt; IP::Addr },
+            );</pre>
+<p>Because value validation takes place in a context where <code>$*CFG-VALUE</code> is available, it is even possible to do things like:</p>
+<pre class="pod-block-code">my $cfg = Config::BINDish.new: ...,
+            blocks =&gt; (
+                :srv-ph&lt;server&gt; =&gt; { :in&lt;datacenter&gt;, :named }, # A physical server
+                :srv-vm&lt;server&gt; =&gt; { :in&lt;vm-cluster&gt;, :named }, # A VM server
+            ),
+            options =&gt; (
+                location =&gt; { :in&lt;srv-ph&gt;, type =&gt; { $_ ~~ Stringy &amp;&amp; $*CFG-VALUE.payload.contains('Rack') },
+                location =&gt; { :in&lt;srv-vm&gt;, type =&gt; { $_ ~~ Stringy &amp;&amp; $*CFG-VALUE.payload.contains('Cluster') },
+            );</pre>
+<h4 id="type-name"><a class="u" href="#___top" title="go to top of document"><code>type-name</code></a></h4>
+<p>Value type name elaborates on the exact meaning of a value. For example, a value can have Raku <a href="https://docs.raku.org/type/Str"><code>Str</code></a> type. But then it can be one of:</p>
+<ul><li><p><em>sq-string</em> - single-quoted string</p>
+</li>
+<li><p><em>dq-string</em> - double-quoted string</p>
+</li>
+<li><p><em>file-path</em></p>
+</li>
+<li><p><em>keyword</em></p>
+</li>
+</ul>
+<p>With this key one can be even more explicit as to what values are acceptable:</p>
+<pre class="pod-block-code">my $cfg = Config::BINDish.new: ...,
+            options =&gt; (
+                location =&gt; { :in&lt;srv-ph&gt;, type =&gt; { $_ ~~ Stringy &amp;&amp; $*CFG-VALUE.payload.contains('Rack') },
+                location =&gt; { :in&lt;srv-vm&gt;, type =&gt; { $_ ~~ Stringy &amp;&amp; $*CFG-VALUE.payload.contains('Cluster') },
+                location =&gt; { :in&lt;pdf-collection image-collection&gt;, :type(Str), :type-name&lt;file-path&gt; }
+            );</pre>
+<p>With this declaration the following config is incorrect:</p>
+<pre class="pod-block-code">pdf-collection "user uploads" {
+    location "/mnt/cloud-data/uploads/pdf"
+}</pre>
+<p>Yet, same as with the <code>type</code> key, <code>type-name</code> is used as smartmatch operator RHS. Therefore if we replace it with: <code>:type-name(/^ [ "file-path" | .. "-string" ] $/)</code> or <code>:type-name(any &lt;file-path sq-string dq-string&gt;)</code> – then the above snipped will become valid.</p>
+<h4 id="value-sym"><a class="u" href="#___top" title="go to top of document"><code>value-sym</code></a></h4>
+<p>This key defines an exact list of allowed grammar rules/tokens of <code>value:sym&lt;...&gt;</code> candidates to be tried when a value is parsed. The list must contain the words used between <code>&lt; &gt;</code> symbols of <code>:sym</code> adverb. I.e. for the <code>multiplier</code> option from a previous example we can explicitly make the grammar even don't attempt matching on anything but the numeric values:</p>
+<pre class="pod-block-code">multiplier =&gt; { :value-sym&lt;num rat int&gt;, ... }</pre>
+<p>With this pre-declaration the grammar will attempt only tokens <code>value:sym&lt;num&gt;</code>, <code>value:sym&lt;rat&gt;</code>, <code>value:sym&lt;int&gt;</code>. In this case the following example will throw with <code>Config::BINDish::X::Parse::General</code> instead of <code>Config::BINDish::X::Parse::ValueType</code>:</p>
+<pre class="pod-block-code">multiplier "3.1415926";</pre>
+<p>When the grammar iterates over <code>value-sym</code> items it sets <code>$*CFG-SPECIFIC-VALUE-SYM</code> dynamic to the currently attempted item. This allows the candidate token to know that it is being expected to succeed and some additional measures could be taken to fulfill the expectations.</p>
+<p>For example, if we expect an option to be a file system path then the following example is likely not to parse correctly because the value can be considered both a keyword or a single path element:</p>
+<pre class="pod-block-code">pathy etc;</pre>
+<p>For this reason <code>value:sym&lt;file-path&gt;</code> candidate does not attempt parsing something as a path unless it finds a slash separator. I.e. for the above example to work it must look like:</p>
+<pre class="pod-block-code">pathy /etc;</pre>
+<p>or</p>
+<pre class="pod-block-code">pathy etc/;</pre>
+<p>But if we pre-declare the option like:</p>
+<pre class="pod-block-code">pathy =&gt; { :value-sym&lt;file-path&gt;, ... }</pre>
+<p>Then <code>value:sym&lt;file-path&gt;</code> would know that <code>etc</code> would not be tried as a keyword and it can safely consider it a file/directory name.</p>
+<h4 id="named"><a class="u" href="#___top" title="go to top of document"><code>named</code></a></h4>
+<p>Block-only key. If <em>True</em> then block must have a name. If <em>False</em> then block must not be named. Omitting this key allows the name to be optional.</p>
+<h4 id="classified"><a class="u" href="#___top" title="go to top of document"><code>classified</code></a></h4>
+<p>Block-only. Similar to <code>named</code> but for block class. Only makes sense if <code>named</code> is true or optional and block name is specified. Otherwise this key is ignored.</p>
+<h4 id="value-only"><a class="u" href="#___top" title="go to top of document"><code>value-only</code></a></h4>
+<p>Block-only. If this key is set to <em>True</em> then the block can not contain options, only values are allowed. I.e. with a declaration like:</p>
+<pre class="pod-block-code">foo =&gt; { :value-only }</pre>
+<p>The following config would be an error:</p>
+<pre class="pod-block-code">foo { option 42 }</pre>
+<p>But the following example will work:</p>
+<pre class="pod-block-code">foo { 13; 42; 3.1415926 }</pre>
+<p>Note that within a value-only block keywords are treated as keyword values, not as boolean options:</p>
+<pre class="pod-block-code">foo { value1; value2 } # Two string values with type name 'keyword'
+bar { value1; value2 } # Two True options because bar is not pre-declared</pre>
+<p>Here is an example of how this peculiarity can be used:</p>
+<pre class="pod-block-code">acl office { 192.168.42.0/24; 192.168.13.0/24 }
+acl data-center { 10.42.0.0/16 }
+acl customers { 172.10.0.0/16 }
+acl any { 0.0.0.0/0 }
+network "internal" {
+    access-rules {
+        allow { office; data-center } # 'allow' is a value-only block
+        disable { any }; # value-only block too
+    }
+}
+network "public" {
+    access-rules { allow { any } }
+}</pre>
+<h4 id="no-values"><a class="u" href="#___top" title="go to top of document"><code>no-values</code></a></h4>
+<p>Block-only. This property is a direct opposite to <code>value-only</code> as blocks declared with it can not hold any values. So, a declaration like this:</p>
+<pre class="pod-block-code">foo =&gt; { :no-values }</pre>
+<p>will cause the following to throw:</p>
+<pre class="pod-block-code">foo { "bar"; }</pre>
+<p>Since the property is clearly conflicting with <code>value-only</code> use of both within a block declaration will result in an exception thrown.</p>
+<h4 id="default"><a class="u" href="#___top" title="go to top of document"><code>default</code></a></h4>
+<p>Specifies the default value of a statement. When used with a block declaration then multiple values can be used.</p>
+<pre class="pod-block-code">blocks =&gt; (
+    :server =&gt; %( :in&lt;.TOP&gt; ),
+    :services =&gt; %( :default&lt;api login files&gt;, :type(Str), :in&lt;server&gt; ),
+),
+options =&gt; (
+    :server-iface&lt;interface&gt; =&gt; { :type(Str), :default&lt;*&gt;, :in&lt;server&gt; },
+    :server-port&lt;port&gt; =&gt; { :type(Int), :default(80), :in&lt;server&gt; },
+)</pre>
+<p>Default values are not verified against pre-declaration <code>type</code> constrain.</p>
+<h4 id="where"><a class="u" href="#___top" title="go to top of document"><code>where</code></a></h4>
+<p>This property meaning is the same, as <a href="https://docs.raku.org/type/Signature#Type_constraints"><code>where</code></a> clause in Raku: it defines a constraint on the allowed values. The property is used as smartmatch RHS. Consider the examples:</p>
+<pre class="pod-block-code">foo =&gt; { :type(Int), :where(* &gt; 10) }
+bar =&gt; { :type(Str), :where(any &lt;debug info error&gt;) }</pre>
+<p><strong>Note</strong> that similar outcome could be achieved by using a <a href="https://docs.raku.org/language/typesystem#index-entry-subset-subset"><code>subset</code></a> with <code>type</code> property. But <code>where</code> is more obvious on many occasions.</p>
+<h4 id="why"><a class="u" href="#___top" title="go to top of document"><code>why</code></a></h4>
+<p>This property must be a short string to be used within error message of the exception thrown when <code>where</code> constraint is not met. For example, if there is an option declaration:</p>
+<pre class="pod-block-code">min =&gt; { :type(Int), :where(* &gt;= 10), :why('must be 10 or more') }</pre>
+<p>Then defining the option as <code>min 1;</code> in a configuration file would produce output similar to the following:</p>
+<pre class="pod-block-code">Option 'min' expects a (Int) value (must be 10 or more) but got 1
+  at line 2
+    ⏏min 1;</pre>
+<h3 id="Reservations"><a class="u" href="#___top" title="go to top of document">Reservations</a></h3>
+<h4 id="Names"><a class="u" href="#___top" title="go to top of document">Names</a></h4>
+<p>All keywords and IDs starting with a dot are reserved for internal use. Any use of dot-started names/IDs like <em>.foo</em> is discouraged.</p>
+<h4 id="Option_And_Block_Keywords"><a class="u" href="#___top" title="go to top of document">Option And Block Keywords</a></h4>
+<p>The grammar reserves the following keywords for internal use:</p>
+<ul><li><p><code>include</code></p>
+</li>
+<li><p><code>use</code></p>
+</li>
+</ul>
+<h4 id="Blocks"><a class="u" href="#___top" title="go to top of document">Blocks</a></h4>
+<p>Two blocks are used internally by the grammar: <code>.TOP</code> and <code>.ANYWHERE</code>. The first one is a kind of global context, where all top-level blocks and options are installed. The name can also be use in a pre-declaration to specify that a statement can be used at the top-level:</p>
+<pre class="pod-block-code">options =&gt; ( foo =&gt; { :in&lt;.TOP&gt; } )</pre>
+<p><code>.ANYWHERE</code> is used in pre-declaration context to keep track of pre-declared statements which do not have <code>in</code> key and therefore can be used literally anywhere in a config file.</p>
+<p>Note that no keyword can start with a dot. Therefore there is no way to accidentally declare <code>.TOP { }</code> or <code>.ANYWHERE { }</code>, even though technically and formally the config file looks like:</p>
+<pre class="pod-block-code">.TOP {
+    include "your-config.cfg"
+}</pre>
+<h4 id="IDs"><a class="u" href="#___top" title="go to top of document">IDs</a></h4>
+<p>As it was stated in the <a href="#Names">Names</a> section any ID string starting with a dot is reserved. Use method <code>autogen-id</code> if you need a unique one.</p>
+<h2 id="Context"><a class="u" href="#___top" title="go to top of document">Context</a></h2>
+<p>The grammar maintains current parsing context as a way to validate various aspects of config file syntax. In this task it relies upon:</p>
+<ul><li><p><code>Config::BINDish::Grammar::Context</code> class</p>
+</li>
+<li><p><code>$*CFG-CTX</code> and <code>$*CFG-PARENT-CTX</code> variables containing instances of the <code>Context</code> class</p>
+</li>
+<li><p>roles <code>Config::BINDish::Grammar::StatementProps</code>, <code>Config::BINDish::Grammar::ContainerProps</code> and classes consuming them: <code>Config::BINDish::Grammar::OptionProps</code> and <code>Config::BINDish::Grammar::BlockProps</code></p>
+</li>
+<li><p>Raku call stack</p>
+</li>
+</ul>
+<p>Most of the context implementation mechanics are not standardized and subject for change. Yet, a few elements are rather unlikely to change. Among those are:</p>
+<ul><li><p>A context has a type, stored in the same-named attribute of the <code>Context</code> class. The currently used types are: <em>"TOP"</em>, <em>"BLOCK"</em>, and <em>"OPTION"</em></p>
+</li>
+<li><p>Except for the <em>"TOP"</em> context, all other contexts keep track of their enclosing context via <code>$.parent</code> attribute of the <code>Context</code> class</p>
+</li>
+<li><p>A context's primary purpose is to provide properties of the currently begin parsed syntax element. Those properties are provided by <code>props</code> attribute of the <code>Context</code> class and expected to consume <code>StatementProps</code> role</p>
+</li>
+</ul>
+<p>If you plan to implement a grammar extension with a rule or token providing own context then it'd make sense to follow the steps taken by <code>statement:sym&lt;option&gt;</code> or <code>statement:sym&lt;block&gt;</code> rules.</p>
+<h2 id="Extending_The_Grammar"><a class="u" href="#___top" title="go to top of document">Extending The Grammar</a></h2>
+<p><a href="../BINDish.html"><code>Config::BINDish</code></a> contains general information about writing extensions. Here we provide only grammar-specific details.</p>
+<p>Only the rules and tokens documented in corresponding section above are guaranteed to be supported and not be changed or removed without deprecation.</p>
+<p>The most common way to extend the grammar would be to add a new kind of statement or value type. This must be as easy as adding new rules or tokens akin to the following example:</p>
+<pre class="pod-block-code">role MyExtension is BINDish-grammar {
+    ...
+    multi rule statement:sym&lt;your-statement&gt; {
+        # Your statement syntax rules
+    }
+    multi token value:sym&lt;your-type&gt; {
+        # Your value syntax rules
+    }
+    ...
+}</pre>
+<h1 id="SEE_ALSO"><a class="u" href="#___top" title="go to top of document">SEE ALSO</a></h1>
+<p><a href="../BINDish.html"><code>Config::BINDish</code></a>, <a href="Grammar/Strictness.html"><code>Config::BINDish::Grammar::Strictness</code></a>, <a href="Grammar/StatementProps.html"><code>Config::BINDish::Grammar::StatementProps</code></a>, <a href="Grammar/ContainerProps.html"><code>Config::BINDish::Grammar::ContainerProps</code></a>, <a href="Grammar/OptionProps.html"><code>Config::BINDish::Grammar::OptionProps</code></a>, <a href="Grammar/BlockProps.html"><code>Config::BINDish::Grammar::BlockProps</code></a></p>
+
+    </div>
+
+    
+</body>
+</html>

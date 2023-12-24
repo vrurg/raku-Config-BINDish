@@ -5,11 +5,11 @@ C<class Config::BINDish::AST::Option> - configuration option representation
 
 =head1 DESCRIPTION
 
-Is L<C<Config::BINDish::AST::Node>|Node.md>.
+Is L<C<Config::BINDish::AST::Node>|rakudoc:Config::BINDish::AST::Node>.
 
 =head1 ATTRIBUTES
 
-=head3  C<$.id>
+=head3 C<$.id>
 
 Unique ID of an option object. See L<C<Config::BINDish::Grammar Pre-declaration>|../Grammar.md#Pre-declaration>
 section.
@@ -30,11 +30,12 @@ Returns value payload of a child marked with I<"option-value">. Returns the AST 
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|../../BINDish.md>,
-L<C<Config::BINDish::AST>|../AST.md>
+L<C<Config::BINDish>|rakudoc:Config::BINDish>,
+L<C<Config::BINDish::AST>|rakudoc:Config::BINDish::AST>
 
 =head1 AUTHOR
 
 Vadim Belman <vrurg@cpan.org>
 
 =end pod
+

@@ -1,15 +1,12 @@
-ROLE
-====
+# ROLE
 
 `role Config::BINDish::AST::Container` - common declarations for any kind of value containers
 
-DESCRIPTION
-===========
+# DESCRIPTION
 
 This role defines the interface and implementation of a container which is characterized by the value it contains and a type name associated with the value.
 
-ATTRIBUTES
-==========
+# ATTRIBUTES
 
 ### [`Mu`](https://docs.raku.org/type/Mu) `$.payload`
 
@@ -17,11 +14,15 @@ The actual value.
 
 This attribute `handles` all stadndard coercion methods found on [`Match`](https://docs.raku.org/type/Match) and [`Str`](https://docs.raku.org/type/Str) classes. So, it is possible to coerce a container like this:
 
-    my Int(Config::BINDish::AST::Container:D) $some-count = $container;
+``` 
+my Int(Config::BINDish::AST::Container:D) $some-count = $container;
+```
 
 or even easier:
 
-    my Int $some-count = Int($container);
+``` 
+my Int $some-count = Int($container);
+```
 
 ### [`Str:D`](https://docs.raku.org/type/Str) `$.type-name`
 
@@ -29,19 +30,19 @@ The type name describing `$.payload`. Normally borrowed from [`Config::BINDish::
 
 Defaults to *"any"*.
 
-METHODS
-=======
+# METHODS
 
 ### `node-name()`
 
 Returns node class `shortname`.
 
-COERCIONS
-=========
+# COERCIONS
 
 The role supports specialized coercion from [`Config::BINDish::Grammar::Value`](../Grammar/Value.md):
 
-    my Config::BINDish::AST::Container $c = Config::BINDish::AST::Value($grammar-value);
+``` 
+my Config::BINDish::AST::Container $c = Config::BINDish::AST::Value($grammar-value);
+```
 
 In this case new container's payload and type name are set from corresponding attributes of [`Config::BINDish::Grammar::Value`](../Grammar/Value.md) instance. The `payload` is obtained using the `coerced` method of [`Config::BINDish::Grammar::Value`](../Grammar/Value.md).
 
@@ -55,13 +56,10 @@ Matches `$val.payload` against our `$.payload`
 
 Matches `$val` against our `$.payload`.
 
-SEE ALSO
-========
+# SEE ALSO
 
 [`Config::BINDish`](../../BINDish.md), [`Config::BINDish::AST`](../AST.md)
 
-AUTHOR
-======
+# AUTHOR
 
 Vadim Belman <vrurg@cpan.org>
-

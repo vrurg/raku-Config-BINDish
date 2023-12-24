@@ -1,11 +1,8 @@
-
 =begin pod
-=ROLE
-
+=ROLE 
 C<Config::BINDish::Grammar::TypeStringify> - default grammar type info stringification
 
-=METHODS
-
+=METHODS 
 =head2 Implemented
 
 =head3 C<type-as-str(--> Str:D)>
@@ -21,10 +18,12 @@ These methods are required by the role:
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|../../BINDish.md>,
-L<C<Config::BINDish::Grammar>|../Grammar.md>,
-L<C<Config::BINDish::Grammar::Value>|Value.md>,
-L<C<Config::BINDish::Grammar::ContainerProps>|ContainerProps.md>
+L<C<Config::BINDish>|rakudoc:Config::BINDish>,
+L<C<Config::BINDish::Grammar>|rakudoc:Config::BINDish::Grammar>,
+L<C<Config::BINDish::Grammar::Value>|rakudoc:Config::BINDish::Grammar::Value>,
+L<C<Config::BINDish::Grammar::ContainerProps>|rakudoc:Config::BINDish::Grammar::ContainerProps>
 
 =AUTHOR Vadim Belman <vrurg@cpan.org>
+
 =end pod
+

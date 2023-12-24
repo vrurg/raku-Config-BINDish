@@ -1,11 +1,8 @@
-
 =begin pod
-=CLASS
-
+=CLASS 
 C<Config::BINDish::Grammar::Value> - grammar representation of a value
 
-=ATTRIBUTES
-
+=ATTRIBUTES 
 =head3 L<C<Match:D>|https://docs.raku.org/type/Match>C< | >L<C<Str:D>|https://docs.raku.org/type/Str>C< $.payload>
 
 The actual value representation. Most of the time it would be a L<C<Match>|https://docs.raku.org/type/Match> obtained from parsed down source. But
@@ -21,11 +18,13 @@ Value type object.
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|../../BINDish.md>,
-L<C<Config::BINDish::Grammar>|../Grammar.md>,
-L<C<Config::BINDish::Grammar::TypeStringify>|TypeStringify.md>,
-L<C<Config::BINDish::Grammar::ContainerProps>|ContainerProps.md>
+L<C<Config::BINDish>|rakudoc:Config::BINDish>,
+L<C<Config::BINDish::Grammar>|rakudoc:Config::BINDish::Grammar>,
+L<C<Config::BINDish::Grammar::TypeStringify>|rakudoc:Config::BINDish::Grammar::TypeStringify>,
+L<C<Config::BINDish::Grammar::ContainerProps>|rakudoc:Config::BINDish::Grammar::ContainerProps>
 
 =AUTHOR Vadim Belman <vrurg@cpan.org>
 
+
 =end pod
+

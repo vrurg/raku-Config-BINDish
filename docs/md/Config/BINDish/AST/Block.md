@@ -1,17 +1,14 @@
-CLASS
-=====
+# CLASS
 
 `class Config::BINDish::AST::Block` - representation of a configuration block
 
-DESCRIPTION
-===========
+# DESCRIPTION
 
 Is [`Config::BINDish::AST::Node`](Node.md).
 
 Does [`Config::BINDish::AST::Blockish`](Blockish.md).
 
-ATTRIBUTES
-==========
+# ATTRIBUTES
 
 ### [`Bool:D`](https://docs.raku.org/type/Bool) `$.flat`
 
@@ -19,21 +16,22 @@ A flat block doesn't allow multiple children of the same kind. In other words, f
 
 For example:
 
-    foo "bar" { # A flat block
-        opt1 "1";
-        opt1 2; # This will override the above
-        subblock "baz" {
-            opt2 "first";
-        }
-        subblock "baz" {
-            opt2 "second"; # :foo<bar> => :subblock<baz> => "opt2" will return "second"
-        }
+``` 
+foo "bar" { # A flat block
+    opt1 "1";
+    opt1 2; # This will override the above
+    subblock "baz" {
+        opt2 "first";
     }
+    subblock "baz" {
+        opt2 "second"; # :foo<bar> => :subblock<baz> => "opt2" will return "second"
+    }
+}
+```
 
 The attribute is by default set either to the value in `$*CFG-FLAT-BLOCKS` or to *False*.
 
-METHODS
-=======
+# METHODS
 
 ### `keyword(Bool :$raw)`
 
@@ -59,13 +57,10 @@ Adds `$option` as a child.
 
 Returns a flattened copy of the block.
 
-SEE ALSO
-========
+# SEE ALSO
 
 [`Config::BINDish`](../../BINDish.md), [`Config::BINDish::AST`](../AST.md)
 
-AUTHOR
-======
+# AUTHOR
 
 Vadim Belman <vrurg@cpan.org>
-

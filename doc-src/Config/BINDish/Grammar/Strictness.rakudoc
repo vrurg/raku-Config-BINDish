@@ -1,11 +1,8 @@
-
 =begin pod
-=CLASS
-
+=CLASS 
 C<Config::BINDish::Grammar::Strictness> - strict mode options
 
-=DESCRIPTION
-
+=DESCRIPTION 
 This class defines what parts of the parser should operate in strict mode. See L<#ATTRIBUTES>.
 
 The most simple way to initialize an instance of this class is to coerce it from a L<C<Bool>|https://docs.raku.org/type/Bool> value:
@@ -17,8 +14,7 @@ From the perspective of creating a new grammar it would be done as:
     Config::BINDish::Grammar.parse(..., :strict);   # All strict
     Config::BINDish::Grammar.parse(..., :!strict);  # All non-strict
 
-=ATTRIBUTES
-
+=ATTRIBUTES 
 =head3 L<C<Bool:D>|https://docs.raku.org/type/Bool> C<$.syntax = False>
 
 When set the parser will require a semi-colon (C<;>) after all statements. Otherwise semi-colon is optional after
@@ -39,13 +35,13 @@ Otherwise it has to be like this:
 
 This attribute determines if all options have to be explicitly pre-declared.
 
-See method C<declare-options> in L<C<Config::BINDish::Grammar>|../Grammar.md>.
+See method C<declare-options> in L<C<Config::BINDish::Grammar>|rakudoc:Config::BINDish::Grammar>.
 
 =head3 L<C<Bool:D>|https://docs.raku.org/type/Bool> C<$.blocks = False>
 
 This attribute determines if all block types have to be explicitly pre-declared.
 
-See method C<declare-blocks> in L<C<Config::BINDish::Grammar>|../Grammar.md>.
+See method C<declare-blocks> in L<C<Config::BINDish::Grammar>|rakudoc:Config::BINDish::Grammar>.
 
 =head3 L<C<Bool:D>|https://docs.raku.org/type/Bool> C<$.warnings = True>
 
@@ -60,9 +56,11 @@ which is an invalid keyword.
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|../../BINDish.md>,
-L<C<Config::BINDish::Grammar>|../Grammar.md>
+L<C<Config::BINDish>|rakudoc:Config::BINDish>,
+L<C<Config::BINDish::Grammar>|rakudoc:Config::BINDish::Grammar>
 
 =AUTHOR Vadim Belman <vrurg@cpan.org>
 
+
 =end pod
+

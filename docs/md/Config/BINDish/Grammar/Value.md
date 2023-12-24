@@ -1,14 +1,8 @@
-CLASS
-=====
-
-
+# CLASS
 
 `Config::BINDish::Grammar::Value` - grammar representation of a value
 
-ATTRIBUTES
-==========
-
-
+# ATTRIBUTES
 
 ### [`Match:D`](https://docs.raku.org/type/Match)`| `[`Str:D`](https://docs.raku.org/type/Str)`$.payload`
 
@@ -22,13 +16,10 @@ Value type name.
 
 Value type object.
 
-SEE ALSO
-========
+# SEE ALSO
 
 [`Config::BINDish`](../../BINDish.md), [`Config::BINDish::Grammar`](../Grammar.md), [`Config::BINDish::Grammar::TypeStringify`](TypeStringify.md), [`Config::BINDish::Grammar::ContainerProps`](ContainerProps.md)
 
-AUTHOR
-======
+# AUTHOR
 
 Vadim Belman <vrurg@cpan.org>
-

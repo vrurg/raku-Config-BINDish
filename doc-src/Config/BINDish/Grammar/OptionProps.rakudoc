@@ -6,18 +6,19 @@ C<Config::BINDish::Grammar::OptionProps> - option statement properties
 =head1 DESCRIPTION
 
 Does
-L<C<Config::BINDish::Grammar::StatementProps>|StatementProps.md>,
-L<C<Config::BINDish::Grammar::ContainerProps>|ContainerProps.md>,
-L<C<Config::BINDish::Grammar::DeclarationProps>|DeclarationProps.md>.
+L<C<Config::BINDish::Grammar::StatementProps>|rakudoc:Config::BINDish::Grammar::StatementProps>,
+L<C<Config::BINDish::Grammar::ContainerProps>|rakudoc:Config::BINDish::Grammar::ContainerProps>,
+L<C<Config::BINDish::Grammar::DeclarationProps>|rakudoc:Config::BINDish::Grammar::DeclarationProps>.
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|../../BINDish.md>,
-L<C<Config::BINDish::Grammar>|../Grammar.md>,
-L<C<Config::BINDish::Grammar::BlockProps>|BlockProps.md>
+L<C<Config::BINDish>|rakudoc:Config::BINDish>,
+L<C<Config::BINDish::Grammar>|rakudoc:Config::BINDish::Grammar>,
+L<C<Config::BINDish::Grammar::BlockProps>|rakudoc:Config::BINDish::Grammar::BlockProps>
 
 =head1 AUTHOR
 
 Vadim Belman <vrurg@cpan.org>
 
 =end pod
+

@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Config::BINDish::AST::Blockish</title>
+    <meta charset="UTF-8">
+    <style>hr,
+img {
+    box-sizing: content-box
+}
+body::after,
+body::before,
+hr::after,
+hr::before {
+    display: table;
+    content: ""
+}
+a,
+a:not([href]) {
+    text-decoration: none
+}
+
+hr,
+svg:not(:root) {
+    overflow: hidden
+}
+
+img,
+table tr {
+    background-color: #fff
+}
+
+pre,
+table {
+    overflow: auto
+}
+
+dl,
+dl dt,
+hr,
+pre code,
+pre>code,
+td,
+th {
+    padding: 0
+}
+
+input,
+pre code {
+    overflow: visible
+}
+
+pre,
+pre code {
+    word-wrap: normal
+}
+
+body {
+    -ms-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+    color: #333;
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-size: 16px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    width: 820px;
+    margin: 2em auto;
+}
+
+a {
+    background-color: transparent;
+    -webkit-text-decoration-skip: objects;
+    color: #4078c0
+}
+
+a:active,
+a:hover {
+    outline-width: 0;
+    text-decoration: underline
+}
+
+h1 {
+    margin: .67em 0
+}
+
+img {
+    border-style: none;
+    max-width: 100%
+}
+
+h1,
+h2 {
+    padding-bottom: .3em;
+    border-bottom: 1px solid #eee
+}
+
+input {
+    font: inherit;
+    margin: 0;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit
+}
+
+* {
+    box-sizing: border-box
+}
+
+strong {
+    font-weight: 600
+}
+
+body::after,
+hr::after {
+    clear: both
+}
+
+table {
+    border-spacing: 0;
+    border-collapse: collapse;
+    display: block;
+    width: 100%
+}
+
+blockquote {
+    margin: 0;
+    padding: 0 1em;
+    color: #777;
+    border-left: .25em solid #ddd
+}
+
+ol ol,
+ul ol {
+    list-style-type: lower-roman
+}
+
+ol ol ol,
+ol ul ol,
+ul ol ol,
+ul ul ol {
+    list-style-type: lower-alpha
+}
+
+dd {
+    margin-left: 0
+}
+
+code {
+    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace
+}
+
+pre {
+    font: 12px Consolas, "Liberation Mono", Menlo, Courier, monospace
+}
+
+input {
+    -webkit-font-feature-settings: "liga" 0;
+    font-feature-settings: "liga" 0
+}
+
+body>:first-child {
+    margin-top: 0!important
+}
+
+body>:last-child {
+    margin-bottom: 0!important
+}
+
+a:not([href]) {
+    color: inherit
+}
+
+blockquote,
+dl,
+ol,
+p,
+pre,
+table,
+ul {
+    margin-top: 0;
+    margin-bottom: 16px
+}
+
+hr {
+    background: #e7e7e7;
+    height: .25em;
+    margin: 24px 0;
+    border: 0
+}
+
+blockquote>:first-child {
+    margin-top: 0
+}
+
+blockquote>:last-child {
+    margin-bottom: 0
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin-top: 24px;
+    margin-bottom: 16px;
+    font-weight: 600;
+    line-height: 1.25
+}
+
+dl dt,
+table th {
+    font-weight: 700
+}
+
+h1 code,
+h1 tt,
+h2 code,
+h2 tt,
+h3 code,
+h3 tt,
+h4 code,
+h4 tt,
+h5 code,
+h5 tt,
+h6 code,
+h6 tt {
+    font-size: inherit
+}
+
+h1 {
+    font-size: 2em
+}
+
+h2 {
+    font-size: 1.5em
+}
+
+h3 {
+    font-size: 1.25em
+}
+
+h4 {
+    font-size: 1em
+}
+
+h5 {
+    font-size: .875em
+}
+
+h6 {
+    font-size: .85em;
+    color: #777
+}
+
+ol,
+ul {
+    padding-left: 2em
+}
+
+ol ol,
+ol ul,
+ul ol,
+ul ul {
+    margin-top: 0;
+    margin-bottom: 0
+}
+
+li>p {
+    margin-top: 16px
+}
+
+li+li {
+    margin-top: .25em
+}
+
+dl dt {
+    margin-top: 16px;
+    font-size: 1em;
+    font-style: italic
+}
+
+dl dd {
+    padding: 0 16px;
+    margin-bottom: 16px
+}
+
+table td,
+table th {
+    padding: 6px 13px;
+    border: 1px solid #ddd
+}
+
+table tr {
+    border-top: 1px solid #ccc
+}
+
+table tr:nth-child(2n) {
+    background-color: #f8f8f8
+}
+
+code {
+    padding: .2em 0;
+    margin: 0;
+    font-size: 85%;
+    background-color: rgba(0, 0, 0, .04);
+    border-radius: 3px
+}
+
+code::after,
+code::before {
+    letter-spacing: -.2em;
+    content: "\00a0"
+}
+
+pre>code {
+    margin: 0;
+    font-size: 100%;
+    word-break: normal;
+    white-space: pre;
+    background: 0 0;
+    border: 0
+}
+
+pre {
+    padding: 16px;
+    font-size: 85%;
+    line-height: 1.45;
+    background-color: #f7f7f7;
+    border-radius: 3px
+}
+
+pre code {
+    display: inline;
+    max-width: auto;
+    margin: 0;
+    line-height: inherit;
+    background-color: transparent;
+    border: 0
+}
+
+pre code::after,
+pre code::before {
+    content: normal
+}
+
+kbd {
+    display: inline-block;
+    padding: 3px 5px;
+    font: 11px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    line-height: 10px;
+    color: #555;
+    vertical-align: middle;
+    background-color: #fcfcfc;
+    border: 1px solid #ccc;
+    border-bottom-color: #bbb;
+    border-radius: 3px;
+    box-shadow: inset 0 -1px 0 #bbb
+}
+
+hr {
+    border-bottom-color: #eee
+}
+</style>
+
+    
+<style class="build-tools-gen-doc">.toc-level-1 .toc-text { padding-left: 1.5em; }
+.toc-level-2 .toc-text { padding-left: 2.5em; }
+.toc-level-3 .toc-text { padding-left: 3.5em; }
+.toc-level-4 .toc-text { padding-left: 4.5em; }
+.toc-level-5 .toc-text { padding-left: 5.5em; }
+#TOC * { border-width: 0; }
+li > p { margin: inherit; }
+li > .pod-block-code { margin-top: 16px; }
+</style></head>
+
+<body class="pod">
+    <div id="___top"></div>
+    <nav class="indexgroup">
+<table id="TOC">
+<caption><h2 id="TOC_Title">Table of Contents</h2></caption>
+<tr class="toc-level-1"><td class="toc-number">1</td><td class="toc-text"><a href="#ROLE">ROLE</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">2</td><td class="toc-text"><a href="#DESCRIPTION">DESCRIPTION</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">3</td><td class="toc-text"><a href="#ATTRIBUTES">ATTRIBUTES</a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">3.0.1</td><td class="toc-text"><a href="#%24.id"><code class="pod-code-inline">$.id</code></a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">4</td><td class="toc-text"><a href="#METHODS">METHODS</a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.0.1</td><td class="toc-text"><a href="#multi_find(:%24block!,_:%24name,_:%24class,_Bool_:%24local_--&gt;_Config::BINDish::AST::Block)"><code class="pod-code-inline">multi find(:$block!, :$name, :$class, Bool :$local --&gt; Config::BINDish::AST::Block)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.0.2</td><td class="toc-text"><a href="#multi_find(:%24option!,_Bool_:%24local_--&gt;_Config::BINDish::AST::Option)"><code class="pod-code-inline">multi find(:$option!, Bool :$local --&gt; Config::BINDish::AST::Option)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.0.3</td><td class="toc-text"><a href="#block(%24block,_Bool_:%24local,_*%p)"><code class="pod-code-inline">block($block, Bool :$local, *%p)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.0.4</td><td class="toc-text"><a href="#blocks(%24block,_*%p)"><code class="pod-code-inline">blocks($block, *%p)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.0.5</td><td class="toc-text"><a href="#option(%24option,_Bool_:%24local_=_True,_*%p)"><code class="pod-code-inline">option($option, Bool :$local = True, *%p)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.0.6</td><td class="toc-text"><a href="#options(%24option,_Bool_:%24local_=_True,_*%p)"><code class="pod-code-inline">options($option, Bool :$local = True, *%p)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.0.7</td><td class="toc-text"><a href="#value(%24option,_Bool_:%24local_=_True,_Bool_:%24raw_=_False,_*%p)"><code class="pod-code-inline">value($option, Bool :$local = True, Bool :$raw = False, *%p)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.0.8</td><td class="toc-text"><a href="#values(Bool_:%24raw)"><code class="pod-code-inline">values(Bool :$raw)</code></a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">4.1</td><td class="toc-text"><a href="#Method_get">Method <code class="pod-code-inline">get</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.1.1</td><td class="toc-text"><a href="#Default_Values">Default Values</a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.1.2</td><td class="toc-text"><a href="#multi_get(Str:D_%24option,_Bool_:%24raw,_Bool_:%24local_=_True)"><code class="pod-code-inline">multi get(Str:D $option, Bool :$raw, Bool :$local = True)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.1.3</td><td class="toc-text"><a href="#multi_get(Str:D_:%24option,_Bool_:%24local_=_True)"><code class="pod-code-inline">multi get(Str:D :$option, Bool :$local = True)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.1.4</td><td class="toc-text"><a href="#multi_get(Str:D_:%24value,_Bool_:%24local_=_True)"><code class="pod-code-inline">multi get(Str:D :$value, Bool :$local = True)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.1.5</td><td class="toc-text"><a href="#multi_get(Str:D_%24keyword,_:block)"><code class="pod-code-inline">multi get(Str:D $keyword, :block)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.1.6</td><td class="toc-text"><a href="#multi_get(Str:D_:%24block,_*%c)"><code class="pod-code-inline">multi get(Str:D :$block, *%c)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.1.7</td><td class="toc-text"><a href="#multi_get(Pair:D_%24path,_Bool_:%24block,_Bool_:%24raw,_Bool_:%24local)"><code class="pod-code-inline">multi get(Pair:D $path, Bool :$block, Bool :$raw, Bool :$local)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.1.8</td><td class="toc-text"><a href="#multi_get(Pair:D_:%24option,_*%c)"><code class="pod-code-inline">multi get(Pair:D :$option, *%c)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.1.9</td><td class="toc-text"><a href="#multi_get(Pair:D_:%24value,_*%c)"><code class="pod-code-inline">multi get(Pair:D :$value, *%c)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">4.1.10</td><td class="toc-text"><a href="#multi_get(Pair:D_:%24block,_*%c)"><code class="pod-code-inline">multi get(Pair:D :$block, *%c)</code></a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">5</td><td class="toc-text"><a href="#SEE_ALSO">SEE ALSO</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">6</td><td class="toc-text"><a href="#AUTHOR">AUTHOR</a></td></tr>
+
+</table>
+</nav>
+
+
+    <div class="pod-body">
+    <h1 id="ROLE"><a class="u" href="#___top" title="go to top of document">ROLE</a></h1>
+<p><code>role Config::BINDish::AST::Blockish</code> - interface of a generic block class</p>
+<h1 id="DESCRIPTION"><a class="u" href="#___top" title="go to top of document">DESCRIPTION</a></h1>
+<p>This role mostly implements basic block search capabilities provding interface for locating and pulling out various kinds of children objects.</p>
+<h1 id="ATTRIBUTES"><a class="u" href="#___top" title="go to top of document">ATTRIBUTES</a></h1>
+<h3 id="$.id"><a class="u" href="#___top" title="go to top of document"><code>$.id</code></a></h3>
+<p>Unique ID of a blockish object. See <a href="../Grammar.md#Pre-declaration"><code>Config::BINDish::Grammar Pre-declaration</code></a> section.</p>
+<h1 id="METHODS"><a class="u" href="#___top" title="go to top of document">METHODS</a></h1>
+<h3 id="multi_find(:$block!,_:$name,_:$class,_Bool_:$local_--&gt;_Config::BINDish::AST::Block)"><a class="u" href="#___top" title="go to top of document"><code>multi find(:$block!, :$name, :$class, Bool :$local --&gt; Config::BINDish::AST::Block)</code></a></h3>
+<p>Similar to <code>find-all(:$block!, ...)</code> candidate but makes makes sure that only one block entry is found. It either returns the block instance found, or <a href="https://docs.raku.org/type/Nil"><code>Nil</code></a>, or throws with <code>Config::BINDish::X::Block::Ambiguous</code> if more than one candidate found.</p>
+<h3 id="multi_find(:$option!,_Bool_:$local_--&gt;_Config::BINDish::AST::Option)"><a class="u" href="#___top" title="go to top of document"><code>multi find(:$option!, Bool :$local --&gt; Config::BINDish::AST::Option)</code></a></h3>
+<p>Similar to the candidate for <code>:$block!</code>, but for options. Returns <a href="Option.html"><code>Config::BINDish::AST::Option</code></a>. Throws with <code>Config::BINDish::X::Option::Ambiguous</code>.</p>
+<h3 id="block($block,_Bool_:$local,_*%p)"><a class="u" href="#___top" title="go to top of document"><code>block($block, Bool :$local, *%p)</code></a></h3>
+<p>A shortcut for <code>$node.find(:$block, :$local, |%p)</code>.</p>
+<h3 id="blocks($block,_*%p)"><a class="u" href="#___top" title="go to top of document"><code>blocks($block, *%p)</code></a></h3>
+<p>A shortcut for <code>$node.find-all(:$block, |%p)</code>.</p>
+<h3 id="option($option,_Bool_:$local_=_True,_*%p)"><a class="u" href="#___top" title="go to top of document"><code>option($option, Bool :$local = True, *%p)</code></a></h3>
+<p>A shortcut for <code>$node.find(:$option, :$local, |%p)</code>. Note that <code>$local</code> is <em>True</em> by default as this is the most anticipated mode of operation. With <code>:!local</code> it's still possible to do a recursive search for a unique option instance.</p>
+<h3 id="options($option,_Bool_:$local_=_True,_*%p)"><a class="u" href="#___top" title="go to top of document"><code>options($option, Bool :$local = True, *%p)</code></a></h3>
+<p>A shortcut to <code>$node.find-all(:$option, :$local, |%p)</code>. Note that <code>$local</code> is also set to <em>True</em> by default, as for <code>option</code> method above. This is still meaningful because a block may contain multiple options of the same name.</p>
+<h3 id="value($option,_Bool_:$local_=_True,_Bool_:$raw_=_False,_*%p)"><a class="u" href="#___top" title="go to top of document"><code>value($option, Bool :$local = True, Bool :$raw = False, *%p)</code></a></h3>
+<p>This method is similar to the <code>option</code> method above except that <code>value</code> returns not option but option's value payload, unless `:raw` is passed in which case a <a href="Container.html"><code>Config::BINDish::AST::Container</code></a> object is returned.</p>
+<h3 id="values(Bool_:$raw)"><a class="u" href="#___top" title="go to top of document"><code>values(Bool :$raw)</code></a></h3>
+<p>Returns block's standalone values. For example, for the following example it will return <code>1, 2, 3</code>:</p>
+<pre class="pod-block-code">block "foo" {
+    1; 2; 3;
+}</pre>
+<p>If <code>$raw</code> named argument is used then instead of payloads the method will return value nodes.</p>
+<p><em>Note</em> that value nodes are those consuming <a href="Container.html"><code>Config::BINDish::AST::Container</code></a> and marked as <em>standalone</em>.</p>
+<h2 id="Method_get"><a class="u" href="#___top" title="go to top of document">Method <code>get</code></a></h2>
+<p>This is an umbrella method which provides a few ways of accessing configuration data. It is also considered the primary means of accessing configuration data stored on an AST.</p>
+<h3 id="Default_Values"><a class="u" href="#___top" title="go to top of document">Default Values</a></h3>
+<p>One of the key features of `get` which sets it apart of methods <code>value</code>, <code>option</code>, <code>block</code>, etc., is its ability to return some kind of default for a requested configuration element which is actually missing from the config file. For example, if we have a <a href="https://raku.land/?q=pre-declaration"><code>pre-declaration</code></a> like this:</p>
+<pre class="pod-block-code">blocks =&gt; (
+    :host =&gt; %( :named ),
+),
+options =&gt; (
+    :host-iface&lt;interface&gt; =&gt; %( :in&lt;host&gt;, :default&lt;*&gt; ),
+)</pre>
+<p>And then request the value of <code>interface</code> option from a config file like:</p>
+<pre class="pod-block-code">host "srv1.local" {
+    ip 192.168.1.42;
+}</pre>
+<p>Then the method will supply us with string <em>"*"</em> which it would find in corresponding <a href="../Grammar/OptionProps.html"><code>Config::BINDish::Grammar::OptionProps</code></a>, created from the above pre-declaration structure.</p>
+<p>For a missing option with no default value (or no pre-declaration whatsoever) `Nil` will be returned.</p>
+<p>Whenever we expect an option or a block object to be returned (see <code>:raw</code> parameter in the followin sub-sections) instead of <a href="Option.html"><code>Config::BINDish::AST::Option</code></a> or <a href="Block.html"><code>Config::BINDish::AST::Block</code></a> instance the method would return <a href="../Grammar/OptionProps.html"><code>Config::BINDish::Grammar::OptionProps</code></a> or <a href="../Grammar/BlockProps.html"><code>Config::BINDish::Grammar::BlockProps</code></a>, respectively, if the requested elements do have corresponding pre-declarations. For example, for the above config snippet:</p>
+<pre class="pod-block-code">$cfg.get( :host&lt;srv1.local&gt; =&gt; "interface", :raw )</pre>
+<p>an instance of <code>OptionProps</code> will be returned. If one misspells the option name like, say, <em>"intrface"</em> then the method will return <code>Nil</code>, same as for when a value is requested. Yet, in either case one can test against the return value to know if the option exists in the config file:</p>
+<pre class="pod-block-code">? $cfg.get( :host&lt;srv1.local&gt; =&gt; "interface", :raw ); # False
+? $cfg.get( :host&lt;srv1.local&gt; =&gt; "intrface", :raw );  # False
+? $cfg.get( :host&lt;srv1.local&gt; =&gt; "ip", :raw );        # True</pre>
+<p>This is because all <code>OptionProps</code> and <code>BlockProps</code> objects are <em>falsy</em> in a boolean context. This way one can check it out if an option or a block is actually present in the config. To find out if the requested option or block is not in the config and neither has a pre-declaration one can use `.defined` on the return value or test it against `Nil`.</p>
+<h3 id="multi_get(Str:D_$option,_Bool_:$raw,_Bool_:$local_=_True)"><a class="u" href="#___top" title="go to top of document"><code>multi get(Str:D $option, Bool :$raw, Bool :$local = True)</code></a></h3>
+<p>By default returns <code>$option</code> value. With <code>:raw</code> argument will return corresponding <a href="Option.html"><code>Config::BINDish::AST::Option</code></a> or <a href="../Grammar/OptionProps.html"><code>Config::BINDish::Grammar::OptionProps</code></a> object.</p>
+<p>With <code>:!local</code> will search for the option recursively.</p>
+<pre class="pod-block-code">$block.get("foo");         # Option "foo" value
+$block.get("foo", !local); # Option "foo" value in this or any nested block</pre>
+<h3 id="multi_get(Str:D_:$option,_Bool_:$local_=_True)"><a class="u" href="#___top" title="go to top of document"><code>multi get(Str:D :$option, Bool :$local = True)</code></a></h3>
+<p>Returns an option object. A shortcut for <code>$block.get($option, :$local, :raw)</code>.</p>
+<h3 id="multi_get(Str:D_:$value,_Bool_:$local_=_True)"><a class="u" href="#___top" title="go to top of document"><code>multi get(Str:D :$value, Bool :$local = True)</code></a></h3>
+<p>Returns an option value. Note that <code>$value</code> must contain option keyword:</p>
+<pre class="pod-block-code">$block.get: :value&lt;foo&gt;; # Option "foo" value</pre>
+<p>A shortcut for <code>$block.get($value, :$local, :!raw)</code>.</p>
+<h3 id="multi_get(Str:D_$keyword,_:block)"><a class="u" href="#___top" title="go to top of document"><code>multi get(Str:D $keyword, :block)</code></a></h3>
+<p>Returns a nameless block located by <code>$keyword</code> locally on the invocator.</p>
+<h3 id="multi_get(Str:D_:$block,_*%c)"><a class="u" href="#___top" title="go to top of document"><code>multi get(Str:D :$block, *%c)</code></a></h3>
+<p>Finds and returns a block object by its keyword. A shortcut for `$block.get($block, :block)`.</p>
+<h3 id="multi_get(Pair:D_$path,_Bool_:$block,_Bool_:$raw,_Bool_:$local)"><a class="u" href="#___top" title="go to top of document"><code>multi get(Pair:D $path, Bool :$block, Bool :$raw, Bool :$local)</code></a></h3>
+<p>This is the most advanced form of <code>get</code> method. It allows to find an option or block by its path. The path is defined as a nested structure of <a href="https://docs.raku.org/type/Pair"><code>Pair</code></a>s. For each <code>Pair</code> its key specifies a subblock within its parent block; its value specifies an object within the subblock:</p>
+<pre class="pod-block-code"># Get option "fubar" from a top block "foo"
+$cfg.top.get(:foo&lt;fubar&gt;);
+# Get "fubar" from block "baz" inside block "bar", inside block "foo"
+$cfg.top.get(foo =&gt; bar =&gt; baz =&gt; "fubar");
+$cfg.get(:foo(:bar(:baz&lt;fubar&gt;))); # Same as above</pre>
+<p>Both key and value can be <a href="https://docs.raku.org/type/Pair"><code>Pair</code></a> on their own. When key is a <a href="https://docs.raku.org/type/Pair"><code>Pair</code></a> then it is considered a block reference. Its key defines block type, its value defines block name and, possibly, class:</p>
+<pre class="pod-block-code"># find in `foo "bar" { ... }`
+:foo&lt;bar&gt; =&gt; ...;
+
+# find in `foo "bar" baz { ... }`
+:foo("bar", "baz") =&gt; ...;</pre>
+<p>When pair's value is a <a href="https://docs.raku.org/type/Pair"><code>Pair</code></a> on it's own it is considered to be a subpath, to be handled recursively. I.e., in the above example of <code>foo =&gt; bar =&gt; baz =&gt; "fubar"</code> the value <code>bar =&gt; ...</code> is a path, then <code>baz =&gt; "fubar"</code> is too. But then when we reach <em>"fubar"</em> it is considered to be the object the method is requested for.</p>
+<p>Let's use an example from tests:</p>
+<pre class="pod-block-code">multi "1" {
+    opt 42;
+    subblk "level 1.a" {
+        opt 1.3;
+        subsubblk "level 2" nesting {
+            opt2 "π";
+        }
+    }
+    subblk "level 1.a" special {
+        opt -1.3;
+    }
+    subblk "level 1.b" {
+        opt 4.2;
+    }
+}
+
+multi {
+    opt "just multi"
+}
+
+multi "special" class {
+    num 3.14e0;
+}
+
+top-opt 3.1415926;</pre>
+<p>Assuming that <code>$cfg</code> is our <a href="../../BINDish.html"><code>Config::BINDish</code></a> instance, and by noting that method <code>get</code> is available on it via <code>$.top</code> attribute, we can have the following:</p>
+<pre class="pod-block-code">$cfg.get: :multi =&gt; "opt"; # Get option "opt" from the nameless block multi, i.e. results in "just multi"
+$cfg.get: :multi("1") =&gt;
+            :subblk("level 1.a") =&gt;
+                :subsubblk("level 2", "nesting") =&gt;
+                    "opt2"; # "π"</pre>
+<p>It is also possible to request multiple objects at once by passing a <a href="https://docs.raku.org/type/Positional"><code>Positional</code></a> as the final path value:</p>
+<pre class="pod-block-code">$cfg.get(:foo&lt;bar baz&gt;); # Returns options "bar" and "baz" in block "foo"</pre>
+<p>Or another way to achieve the same result is to use a <a href="https://docs.raku.org/type/Code"><code>Code</code></a> object as the final path value:</p>
+<pre class="pod-block-code">$cfg.get(foo =&gt; { "bar", "baz" });</pre>
+<p>In this case the return value of the code is coerced into a <a href="https://docs.raku.org/type/List"><code>List</code></a> and used as in the previous example. This also means that <code>$cfg.get(foo =&gt; { "bar" })</code> would return a single-element list consisting of <em>"bar"</em> value.</p>
+<p><em>Note.</em> The code object takes a single argument which is the last block object on the path. In the last example this would be the object representing block <em>"foo"</em>.</p>
+<p>Apparently, there is no way for the method to distinguish block requests from option requests and there is no way to tell wether <code>:foo&lt;name&gt;</code> stands for option <em>"name"</em> in block <em>"foo"</em>, or is it for a block <code>foo "name" { }</code>? To make one's intentions clear a named argument <code>:block</code> can be used:</p>
+<pre class="pod-block-code">$cfg.get(:foo&lt;name&gt;, :block);  # Would return a block object
+$cfg.get(:foo&lt;name&gt;, :!block); # Would return an option object;</pre>
+<p><code>:!block</code> is the default. Similarly to options, blocks can be referenced with a string (for nameless ones), with a <a href="https://docs.raku.org/type/Positional"><code>Positional</code></a>, or a <a href="https://docs.raku.org/type/Code"><code>Code</code></a> object.</p>
+<p>Note that because a block is mostly useful for introspection whereas from options we would mostly require their values, method <code>get</code> has different return semantics for different requests. Thus, if a block has values on it like in the following example:</p>
+<pre class="pod-block-code">serivce "api" {
+    servers {
+        "srv1.local";
+        "srv2.local";
+    }
+}</pre>
+<p>and the values are what we need then we'd have to request them explicitly:</p>
+<pre class="pod-block-code">$cfg.get(:service&lt;api&gt; =&gt; :servers, :block).values; # ("srv1.local", "srv2.local")</pre>
+<p>Contrary, is we need to introspect an option object then we need to use <code>:raw</code> named argument with a request:</p>
+<pre class="pod-block-code">$cfg.get(:foo&lt;bar&gt;, :raw);</pre>
+<p><em>Note.</em> The actual nature of the returned option or block object may differ depedning on the conditions. See the Default Values section above.</p>
+<p>Option lookup is done locally on the last block preceding the option reference in path. This behavior can be changed with explicit <code>:!local</code> argument causing the option to be looked upon in any nested block recursively. Note though that if the lookup fails then search for a default value is only done locally. I.e., if we have a config file like this:</p>
+<pre class="pod-block-code">foo { bar { } }</pre>
+<p>And request for <code>:foo&lt;fubar&gt;</code>, a <code>Nil</code> will be returned even with the following pre-declaration:</p>
+<pre class="pod-block-code">options =&gt; (
+    :fubar =&gt; %( :in&lt;bar&gt;, :default(42) ),
+)</pre>
+<h3 id="multi_get(Pair:D_:$option,_*%c)"><a class="u" href="#___top" title="go to top of document"><code>multi get(Pair:D :$option, *%c)</code></a></h3>
+<p>Returns an option object defined by a path. Shortcut for <code>$blk.get($option, :!block, :raw, |%c)</code>.</p>
+<h3 id="multi_get(Pair:D_:$value,_*%c)"><a class="u" href="#___top" title="go to top of document"><code>multi get(Pair:D :$value, *%c)</code></a></h3>
+<p>Returns an option value defined by a path. Shortcut for <code>$blk.get($value, :!block, :!raw, |%c)</code>.</p>
+<h3 id="multi_get(Pair:D_:$block,_*%c)"><a class="u" href="#___top" title="go to top of document"><code>multi get(Pair:D :$block, *%c)</code></a></h3>
+<p>Returns a block object defined by a path. Shorcut for <code>$blk.get($block, :block, |%c)</code>.</p>
+<h1 id="SEE_ALSO"><a class="u" href="#___top" title="go to top of document">SEE ALSO</a></h1>
+<p><a href="../../BINDish.html"><code>Config::BINDish</code></a>, <a href="../AST.html"><code>Config::BINDish::AST</code></a></p>
+<h1 id="AUTHOR"><a class="u" href="#___top" title="go to top of document">AUTHOR</a></h1>
+<p>Vadim Belman &lt;vrurg@cpan.org&gt;</p>
+
+    </div>
+
+    
+</body>
+</html>

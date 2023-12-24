@@ -1,20 +1,15 @@
-CLASS
-=====
+# CLASS
 
 `class Config::BINDish::AST::TOP` - the root of AST tree
 
-DESCRIPTION
-===========
+# DESCRIPTION
 
 Is [`Config::BINDish::AST::Block`](Block.md).
 
-SEE ALSO
-========
+# SEE ALSO
 
 [`Config::BINDish`](../../BINDish.md), [`Config::BINDish::AST`](../AST.md)
 
-AUTHOR
-======
+# AUTHOR
 
 Vadim Belman <vrurg@cpan.org>
-

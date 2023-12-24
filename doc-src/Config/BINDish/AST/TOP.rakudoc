@@ -5,15 +5,16 @@ C<class Config::BINDish::AST::TOP> - the root of AST tree
 
 =head1 DESCRIPTION
 
-Is L<C<Config::BINDish::AST::Block>|Block.md>.
+Is L<C<Config::BINDish::AST::Block>|rakudoc:Config::BINDish::AST::Block>.
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|../../BINDish.md>,
-L<C<Config::BINDish::AST>|../AST.md>
+L<C<Config::BINDish>|rakudoc:Config::BINDish>,
+L<C<Config::BINDish::AST>|rakudoc:Config::BINDish::AST>
 
 =head1 AUTHOR
 
 Vadim Belman <vrurg@cpan.org>
 
 =end pod
+

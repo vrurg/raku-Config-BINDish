@@ -1,39 +1,38 @@
-
 =begin pod
 =head1 CLASS
 
 C<Config::BINDish::Actions> - default actions for
-L<C<Config::BINDish::Grammar>|Grammar.md>
+L<C<Config::BINDish::Grammar>|rakudoc:Config::BINDish::Grammar>
 
 =head1 DESCRIPTION
 
 This class is the default to be used for parsing configs. It builds
-L<C<Config::BINDish::AST>|AST.md>
+L<C<Config::BINDish::AST>|rakudoc:Config::BINDish::AST>
 tree representation of a config data which is then provided to application code via
-L<C<Config::BINDish>|../BINDish.md>
+L<C<Config::BINDish>|rakudoc:Config::BINDish>
 attribute C<$.top>. The tree can be used to fetch required configuration data, see
-L<C<Config::BINDish::AST>|AST.md>.
+L<C<Config::BINDish::AST>|rakudoc:Config::BINDish::AST>.
 
 =head1 METHODS
 
 Most of the methods correspond to named rules in
-L<C<Config::BINDish::Grammar>|Grammar.md>.
+L<C<Config::BINDish::Grammar>|rakudoc:Config::BINDish::Grammar>.
 In this section only utility methods are documented.
 
 =head3 C<make-container(Config::BINDish::Grammar::Value:D $val)>
 
 Method creates a new instance of
-L<C<Config::BINDish::AST::Value>|AST/Value.md>
+L<C<Config::BINDish::AST::Value>|rakudoc:Config::BINDish::AST::Value>
 from its grammar counterpart.
 
 =head3 C<enter-parent(Config::BINDish::AST::Node:D $inner --> Config::BINDish::AST::Node:D)>
 =head3 C<enter-parent(Config::BINDish::AST::Node:U $inner, |profile --> Config::BINDish::AST::Node:D)>
 
 Method is invoked when a new
-L<C<Config::BINDish::AST::Node>|AST/Node.md>
+L<C<Config::BINDish::AST::Node>|rakudoc:Config::BINDish::AST::Node>
 is to be created. For example, this class uses it when creates the C<TOP> node and each time a new block node is
 created.
-L<C<Config::BINDish::Extendabale>|Extendabale.md> also uses this method for another kinds of nodes.
+L<C<Config::BINDish::Expandable>|rakudoc:Config::BINDish::Expandable> also uses this method for another kinds of nodes.
 
 If C<$inner> is an undefined typeobject then the method first creates an instance of it using method `new` and using
 C<profile> as its arguments:
@@ -48,9 +47,12 @@ Returns the innermost parent node.
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|../BINDish.md>,
-L<C<Config::BINDish::Grammar>|Grammar.md>
+L<C<Config::BINDish>|rakudoc:Config::BINDish>,
+L<C<Config::BINDish::Grammar>|rakudoc:Config::BINDish::Grammar>
 
 =AUTHOR Vadim Belman <vrurg@cpan.org>
 
+
+
 =end pod
+

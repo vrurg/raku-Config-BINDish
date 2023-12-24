@@ -6,11 +6,11 @@ C<Config::BINDish::Expandable> - C<Config::BINDish> extension implmeneting expan
 =head1 DESCRIPTION
 
 This module extends
-L<C<Config::BINDish>|../BINDish.md>
+L<C<Config::BINDish>|rakudoc:Config::BINDish>
 with strings which can include other option values. Only double-quoted string (i.e. those for which
-L<C<Config::BINDish::Grammar::Value>|Grammar/Value.md>
+L<C<Config::BINDish::Grammar::Value>|rakudoc:Config::BINDish::Grammar::Value>
 and
-L<C<Config::BINDish::AST::Value>|AST/Value.md>
+L<C<Config::BINDish::AST::Value>|rakudoc:Config::BINDish::AST::Value>
 have type name set to I<dq-string>) are expandable.
 
 To incorporate a value into a string the following macro format is used:
@@ -87,7 +87,7 @@ Environment variables are expanded with C<"{$HOME}"> syntax. For example:
     base-dir "{$HOME}/.myapp";
 
 Normally, if requested environment variable doesn't exists the parser would throw
-L<C<Config::BINDish::X::Macro::DoesntExists>|X/Macro/DoesntExists.md> exception. But if the variable name is followed
+C<Config::BINDish::X::Macro::DoesntExists> exception. But if the variable name is followed
 with a question mark sign then the macro would be expanded into an empty string:
 
     default-prefix "{$MYAPP_PFX?}";
@@ -96,9 +96,9 @@ with a question mark sign then the macro would be expanded into an empty string:
 =head2 This Is A Value!
 
 I<Actually, this is a
-L<C<Config::BINDish::AST::Container>|AST/Container.md>.
+L<C<Config::BINDish::AST::Container>|rakudoc:Config::BINDish::AST::Container>.
 And a
-L<C<Config::BINDish::AST::Node>|AST/Node.md>.
+L<C<Config::BINDish::AST::Node>|rakudoc:Config::BINDish::AST::Node>.
 But as long as we talk about option values, so – let it be a value then.>
 
 Because expandable strings are normal values they can be used anywhere, where a value is accepted. We can do things
@@ -119,11 +119,12 @@ This works because when a macro is expanded server name and class can be specifi
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|../BINDish.md>,
-L<C<Config::BINDish::AST>|AST.md>
+L<C<Config::BINDish>|rakudoc:Config::BINDish>,
+L<C<Config::BINDish::AST>|rakudoc:Config::BINDish::AST>
 
 =head1 AUTHOR
 
 Vadim Belman <vrurg@cpan.org>
 
 =end pod
+

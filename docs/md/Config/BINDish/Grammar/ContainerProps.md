@@ -1,17 +1,14 @@
-ROLE
-====
+# ROLE
 
 `Config::BINDish::Grammar::ContainerProps` - common properties of container statements
 
-DESCRIPTION
-===========
+# DESCRIPTION
 
 Does [`Config::BINDish::Grammar::TypeStringify`](TypeStringify.md).
 
 A container statement is the one which can contain a value. The only two pre-declarable kind of statements currently supported: options and blocks – are both containers.
 
-ATTRIBUTES
-==========
+# ATTRIBUTES
 
 ### `List(Str)` `$.value-sym`
 
@@ -25,20 +22,16 @@ Must be a type object, which is the type this container is constrained to. Can b
 
 Contains allowed type name for this container. For example, to restrict a container to keywords only `$.type` must be set to [`Str`](https://docs.raku.org/type/Str), and type name set to *"keyword"*.
 
-METHODS
-=======
+# METHODS
 
 ### `ACCEPTS(`[`Config::BINDish::Grammar::Value:D`](Value.md)`$val)`
 
 Returns *True* if `$val` matches this container constraints on data type and type name.
 
-SEE ALSO
-========
+# SEE ALSO
 
 [`Config::BINDish`](../../BINDish.md), [`Config::BINDish::Grammar`](../Grammar.md), [`Config::BINDish::Grammar::BlockProps`](BlockProps.md), [`Config::BINDish::Grammar::OptionProps`](OptionProps.md)
 
-AUTHOR
-======
+# AUTHOR
 
 Vadim Belman <vrurg@cpan.org>
-

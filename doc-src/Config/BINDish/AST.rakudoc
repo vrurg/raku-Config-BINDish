@@ -6,7 +6,7 @@ C<Config::BINDish::AST> - the standard C<Config::BINDish> AST tree representatio
 =head1 DESCRIPTION
 
 As a module C<Config::BINDish::AST> defines all standard AST node classes used by
-L<C<Config::BINDish::Actions>|Actions.md>
+L<C<Config::BINDish::Actions>|rakudoc:Config::BINDish::Actions>
 to build the resulting representation of the parsed configuration.
 
 As a class C<Config::BINDish::AST> is the base class for all other AST classes.
@@ -18,9 +18,9 @@ A little bit of special attention must be paid to labeling functionality of AST.
     the-answer 42;
 
 In the above example both `the-answer` and `42` are considered to be I<values> and as such they result in two instances
-of L<C<Config::BINDish::AST::Value>|AST/Value.md>.
+of L<C<Config::BINDish::AST::Value>|rakudoc:Config::BINDish::AST::Value>.
 Both objects then become children of an
-L<C<Config::BINDish::AST::Option>|AST/Option.md>
+L<C<Config::BINDish::AST::Option>|rakudoc:Config::BINDish::AST::Option>
 instance. Roughly, the parsed tree will look like:
 
     Option
@@ -50,7 +50,7 @@ Returns current parent node.
 =head3 C<multi parent(Config::BINDish::AST:U \parent-type)>
 
 Returns the closest parent node of type C<parent-type>. For example, to get the enclosing block of a
-L<C<Config::BINDish::AST::Value>|AST/Value.md> one can do:
+L<C<Config::BINDish::AST::Value>|rakudoc:Config::BINDish::AST::Value> one can do:
 
     $value.parent(Config::BINDish::AST::Block);
 
@@ -86,7 +86,7 @@ based on its registered name.
 Creates a new instance of ast node based on its name. The name can be either a registered AST node name, see
 C<register-type> method above; or a short name under C<Config::BINDish::AST::> namespace. If no associated AST type
 object is found then a failure wrapped around
-L<C<Config::BINDish::X::AST::DoesnExists>|X/AST/DoesnExists.md>
+C<Config::BINDish::X::AST::DoesnExists>
 is returned.
 
 For example, with the following statement:
@@ -109,27 +109,28 @@ Returns the topmost node, or, in other words, the root of the AST tree.
 
 =head2 Roles
 
-=item L<C<Config::BINDish::AST::Container>|AST/Container.md>
-=item L<C<Config::BINDish::AST::Blockish>|AST/Blockish.md>
+=item L<C<Config::BINDish::AST::Container>|rakudoc:Config::BINDish::AST::Container>
+=item L<C<Config::BINDish::AST::Blockish>|rakudoc:Config::BINDish::AST::Blockish>
 
 =head2 Classes
 
-=item L<C<Config::BINDish::AST::Block>|AST/Block.md>
-=item L<C<Config::BINDish::AST::Comment>|AST/Comment.md>
-=item L<C<Config::BINDish::AST::Option>|AST/Option.md>
-=item L<C<Config::BINDish::AST::Node>|AST/Node.md>
-=item L<C<Config::BINDish::AST::NOP>|AST/NOP.md>
-=item L<C<Config::BINDish::AST::Stmts>|AST/Stmts.md>
-=item L<C<Config::BINDish::AST::TOP>|AST/TOP.md>
-=item L<C<Config::BINDish::AST::Value>|AST/Value.md>
+=item L<C<Config::BINDish::AST::Block>|rakudoc:Config::BINDish::AST::Block>
+=item L<C<Config::BINDish::AST::Comment>|rakudoc:Config::BINDish::AST::Comment>
+=item L<C<Config::BINDish::AST::Option>|rakudoc:Config::BINDish::AST::Option>
+=item L<C<Config::BINDish::AST::Node>|rakudoc:Config::BINDish::AST::Node>
+=item L<C<Config::BINDish::AST::NOP>|rakudoc:Config::BINDish::AST::NOP>
+=item L<C<Config::BINDish::AST::Stmts>|rakudoc:Config::BINDish::AST::Stmts>
+=item L<C<Config::BINDish::AST::TOP>|rakudoc:Config::BINDish::AST::TOP>
+=item L<C<Config::BINDish::AST::Value>|rakudoc:Config::BINDish::AST::Value>
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|../BINDish.md>,
-L<C<Config::BINDish::Actions>|Actions.md>
+L<C<Config::BINDish>|rakudoc:Config::BINDish>,
+L<C<Config::BINDish::Actions>|rakudoc:Config::BINDish::Actions>
 
 =head1 AUTHOR
 
 Vadim Belman <vrurg@cpan.org>
 
 =end pod
+

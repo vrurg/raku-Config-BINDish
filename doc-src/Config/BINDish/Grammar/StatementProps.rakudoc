@@ -1,4 +1,3 @@
-
 =begin pod
 =head1 ROLE
 
@@ -28,18 +27,19 @@ if the block is mentioned in statement's C<$.in> set. Always matches if C<$.in> 
 
 =head3 C<Bool()>
 
-Coerces a property object into I<False>. See method C<get> in L<C<Config::BINDish::AST::Blockish>|../AST/Blockish.md>
+Coerces a property object into I<False>. See method C<get> in L<C<Config::BINDish::AST::Blockish>|rakudoc:Config::BINDish::AST::Blockish>
 for details about default values.
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|../../BINDish.md>,
-L<C<Config::BINDish::Grammar>|../Grammar.md>,
-L<C<Config::BINDish::Grammar::BlockProps>|BlockProps.md>,
-L<C<Config::BINDish::Grammar::OptionProps>|OptionProps.md>
+L<C<Config::BINDish>|rakudoc:Config::BINDish>,
+L<C<Config::BINDish::Grammar>|rakudoc:Config::BINDish::Grammar>,
+L<C<Config::BINDish::Grammar::BlockProps>|rakudoc:Config::BINDish::Grammar::BlockProps>,
+L<C<Config::BINDish::Grammar::OptionProps>|rakudoc:Config::BINDish::Grammar::OptionProps>
 
 =head1 AUTHOR
 
 Vadim Belman <vrurg@cpan.org>
 
 =end pod
+

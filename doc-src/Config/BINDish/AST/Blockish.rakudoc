@@ -21,15 +21,13 @@ section.
 
 Similar to C<find-all(:$block!, ...)> candidate but makes makes sure that only one block entry is found. It either
 returns the block instance found, or L<C<Nil>|https://docs.raku.org/type/Nil>, or throws with
-L<C<Config::BINDish::X::Block::Ambiguous>|../X/Block/Ambiguous.md>
-if more than one candidate found.
+C<Config::BINDish::X::Block::Ambiguous> if more than one candidate found.
 
 =head3 C<<multi find(:$option!, Bool :$local --> Config::BINDish::AST::Option)>>
 
 Similar to the candidate for C<:$block!>, but for options. Returns
-L<C<Config::BINDish::AST::Option>|Option.md>.
-Throws with
-L<C<Config::BINDish::X::Option::Ambiguous>|../X/Option/Ambiguous.md>.
+L<C<Config::BINDish::AST::Option>|rakudoc:Config::BINDish::AST::Option>.  Throws with
+C<Config::BINDish::X::Option::Ambiguous>.
 
 =head3 C<block($block, Bool :$local, *%p)>
 
@@ -53,7 +51,7 @@ C<option> method above. This is still meaningful because a block may contain mul
 =head3 C<value($option, Bool :$local = True, Bool :$raw = False, *%p)>
 
 This method is similar to the C<option> method above except that C<value> returns not option but option's value payload,
-unless `:raw` is passed in which case a L<C<Config::BINDish::AST::Container>|Container.md> object is returned.
+unless `:raw` is passed in which case a L<C<Config::BINDish::AST::Container>|rakudoc:Config::BINDish::AST::Container> object is returned.
 
 =head3 C<values(Bool :$raw)>
 
@@ -65,7 +63,7 @@ Returns block's standalone values. For example, for the following example it wil
 
 If C<$raw> named argument is used then instead of payloads the method will return value nodes.
 
-I<Note> that value nodes are those consuming L<C<Config::BINDish::AST::Container>|Container.md> and marked as
+I<Note> that value nodes are those consuming L<C<Config::BINDish::AST::Container>|rakudoc:Config::BINDish::AST::Container> and marked as
 I<standalone>.
 
 =head2 Method C<get>
@@ -77,7 +75,7 @@ means of accessing configuration data stored on an AST.
 
 One of the key features of `get` which sets it apart of methods C<value>, C<option>, C<block>, etc., is its ability to
 return some kind of default for a requested configuration element which is actually missing from the config file. For
-example, if we have a L<C<pre-declaration>|../Grammar.md#Pre-declaration> like this:
+example, if we have a L<C<pre-declaration>|rakudoc:pre-declaration> like this:
 
     blocks => (
         :host => %( :named ),
@@ -93,14 +91,14 @@ And then request the value of C<interface> option from a config file like:
     }
 
 Then the method will supply us with string I<"*"> which it would find in corresponding
-L<C<Config::BINDish::Grammar::OptionProps>|../Grammar/OptionProps.md>, created from the above pre-declaration structure.
+L<C<Config::BINDish::Grammar::OptionProps>|rakudoc:Config::BINDish::Grammar::OptionProps>, created from the above pre-declaration structure.
 
 For a missing option with no default value (or no pre-declaration whatsoever) `Nil` will be returned.
 
 Whenever we expect an option or a block object to be returned (see C<:raw> parameter in the followin sub-sections)
-instead of L<C<Config::BINDish::AST::Option>|Option.md> or L<C<Config::BINDish::AST::Block>|Block.md>
-instance the method would return L<C<Config::BINDish::Grammar::OptionProps>|../Grammar/OptionProps.md> or
-L<C<Config::BINDish::Grammar::BlockProps>|../Grammar/BlockProps.md>, respectively, if the requested elements
+instead of L<C<Config::BINDish::AST::Option>|rakudoc:Config::BINDish::AST::Option> or L<C<Config::BINDish::AST::Block>|rakudoc:Config::BINDish::AST::Block>
+instance the method would return L<C<Config::BINDish::Grammar::OptionProps>|rakudoc:Config::BINDish::Grammar::OptionProps> or
+L<C<Config::BINDish::Grammar::BlockProps>|rakudoc:Config::BINDish::Grammar::BlockProps>, respectively, if the requested elements
 do have corresponding pre-declarations. For example, for the above config snippet:
 
     $cfg.get( :host<srv1.local> => "interface", :raw )
@@ -120,7 +118,7 @@ in the config and neither has a pre-declaration one can use `.defined` on the re
 =head3 C<multi get(Str:D $option, Bool :$raw, Bool :$local = True)>
 
 By default returns C<$option> value. With C<:raw> argument will return corresponding
-L<C<Config::BINDish::AST::Option>|Option.md> or L<C<Config::BINDish::Grammar::OptionProps>|../Grammar/OptionProps.md>
+L<C<Config::BINDish::AST::Option>|rakudoc:Config::BINDish::AST::Option> or L<C<Config::BINDish::Grammar::OptionProps>|rakudoc:Config::BINDish::Grammar::OptionProps>
 object.
 
 With C<:!local> will search for the option recursively.
@@ -204,7 +202,7 @@ Let's use an example from tests:
     top-opt 3.1415926;
 
 Assuming that C<$cfg> is our
-L<C<Config::BINDish>|../../BINDish.md>
+L<C<Config::BINDish>|rakudoc:Config::BINDish>
 instance, and by noting that method C<get> is available on it via C<$.top> attribute, we can have the following:
 
     $cfg.get: :multi => "opt"; # Get option "opt" from the nameless block multi, i.e. results in "just multi"
@@ -285,11 +283,12 @@ Returns a block object defined by a path. Shorcut for C«$blk.get($block, :block
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|../../BINDish.md>,
-L<C<Config::BINDish::AST>|../AST.md>
+L<C<Config::BINDish>|rakudoc:Config::BINDish>,
+L<C<Config::BINDish::AST>|rakudoc:Config::BINDish::AST>
 
 =head1 AUTHOR
 
 Vadim Belman <vrurg@cpan.org>
 
 =end pod
+

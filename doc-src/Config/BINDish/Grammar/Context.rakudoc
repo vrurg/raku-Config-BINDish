@@ -1,4 +1,3 @@
-
 =begin pod
 =head1 NAME
 
@@ -15,11 +14,11 @@ Instance of this class represents information about the current parsing context.
 The type of the current context. The core grammar knows about I<block> and C<option> contexts. But an extension can
 define its own type.
 
-=head3  C<$.id>
+=head3 C<$.id>
 
 ID of the current context statement, if it has one.
 
-=head3 L<C<Config::BINDish::Grammar::Value>|Value.md> C<$.keyword>
+=head3 L<C<Config::BINDish::Grammar::Value>|rakudoc:Config::BINDish::Grammar::Value> C<$.keyword>
 
 Keyword used to create context. For example, for a block context created with
 
@@ -28,7 +27,7 @@ Keyword used to create context. For example, for a block context created with
 this attribute will be set to a C<Value> where C<payload> attribute is a L<C<Match>|https://docs.raku.org/type/Match>
 against I<foo> part of the block.
 
-=head3 L<C<Config::BINDish::Grammar::Value>|Value.md> C<$.name>
+=head3 L<C<Config::BINDish::Grammar::Value>|rakudoc:Config::BINDish::Grammar::Value> C<$.name>
 
 Name of the current context. Currently can only be set for named block contexts.
 
@@ -36,15 +35,15 @@ Name of the current context. Currently can only be set for named block contexts.
 
 Parent context. Undefined for C<.TOP>.
 
-=head3 L<C<Config::BINDish::Grammar::StatementProps>|StatementProps.md> C<$.props>
+=head3 L<C<Config::BINDish::Grammar::StatementProps>|rakudoc:Config::BINDish::Grammar::StatementProps> C<$.props>
 
 Properties of the context statement if it is pre-declared.
 
-=head3  C<$.relations>
+=head3 C<$.relations>
 
 A hash of keywords of pre-declared statements which are valid in the current block context. See C<prop-relations>
 attribute of
-L<C<Config::BINDish::Grammar>|../Grammar.md>.
+L<C<Config::BINDish::Grammar>|rakudoc:Config::BINDish::Grammar>.
 
 =head1 METHODS
 
@@ -66,13 +65,14 @@ Returns I<True> if a pre-declared statement can be used in the enclosing block c
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|../../BINDish.md>,
-L<C<Config::BINDish::Grammar>|../Grammar.md>,
-L<C<Config::BINDish::Grammar::BlockProps>|BlockProps.md>,
-L<C<Config::BINDish::Grammar::OptionProps>|OptionProps.md>
+L<C<Config::BINDish>|rakudoc:Config::BINDish>,
+L<C<Config::BINDish::Grammar>|rakudoc:Config::BINDish::Grammar>,
+L<C<Config::BINDish::Grammar::BlockProps>|rakudoc:Config::BINDish::Grammar::BlockProps>,
+L<C<Config::BINDish::Grammar::OptionProps>|rakudoc:Config::BINDish::Grammar::OptionProps>
 
 =head1 AUTHOR
 
 Vadim Belman <vrurg@cpan.org>
 
 =end pod
+

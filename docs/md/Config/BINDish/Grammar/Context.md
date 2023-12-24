@@ -1,15 +1,12 @@
-NAME
-====
+# NAME
 
 `Config::BINDish::Grammar::Context` - parsing context representation
 
-DESCRIPTION
-===========
+# DESCRIPTION
 
 Instance of this class represents information about the current parsing context.
 
-ATTRIBUTES
-==========
+# ATTRIBUTES
 
 ### [`Str:D`](https://docs.raku.org/type/Str) `$.type`
 
@@ -23,7 +20,9 @@ ID of the current context statement, if it has one.
 
 Keyword used to create context. For example, for a block context created with
 
-    foo { }
+``` 
+foo { }
+```
 
 this attribute will be set to a `Value` where `payload` attribute is a [`Match`](https://docs.raku.org/type/Match) against *foo* part of the block.
 
@@ -43,8 +42,7 @@ Properties of the context statement if it is pre-declared.
 
 A hash of keywords of pre-declared statements which are valid in the current block context. See `prop-relations` attribute of [`Config::BINDish::Grammar`](../Grammar.md).
 
-METHODS
-=======
+# METHODS
 
 ### `cur-block-ctx(--> Config::BINDish::Grammar::Context)`
 
@@ -62,13 +60,10 @@ Returns a string, in a human-readable form, describing the current context.
 
 Returns *True* if a pre-declared statement can be used in the enclosing block context.
 
-SEE ALSO
-========
+# SEE ALSO
 
 [`Config::BINDish`](../../BINDish.md), [`Config::BINDish::Grammar`](../Grammar.md), [`Config::BINDish::Grammar::BlockProps`](BlockProps.md), [`Config::BINDish::Grammar::OptionProps`](OptionProps.md)
 
-AUTHOR
-======
+# AUTHOR
 
 Vadim Belman <vrurg@cpan.org>
-

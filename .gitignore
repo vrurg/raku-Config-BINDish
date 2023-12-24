@@ -4,4 +4,5 @@
 *.iml
 /zef/
 sdist/
+.gen-doc-*
 Config-BINDish-v*.tar.gz

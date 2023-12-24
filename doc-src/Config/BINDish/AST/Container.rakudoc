@@ -26,7 +26,7 @@ or even easier:
 =head3 L<C<Str:D>|https://docs.raku.org/type/Str> C<$.type-name>
 
 The type name describing C<$.payload>. Normally borrowed from
-L<C<Config::BINDish::Grammar::Value>|../Grammar/Value.md>.
+L<C<Config::BINDish::Grammar::Value>|rakudoc:Config::BINDish::Grammar::Value>.
 
 Defaults to I<"any">.
 
@@ -39,14 +39,14 @@ Returns node class C<shortname>.
 =head1 COERCIONS
 
 The role supports specialized coercion from
-L<C<Config::BINDish::Grammar::Value>|../Grammar/Value.md>:
+L<C<Config::BINDish::Grammar::Value>|rakudoc:Config::BINDish::Grammar::Value>:
 
     my Config::BINDish::AST::Container $c = Config::BINDish::AST::Value($grammar-value);
 
 In this case new container's payload and type name are set from corresponding attributes of
-L<C<Config::BINDish::Grammar::Value>|../Grammar/Value.md>
+L<C<Config::BINDish::Grammar::Value>|rakudoc:Config::BINDish::Grammar::Value>
 instance. The C<payload> is obtained using the C<coerced> method of
-L<C<Config::BINDish::Grammar::Value>|../Grammar/Value.md>.
+L<C<Config::BINDish::Grammar::Value>|rakudoc:Config::BINDish::Grammar::Value>.
 
 For any other kind of value it is stored in the C<$.payload> attribute. And the type name is set to lowercased name of
 the value's class. The only exception is any of C<Stringy>-consuming class for which the type name is set to
@@ -62,11 +62,12 @@ Matches C<$val> against our C<$.payload>.
 
 =head1 SEE ALSO
 
-L<C<Config::BINDish>|../../BINDish.md>,
-L<C<Config::BINDish::AST>|../AST.md>
+L<C<Config::BINDish>|rakudoc:Config::BINDish>,
+L<C<Config::BINDish::AST>|rakudoc:Config::BINDish::AST>
 
 =head1 AUTHOR
 
 Vadim Belman <vrurg@cpan.org>
 
 =end pod
+

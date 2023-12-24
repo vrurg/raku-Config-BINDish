@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Config::BINDish::Expandable</title>
+    <meta charset="UTF-8">
+    <style>hr,
+img {
+    box-sizing: content-box
+}
+body::after,
+body::before,
+hr::after,
+hr::before {
+    display: table;
+    content: ""
+}
+a,
+a:not([href]) {
+    text-decoration: none
+}
+
+hr,
+svg:not(:root) {
+    overflow: hidden
+}
+
+img,
+table tr {
+    background-color: #fff
+}
+
+pre,
+table {
+    overflow: auto
+}
+
+dl,
+dl dt,
+hr,
+pre code,
+pre>code,
+td,
+th {
+    padding: 0
+}
+
+input,
+pre code {
+    overflow: visible
+}
+
+pre,
+pre code {
+    word-wrap: normal
+}
+
+body {
+    -ms-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+    color: #333;
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-size: 16px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    width: 820px;
+    margin: 2em auto;
+}
+
+a {
+    background-color: transparent;
+    -webkit-text-decoration-skip: objects;
+    color: #4078c0
+}
+
+a:active,
+a:hover {
+    outline-width: 0;
+    text-decoration: underline
+}
+
+h1 {
+    margin: .67em 0
+}
+
+img {
+    border-style: none;
+    max-width: 100%
+}
+
+h1,
+h2 {
+    padding-bottom: .3em;
+    border-bottom: 1px solid #eee
+}
+
+input {
+    font: inherit;
+    margin: 0;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit
+}
+
+* {
+    box-sizing: border-box
+}
+
+strong {
+    font-weight: 600
+}
+
+body::after,
+hr::after {
+    clear: both
+}
+
+table {
+    border-spacing: 0;
+    border-collapse: collapse;
+    display: block;
+    width: 100%
+}
+
+blockquote {
+    margin: 0;
+    padding: 0 1em;
+    color: #777;
+    border-left: .25em solid #ddd
+}
+
+ol ol,
+ul ol {
+    list-style-type: lower-roman
+}
+
+ol ol ol,
+ol ul ol,
+ul ol ol,
+ul ul ol {
+    list-style-type: lower-alpha
+}
+
+dd {
+    margin-left: 0
+}
+
+code {
+    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace
+}
+
+pre {
+    font: 12px Consolas, "Liberation Mono", Menlo, Courier, monospace
+}
+
+input {
+    -webkit-font-feature-settings: "liga" 0;
+    font-feature-settings: "liga" 0
+}
+
+body>:first-child {
+    margin-top: 0!important
+}
+
+body>:last-child {
+    margin-bottom: 0!important
+}
+
+a:not([href]) {
+    color: inherit
+}
+
+blockquote,
+dl,
+ol,
+p,
+pre,
+table,
+ul {
+    margin-top: 0;
+    margin-bottom: 16px
+}
+
+hr {
+    background: #e7e7e7;
+    height: .25em;
+    margin: 24px 0;
+    border: 0
+}
+
+blockquote>:first-child {
+    margin-top: 0
+}
+
+blockquote>:last-child {
+    margin-bottom: 0
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin-top: 24px;
+    margin-bottom: 16px;
+    font-weight: 600;
+    line-height: 1.25
+}
+
+dl dt,
+table th {
+    font-weight: 700
+}
+
+h1 code,
+h1 tt,
+h2 code,
+h2 tt,
+h3 code,
+h3 tt,
+h4 code,
+h4 tt,
+h5 code,
+h5 tt,
+h6 code,
+h6 tt {
+    font-size: inherit
+}
+
+h1 {
+    font-size: 2em
+}
+
+h2 {
+    font-size: 1.5em
+}
+
+h3 {
+    font-size: 1.25em
+}
+
+h4 {
+    font-size: 1em
+}
+
+h5 {
+    font-size: .875em
+}
+
+h6 {
+    font-size: .85em;
+    color: #777
+}
+
+ol,
+ul {
+    padding-left: 2em
+}
+
+ol ol,
+ol ul,
+ul ol,
+ul ul {
+    margin-top: 0;
+    margin-bottom: 0
+}
+
+li>p {
+    margin-top: 16px
+}
+
+li+li {
+    margin-top: .25em
+}
+
+dl dt {
+    margin-top: 16px;
+    font-size: 1em;
+    font-style: italic
+}
+
+dl dd {
+    padding: 0 16px;
+    margin-bottom: 16px
+}
+
+table td,
+table th {
+    padding: 6px 13px;
+    border: 1px solid #ddd
+}
+
+table tr {
+    border-top: 1px solid #ccc
+}
+
+table tr:nth-child(2n) {
+    background-color: #f8f8f8
+}
+
+code {
+    padding: .2em 0;
+    margin: 0;
+    font-size: 85%;
+    background-color: rgba(0, 0, 0, .04);
+    border-radius: 3px
+}
+
+code::after,
+code::before {
+    letter-spacing: -.2em;
+    content: "\00a0"
+}
+
+pre>code {
+    margin: 0;
+    font-size: 100%;
+    word-break: normal;
+    white-space: pre;
+    background: 0 0;
+    border: 0
+}
+
+pre {
+    padding: 16px;
+    font-size: 85%;
+    line-height: 1.45;
+    background-color: #f7f7f7;
+    border-radius: 3px
+}
+
+pre code {
+    display: inline;
+    max-width: auto;
+    margin: 0;
+    line-height: inherit;
+    background-color: transparent;
+    border: 0
+}
+
+pre code::after,
+pre code::before {
+    content: normal
+}
+
+kbd {
+    display: inline-block;
+    padding: 3px 5px;
+    font: 11px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    line-height: 10px;
+    color: #555;
+    vertical-align: middle;
+    background-color: #fcfcfc;
+    border: 1px solid #ccc;
+    border-bottom-color: #bbb;
+    border-radius: 3px;
+    box-shadow: inset 0 -1px 0 #bbb
+}
+
+hr {
+    border-bottom-color: #eee
+}
+</style>
+
+    
+<style class="build-tools-gen-doc">.toc-level-1 .toc-text { padding-left: 1.5em; }
+.toc-level-2 .toc-text { padding-left: 2.5em; }
+.toc-level-3 .toc-text { padding-left: 3.5em; }
+.toc-level-4 .toc-text { padding-left: 4.5em; }
+.toc-level-5 .toc-text { padding-left: 5.5em; }
+#TOC * { border-width: 0; }
+li > p { margin: inherit; }
+li > .pod-block-code { margin-top: 16px; }
+</style></head>
+
+<body class="pod">
+    <div id="___top"></div>
+    <nav class="indexgroup">
+<table id="TOC">
+<caption><h2 id="TOC_Title">Table of Contents</h2></caption>
+<tr class="toc-level-1"><td class="toc-number">1</td><td class="toc-text"><a href="#NAME">NAME</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">2</td><td class="toc-text"><a href="#DESCRIPTION">DESCRIPTION</a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">2.1</td><td class="toc-text"><a href="#Option">Option</a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">2.2</td><td class="toc-text"><a href="#Option_Path">Option Path</a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">2.3</td><td class="toc-text"><a href="#Environment">Environment</a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">2.4</td><td class="toc-text"><a href="#This_Is_A_Value!">This Is A Value!</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">3</td><td class="toc-text"><a href="#SEE_ALSO">SEE ALSO</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">4</td><td class="toc-text"><a href="#AUTHOR">AUTHOR</a></td></tr>
+
+</table>
+</nav>
+
+
+    <div class="pod-body">
+    <h1 id="NAME"><a class="u" href="#___top" title="go to top of document">NAME</a></h1>
+<p><code>Config::BINDish::Expandable</code> - <code>Config::BINDish</code> extension implmeneting expandable strings</p>
+<h1 id="DESCRIPTION"><a class="u" href="#___top" title="go to top of document">DESCRIPTION</a></h1>
+<p>This module extends <a href="../BINDish.html"><code>Config::BINDish</code></a> with strings which can include other option values. Only double-quoted string (i.e. those for which <a href="Grammar/Value.html"><code>Config::BINDish::Grammar::Value</code></a> and <a href="AST/Value.html"><code>Config::BINDish::AST::Value</code></a> have type name set to <em>dq-string</em>) are expandable.</p>
+<p>To incorporate a value into a string the following macro format is used:</p>
+<pre class="pod-block-code">'{' &lt;option&gt; | &lt;option-path&gt; | '$' &lt;environment-variable&gt; ['?'] '}'</pre>
+<h2 id="Option"><a class="u" href="#___top" title="go to top of document">Option</a></h2>
+<p><em>option</em> is a plain string naming an option from the current block:</p>
+<pre class="pod-block-code">server "S1" {
+    name "server.local";
+    description "{name} is a mock server"; # becomes "server.local is a mock server"
+}</pre>
+<h2 id="Option_Path"><a class="u" href="#___top" title="go to top of document">Option Path</a></h2>
+<p><em>option-path</em> defines a path to the option if it is located in another block. It consist of a list of blocks in the order of nesting and must end with an option name. Elements in a path are separated with a slash (<code>/</code>) symbol.</p>
+<p>The path can be relative or absolute. Absolute paths are started with a slash:</p>
+<pre class="pod-block-code">base-url "https://localhost"
+resource "Test" {
+    url "{/base-url}/test";
+}</pre>
+<p>Relative paths can use double-dot notation to refer to a parent block:</p>
+<pre class="pod-block-code">pool "shared" {
+    base-url "https://base";
+    resource "bar" {
+        url "{../base-url}/bar"; # https://base/bar
+    }
+}</pre>
+<p>To define a block where the option is to be located the following syntax is used:</p>
+<pre class="pod-block-code">block-type[([name [, class]])]</pre>
+<p>For example:</p>
+<pre class="pod-block-code">resource "default" {
+    url "https://localhost";
+}
+resource "test1" addr {
+    component "foo"
+}
+client-data {
+    url "{/resource(default)/url}/{/resource("test1", addr)/component}"; # https://localhost/foo
+}</pre>
+<p>Referring to a nested block can be done as in the following example:</p>
+<pre class="pod-block-code">resource "default" {
+    urls {
+        base "https://localhost";
+    }
+}
+client-data {
+    user-profile "{/resource(default)/urls/base}/user"; # https://localhost/user
+}</pre>
+<p>Symbol escaping is traditionally done with a backslash:</p>
+<pre class="pod-block-code">client-data {
+    description "Some basic info \{?} \\";
+}</pre>
+<h2 id="Environment"><a class="u" href="#___top" title="go to top of document">Environment</a></h2>
+<p>Environment variables are expanded with <code>"{$HOME}"</code> syntax. For example:</p>
+<pre class="pod-block-code">base-dir "{$HOME}/.myapp";</pre>
+<p>Normally, if requested environment variable doesn't exists the parser would throw <code>Config::BINDish::X::Macro::DoesntExists</code> exception. But if the variable name is followed with a question mark sign then the macro would be expanded into an empty string:</p>
+<pre class="pod-block-code">default-prefix "{$MYAPP_PFX?}";
+table-prefix "{default-prefix}my_table";</pre>
+<h2 id="This_Is_A_Value!"><a class="u" href="#___top" title="go to top of document">This Is A Value!</a></h2>
+<p><em>Actually, this is a <a href="AST/Container.html"><code>Config::BINDish::AST::Container</code></a>. And a <a href="AST/Node.html"><code>Config::BINDish::AST::Node</code></a>. But as long as we talk about option values, so – let it be a value then.</em></p>
+<p>Because expandable strings are normal values they can be used anywhere, where a value is accepted. We can do things like expanding a string within a macro:</p>
+<pre class="pod-block-code">default-server "A1";
+server "A1" {
+    url "https://a1.local";
+}
+server "A2" {
+    url "https://a2.local";
+}
+network "Office" {
+    api-url "{/server("{/default-server}")}/api"; # https://a1.local/api
+}</pre>
+<p>This works because when a macro is expanded server name and class can be specified using string values.</p>
+<h1 id="SEE_ALSO"><a class="u" href="#___top" title="go to top of document">SEE ALSO</a></h1>
+<p><a href="../BINDish.html"><code>Config::BINDish</code></a>, <a href="AST.html"><code>Config::BINDish::AST</code></a></p>
+<h1 id="AUTHOR"><a class="u" href="#___top" title="go to top of document">AUTHOR</a></h1>
+<p>Vadim Belman &lt;vrurg@cpan.org&gt;</p>
+
+    </div>
+
+    
+</body>
+</html>

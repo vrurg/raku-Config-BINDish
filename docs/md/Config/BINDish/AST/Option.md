@@ -1,22 +1,18 @@
-CLASS
-=====
+# CLASS
 
 `class Config::BINDish::AST::Option` - configuration option representation
 
-DESCRIPTION
-===========
+# DESCRIPTION
 
 Is [`Config::BINDish::AST::Node`](Node.md).
 
-ATTRIBUTES
-==========
+# ATTRIBUTES
 
 ### `$.id`
 
 Unique ID of an option object. See [`Config::BINDish::Grammar Pre-declaration`](../Grammar.md#Pre-declaration) section.
 
-METHODS
-=======
+# METHODS
 
 ### `keyword(Bool :$raw)`
 
@@ -30,13 +26,10 @@ An alias to the `keyword()` method.
 
 Returns value payload of a child marked with *"option-value"*. Returns the AST node itself with `:raw` argument.
 
-SEE ALSO
-========
+# SEE ALSO
 
 [`Config::BINDish`](../../BINDish.md), [`Config::BINDish::AST`](../AST.md)
 
-AUTHOR
-======
+# AUTHOR
 
 Vadim Belman <vrurg@cpan.org>
-

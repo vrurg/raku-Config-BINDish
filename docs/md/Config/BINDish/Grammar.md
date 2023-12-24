@@ -1,17 +1,14 @@
-NAME
-====
+# NAME
 
 `Config::BINDish::Grammar` - the central class of everything in `Config::BINDish`
 
-DESCRIPTION
-===========
+# DESCRIPTION
 
 This class is responsible for the actual parsing of the configuration. It is not recommended for direct use. [`Config::BINDish`](../BINDish.md) `read` method must be used instead.
 
 The class inherits from the standard [`Grammar`](https://docs.raku.org/type/Grammar) class.
 
-ATTRIBUTES
-==========
+# ATTRIBUTES
 
 Some attributes are declared with help of [`AttrX::Mooish`](https://modules.raku.org/dist/AttrX::Mooish). For `lazy` attributes it means that method `build-attribute-name` is used to get the initial value. These methods can be overridden by extensions if necessary.
 
@@ -19,13 +16,15 @@ Some attributes are declared with help of [`AttrX::Mooish`](https://modules.raku
 
 If set this attribute expects blocks to be flattened down. I.e. whenever a block has a duplicate declaration in the config the later declaration must be applied on top of the first one. This doesn't change grammar's behavior but rather serves as a note for the actions class to take care of the situation. One way or another, if this attribute is *True* then the user expects a single block `foo "bar"` representation to exists after the following sample is parsed:
 
-    foo "bar" { fubar 1; }
-    baz { }
-    foo "bar" { fubar 2; fubaz 3.14; }
+``` 
+foo "bar" { fubar 1; }
+baz { }
+foo "bar" { fubar 2; fubaz 3.14; }
+```
 
 How the options are dealt with is the sole prerogative of the actions implementation. [`Config::BINDish::Actions`](Actions.md) re-delegates handling of flattening to the underlying [`Config::BINDish::AST`](AST.md) class. It, in turn, will overwrite earlier option declarations with latter ones. So, when one queries for `fubar` the value returned will be *2*.
 
-See [$*CFG-FLAT-BLOCKS](#$*CFG-FLAT-BLOCKS).
+See [$\*CFG-FLAT-BLOCKS](#$*CFG-FLAT-BLOCKS).
 
 ### [`Config::BINDish::Grammar::Strictness`](Grammar/Strictness.md) `$.strict = False`
 
@@ -47,10 +46,12 @@ Defines what strictness modes are activated. See [`Config::BINDish::Grammar::Str
 
 *Lazy*. First level keys are IDs of blocks ever mentioned with `in` key in statement pre-declaraions. For example:
 
-    Config::BINDish.new: blocks => ( :srv-cloud<service> => { ... },
-                                     :srv-local<service> => { ... }
-                         ),
-                         options => ( :loc-url<location> => { :in<srv-cloud> } );
+``` 
+Config::BINDish.new: blocks => ( :srv-cloud<service> => { ... },
+                                 :srv-local<service> => { ... }
+                     ),
+                     options => ( :loc-url<location> => { :in<srv-cloud> } );
+```
 
 `srv-cloud` will become a key on `%.prop-relations`, contrary to `srv-local` which is not referenced by any pre-declaration.
 
@@ -80,8 +81,7 @@ Keys of this hash are names of options which are reserved for `Config::BINDish` 
 
 Contains the delta to be subtracted from the actual line number when it is reported to the user. For example, if set to 2 and the actual location is at line 10 then the user will be reported with number 8. Used by `#line` directive.
 
-DYNAMIC VARIABLES
-=================
+# DYNAMIC VARIABLES
 
 The grammar declares and uses a set of dynamic variables to pass certain information between its rules, tokens, methods, and the actions object.
 
@@ -137,19 +137,23 @@ Set by `<keyword>` token. The value stored will be of type [`Str`](https://docs.
 
 All three are of [`Config::BINDish::Grammar::Value`](Grammar/Value.md) type. When the following example is parsed:
 
-    foo "bar" baz { }
+``` 
+foo "bar" baz { }
+```
 
 The variables will be set to:
 
-  * type: "foo" of [`Str`](https://docs.raku.org/type/Str), type-name *"keyword"*
+  - type: "foo" of [`Str`](https://docs.raku.org/type/Str), type-name *"keyword"*
 
-  * name: "bar" of [`Str`](https://docs.raku.org/type/Str), type name *"dq-string"*
+  - name: "bar" of [`Str`](https://docs.raku.org/type/Str), type name *"dq-string"*
 
-  * class: "baz" of [`Str`](https://docs.raku.org/type/Str), type name *"keyword"*
+  - class: "baz" of [`Str`](https://docs.raku.org/type/Str), type name *"keyword"*
 
 Note that the name could be of any value, supported by the grammar. If an extension adds a new value type then the type can also be used as a type name. Say, with [`Config::BINDish::INET`](INET.md) loaded one can have the following valid declaration:
 
-    IP 192.168.1.42 { }
+``` 
+IP 192.168.1.42 { }
+```
 
 For which the name will be set to type `IP::Addr`, type-name *"IPv4"*.
 
@@ -165,19 +169,20 @@ Set by the grammar whenever a specific value type is expected. See more details 
 
 These variables are set by corresponding `backtrack-*` method to indicate the context in which `leave-*` methods are called. In other words, if `!$*CFG-BACKTRACK-OPTION` is *True* when `leave-option` is invoked then an option has been successfully parsed.
 
-METHODS
-=======
+# METHODS
 
 ### `set-value(Mu \type, *%value)`
 
 This methods creates a new [`Config::BINDish::Grammar::Value`](Grammar/Value.md) object and assigns it to `$*CFG-VALUE`. Takes value's type object as its single positional parameter. Type name and payload are passed as the only named argument of the method call. Here is how a single-quoted string is handled by the grammar:
 
-    token sq-string {
-        \' ~ \' $<string>=<.qstring("'")>
-        {
-            self.set-value: Str, :sq-string($<string>)
-        }
+``` 
+token sq-string {
+    \' ~ \' $<string>=<.qstring("'")>
+    {
+        self.set-value: Str, :sq-string($<string>)
     }
+}
+```
 
 In this example the new [`Config::BINDish::Grammar::Value`](Grammar/Value.md) object will be created with payload set from `$<string>`, type name set to *"sq-string"*, and type set to [`Str`](https://docs.raku.org/type/Str).
 
@@ -209,9 +214,11 @@ See also [Pre-declaration](#Pre-declaration) section.
 
 Registers a list of keywords as reserved. `$what` is statement type for which keywords are registered; must be one of `@.prop-keys` values.
 
-    $*CFG-GRAMMAR.reserve-keywords: "option", <foo bar>;
-    $*CFG-GRAMMAR.reserve-keywords: option => <foo bar>,
-                                    block  => <bar baz>;
+``` 
+$*CFG-GRAMMAR.reserve-keywords: "option", <foo bar>;
+$*CFG-GRAMMAR.reserve-keywords: option => <foo bar>,
+                                block  => <bar baz>;
+```
 
 ### `multi is-reserved(Str:D $what, Str:D $keyword)`
 
@@ -219,8 +226,10 @@ Registers a list of keywords as reserved. `$what` is statement type for which ke
 
 Returns *True* is `$keyword` is registered for statement type `$what`. The second for is a convenience one, it accepts only a single named parameter with name being the statement type. The following two line are equivalent:
 
-    $*CFG-GRAMMAR.is-reserver: 'option', 'foo';
-    $*CFG-GRAMMAR.is-reserver: :option<foo>;
+``` 
+$*CFG-GRAMMAR.is-reserver: 'option', 'foo';
+$*CFG-GRAMMAR.is-reserver: :option<foo>;
+```
 
 ### `proto statement-props(Str:D $what)`
 
@@ -230,7 +239,7 @@ Returns pre-declaration properties class depending on the value of `$what`. The 
 
 This is a low-level statement pre-declaration registration method. It creates a properties object with the class returned by `statement-props` method for statement type `$what` and using `%props` as constructor initialization profile. `$id` and `$keyword` are also used as initialization profile keys.
 
-If `$keyword` parameter is a [`Bool`](https://docs.raku.org/type/Bool) value then it is set to `$id` value. This is done to provide support for `:foo =` { ... }> pre-declaration syntax where `:foo` represents both ID and keyword.
+If `$keyword` parameter is a [`Bool`](https://docs.raku.org/type/Bool) value then it is set to `$id` value. This is done to provide support for `:foo =` { ... }\> pre-declaration syntax where `:foo` represents both ID and keyword.
 
 Parameter `$cleanup` specifies if `$.prop-relations` attribute must be reset and rebuilt. It is unlikely a user would ever need it to be *False*.
 
@@ -248,17 +257,17 @@ Parameter `$cleanup` specifies if `$.prop-relations` attribute must be reset and
 
 This method registers a single block. Parameters:
 
-  * `$id` – block ID
+  - `$id` – block ID
 
-  * `$keyword` – block keyword
+  - `$keyword` – block keyword
 
-  * `$identity` - a [`Pair`](https://docs.raku.org/type/Pair) where the key is `$id`, and the value is `$keyword`
+  - `$identity` - a [`Pair`](https://docs.raku.org/type/Pair) where the key is `$id`, and the value is `$keyword`
 
-  * `%props` – hash of block properties; see [Pre-declaration](#Pre-declaration)
+  - `%props` – hash of block properties; see [Pre-declaration](#Pre-declaration)
 
-  * `$cleanup` – see `declare-statement` method
+  - `$cleanup` – see `declare-statement` method
 
-  * `%params` - hash of named parameters for `declare-statement`
+  - `%params` - hash of named parameters for `declare-statement`
 
 Basically, all this method does it turns its parameters into named arguments for `declare-statement` and calls it as `self.declare-statement('block', |%params)`.
 
@@ -280,17 +289,17 @@ Pre-declare blocks. `@blocks` is expected to be a list of [`Pair`](https://docs.
 
 This method registers a single option. Parameters:
 
-  * `$id` – option ID
+  - `$id` – option ID
 
-  * `$keyword` – option keyword
+  - `$keyword` – option keyword
 
-  * `$identity` - a [`Pair`](https://docs.raku.org/type/Pair) where the key is `$id`, and the value is `$keyword`
+  - `$identity` - a [`Pair`](https://docs.raku.org/type/Pair) where the key is `$id`, and the value is `$keyword`
 
-  * `%props` – hash of option properties; see [Pre-declaration](#Pre-declaration)
+  - `%props` – hash of option properties; see [Pre-declaration](#Pre-declaration)
 
-  * `$cleanup` – see `declare-statement` method
+  - `$cleanup` – see `declare-statement` method
 
-  * `%params` - hash of named parameters for `declare-statement`
+  - `%params` - hash of named parameters for `declare-statement`
 
 Basically, all this method does it turns its parameters into named arguments for `declare-statement` and calls it as `self.declare-statement('option', |%params)`.
 
@@ -310,8 +319,10 @@ Creates a new [`Config::BINDish::Grammar::Context`](Grammar/Context.md) object. 
 
 This method expects `$*CFG-PARENT-CTX` to be set to the parent context instance, and `$*CFG-CTX` to be undefined. Normally a rule which plans to create a new context must have the following two lines in it:
 
-    :my Context:D $*CFG-PARENT-CTX = $*CFG-CTX;
-    :temp $*CFG-CTX = Nil;
+``` 
+:my Context:D $*CFG-PARENT-CTX = $*CFG-CTX;
+:temp $*CFG-CTX = Nil;
+```
 
 Method throws `Config::BINDish::X::Parse::ContextOverwrite` if `$*CFG-CTX` is already set.
 
@@ -343,23 +354,23 @@ Invoked when leaving block context.
 
 Validates currently being parsed option based on its keyword. Uses pre-set variables [`$*CFG-KEYWORD`](#$*CFG-KEYWORD) and [`$*CFG-VALUE`](#$*CFG-VALUE).
 
-Can throw one of [`Config::BINDish::X::Parse::Context`](X/Parse/Context.md), [`Config::BINDish::X::Parse::ValueType`](X/Parse/ValueType.md), or [`Config::BINDish::X::Parse::Unknown`](X/Parse/Unknown.md).
+Can throw one of `Config::BINDish::X::Parse::Context`, `Config::BINDish::X::Parse::ValueType`, or `Config::BINDish::X::Parse::Unknown`.
 
 ### `validate-block()`
 
-Validates currently being parsed block based on its keyword (type), name, and, possibly, class. Uses pre-set variables [`$*CFG-BLOCK-TYPE`](#$*CFG-BLOCK-TYPE), [`$*CFG-BLOCK-NAME`](#$*CFG-BLOCK-NAME), [`$*CFG-BLOCK-CLASS`](#$*CFG-BLOCK-CLASS). If block passes the validation then a new block context is pushed onto the context stack.
+Validates currently being parsed block based on its keyword (type), name, and, possibly, class. Uses pre-set variables \<`$*CFG-BLOCK-TYPE`|\#$\*CFG-BLOCK-TYPE\>, [`$*CFG-BLOCK-NAME`](#$*CFG-BLOCK-NAME), [`$*CFG-BLOCK-CLASS`](#$*CFG-BLOCK-CLASS). If block passes the validation then a new block context is pushed onto the context stack.
 
-Can throw one of [`Config::BINDish::X::Parse::Context`](X/Parse/Context.md), [`Config::BINDish::X::Parse::ExtraPart`](X/Parse/ExtraPart.md), [`Config::BINDish::X::Parse::MissingPart`](X/Parse/MissingPart.md), or [`Config::BINDish::X::Parse::Unknown`](X/Parse/Unknown.md).
+Can throw one of `Config::BINDish::X::Parse::Context`, `Config::BINDish::X::Parse::ExtraPart`, `Config::BINDish::X::Parse::MissingPart`, or `Config::BINDish::X::Parse::Unknown`.
 
 ### `validate-value()`
 
 Makes sure a value can be used in the current context. Uses variable [`$*CFG-VALUE`](#$*CFG-VALUE).
 
-Can throw [`Config::BINDish::X::Parse::ValueType`](X/Parse/ValueType.md).
+Can throw `Config::BINDish::X::Parse::ValueType`.
 
 ### `multi method panic(Str:D $msg)`
 
-Throws [`Config::BINDish::X::Parse::General`](X/Parse/General.md) with message `$msg`.
+Throws `Config::BINDish::X::Parse::General` with message `$msg`.
 
 ### `multi method panic(Config::BINDish::X::Parse:U \exception, Str $msg?, *%profile)`
 
@@ -367,23 +378,21 @@ Creates an object of type `exception` using `%profile` as named arguments for co
 
 Both `panic` methods also pass the grammar object they're invoked upon as `cursor` named argument to provide the exception instance with error location and other useful information.
 
-### `include-source(IO:D(Str:D $file, Match:D $cursor --` Str:D)>
+### `include-source(IO:D(Str:D $file, Match:D $cursor --` Str:D)\>
 
 This method provides source configuration to be included with `include` option. The default implementation tries to read `$file`. If it can't then either of two exceptions are thrown:
 
-  * `Config::BINDish::X::FileNotFound` if `$file` doesn't exists
+  - `Config::BINDish::X::FileNotFound` if `$file` doesn't exists
 
-  * `Config::BINDish::X::FileOp` if `$file` is unreadable
+  - `Config::BINDish::X::FileOp` if `$file` is unreadable
 
-GRAMMAR ELEMENTS
-================
+# GRAMMAR ELEMENTS
 
 Rules and tokens listed in this section are the ones considered public API of this module. Those not listed here but implemented by the grammar are considered implementation detail and can be changed or removed any time without prior notice.
 
 Description provided here would mostly be rather succinct. Checking with the grammar source is the most correct way of understanding it.
 
-Rules And Tokens
-----------------
+## Rules And Tokens
 
 ### `rule TOP`
 
@@ -403,15 +412,15 @@ Used in the global and block contexts.
 
 Currently defined statements are (as named within `:sym<...>` postfix):
 
-  * comment
+  - comment
 
-  * value
+  - value
 
-  * option
+  - option
 
-  * block
+  - block
 
-  * empty
+  - empty
 
 ### `token statement-terminator`
 
@@ -455,20 +464,19 @@ Umbrella-rule for all value types. If you plan an extension for a new value type
 
 The following value types are currently implemented, listed as named within `:sym<...>` postfix:
 
-  * string
+  - string
 
-  * keyword
+  - keyword
 
-  * num
+  - num
 
-  * rat
+  - rat
 
-  * int
+  - int
 
-  * bool
+  - bool
 
-Named captures
---------------
+## Named captures
 
 Some named captures are also considered public API.
 
@@ -476,23 +484,31 @@ Some named captures are also considered public API.
 
 Records the location to which call of method `panic` should be bound. In other words, if the location within a rule body where we make the decision about syntax validity is different from the location where the user would understand it best then `panic` should be invoked as:
 
-    $<err-pos>.panic: Config::BINDish::X::Parse::AError, ...;
+``` 
+$<err-pos>.panic: Config::BINDish::X::Parse::AError, ...;
+```
 
 For example, we parse an option like:
 
-    pi 3.1415926;
+``` 
+pi 3.1415926;
+```
 
 When all the information we need to validate it is collected our grammar points at the position right after the terminating semi-colon. If we do `self.panic(...)` then the error message look kind of the following:
 
-    Option pi cannot be used in block...
-      at line N
-        pi 3.1415926;⏏
+``` 
+Option pi cannot be used in block...
+  at line N
+    pi 3.1415926;⏏
+```
 
 But with `$<err-pos>.panic(...)` it would rather be:
 
-    Option pi cannot be used in block...
-      at line N
-        ⏏pi 3.1415926;
+``` 
+Option pi cannot be used in block...
+  at line N
+    ⏏pi 3.1415926;
+```
 
 Which certainly makes more sense to the user.
 
@@ -508,13 +524,11 @@ Points to parsed block type [`Match`](https://docs.raku.org/type/Match) object.
 
 Points to actual string body of a stringy value. I.e. for *what "The answer is 42"* this capture will be a [`Match`](https://docs.raku.org/type/Match) object pointing at *The answer is 42* part of the source, quotes excluded.
 
-GRAMMAR OPERATION
-=================
+# GRAMMAR OPERATION
 
-Pre-declaration
----------------
+## Pre-declaration
 
-*DISCLAIMER. I don't like the term "pre-declaration", but fail to come up with something better so far. Ideas are welcome!*
+*DISCLAIMER. I don't like the term "pre-declaration", but fail to come up with something better so far. Ideas are welcome\!*
 
 In the default mode of operation the grammar accepts any blocks and options in a config file as long as they adhere to the syntax requirements. But often it is desirable to constrain the set of accepted block/option keywords. And even more often it is necessary to restrict certain syntax rules applied to them.
 
@@ -526,51 +540,57 @@ Let's consider a network configuration file where we use `host` and `lan` blocks
 
 *NOTE* that the following example requires [`Config::BINDish::INET`](INET.md) module to be used.
 
-    ip 192.168.1.2; // Error, we don't know the host to apply this ip to
-    lan { # Error, a LAN must be given a name
-    }
-    lan "office" {
-        network 192.168.42.0/24;
-    }
-    lan 192.168.1.0/24 {
-        name "Data Center";
-        ip 192.168.1.13; // Error, only a host can have an address
-        host "gw" {
-            ip 192.168.1.1; # This is default ip on the lan
-            interface "outside" {
-                ip 1.2.3.4/24;
-                gw 1.2.3.1;
-            }
+``` 
+ip 192.168.1.2; // Error, we don't know the host to apply this ip to
+lan { # Error, a LAN must be given a name
+}
+lan "office" {
+    network 192.168.42.0/24;
+}
+lan 192.168.1.0/24 {
+    name "Data Center";
+    ip 192.168.1.13; // Error, only a host can have an address
+    host "gw" {
+        ip 192.168.1.1; # This is default ip on the lan
+        interface "outside" {
+            ip 1.2.3.4/24;
+            gw 1.2.3.1;
         }
     }
-    host "rambler" { // Error, a host can only belong to a lan
-        ip "dhcp-pool"; // Good try, but – no, this is an error too!
-        free-form "with some text"; # This is an error if the option is not pre-declared and strict mode is in effect
-    }
+}
+host "rambler" { // Error, a host can only belong to a lan
+    ip "dhcp-pool"; // Good try, but – no, this is an error too!
+    free-form "with some text"; # This is an error if the option is not pre-declared and strict mode is in effect
+}
+```
 
 Next in this section we will find out how to tell the grammar about the constraints we'd like to apply. Keep in mind that this section talks about options and blocks. And that any 3rd party extension module can introduce their own kinds of statements and use their own approach to their pre-declaration.
 
 Statement pre-declaration consist of two parts:
 
-  * statement descriptor which consists of its globally unique ID and a keyword
+  - statement descriptor which consists of its globally unique ID and a keyword
 
-  * properties defining the actual constraints
+  - properties defining the actual constraints
 
 There are also two ways to pre-declare:
 
-  * via initializing `@.blocks` and `@.options` attributes with lists of [`Pairs`](https://docs.raku.org/type/Pairs) per each statement
+  - via initializing `@.blocks` and `@.options` attributes with lists of [`Pairs`](https://docs.raku.org/type/Pairs) per each statement
 
-  * via using `declare-` family of grammar methods
+  - via using `declare-` family of grammar methods
 
 As a matter of fact, the grammar is using the attributes to eventually pass them to corresponding `declare-blocks` or `declare-options` methods in `setup-BINDish` submethod. This is also the recommended way for a 3rd party extension, would it need to utilize pre-declaration. But from the user perspective it is preferable to use the first way:
 
-    my $cfg = Config::BINDish.new: blocks => (...), options => (...);
+``` 
+my $cfg = Config::BINDish.new: blocks => (...), options => (...);
+```
 
 ### Statement Pre-declaration Syntax
 
 As it was stated before, blocks and options are pre-declared by pairs. For each [`Pair`](https://docs.raku.org/type/Pair) its key is statement descriptor, and its value is a hash of statement properties. The most generic statement pre-declaration would look like the following example:
 
-    :id1<foo> => { :prop1(...), :prop2(...), ... }
+``` 
+:id1<foo> => { :prop1(...), :prop2(...), ... }
+```
 
 The particular properties will be listed later in this section. For now let's focus on the descriptor.
 
@@ -578,40 +598,48 @@ The particular properties will be listed later in this section. For now let's fo
 
 There is a reason for the descriptor to consist of two elements. If we consider an option, its keyword might not be unique across config, but it can have different meaning within different blocks. Often it would mean different value types allowed for use too:
 
-    LAN "Data Center" {
-        server "microservices.my.net" {
-            location "Room C3, Rack 1234";
-        }
-        service "monitoring" {
-            location https://nagios.local;
-        }
+``` 
+LAN "Data Center" {
+    server "microservices.my.net" {
+        location "Room C3, Rack 1234";
     }
+    service "monitoring" {
+        location https://nagios.local;
+    }
+}
+```
 
 As you can see here, even though `location` keyword is used within both `server` and `service` blocks, it represents different options of which one specifies a physical location, and another is for a network location. Use of unique IDs allows the parse to distinguish them. In terms of creating an instance of `Config::BINDish` it would look like this:
 
-    my $cfg = Config::BINDish.new: ...,
-                options => (
-                    :loc-phys<location> => { ... },
-                    :loc-url<location> => { ... }
-                );
+``` 
+my $cfg = Config::BINDish.new: ...,
+            options => (
+                :loc-phys<location> => { ... },
+                :loc-url<location> => { ... }
+            );
+```
 
 But what if we actually don't need those IDs? In this case they can be omitted:
 
-    my $cfg = Config::BINDish.new: ...,
-                options => (
-                    location => { ... },
-                    location => { ... }
-                );
+``` 
+my $cfg = Config::BINDish.new: ...,
+            options => (
+                location => { ... },
+                location => { ... }
+            );
+```
 
 When this notation is used the grammar will auto-generate unique IDs for each statement to still be able to distinguish one declaration from another. But `Config::BINDish::X::DuplicateKeyword` would be thrown if we attempt to use both variants in the same block.
 
 Another case is when we know that statement's keyword is inherently unique. In the above example we can say this about the `server` and the `service` blocks. It would be OK to use IDs which match respective keywords. To do so a boolean [`Pair`](https://docs.raku.org/type/Pair) notation can be used to declare the blocks:
 
-    my $cfg = Config::BINDish.new: ...,
-                blocks => (
-                    :server => { ... },
-                    :service => { ... },
-                );
+``` 
+my $cfg = Config::BINDish.new: ...,
+            blocks => (
+                :server => { ... },
+                :service => { ... },
+            );
+```
 
 The above is equivalent to `:server<server>` and `:service<service>` notations.
 
@@ -619,11 +647,13 @@ The above is equivalent to `:server<server>` and `:service<service>` notations.
 
 Properties of a statement pre-declaration are specified as keys of a hash. For example, the last example of the previous section can be written as:
 
-    my $cfg = Config::BINDish.new: ...,
-                blocks => (
-                    :server => { :named },
-                    :service => { :named },
-                );
+``` 
+my $cfg = Config::BINDish.new: ...,
+            blocks => (
+                :server => { :named },
+                :service => { :named },
+            );
+```
 
 Detailed descriptions of each key follows.
 
@@ -631,92 +661,110 @@ Detailed descriptions of each key follows.
 
 This key specifies a set of block IDs where use of the statement is allowed. If a block is not listed in this key then the statement can't be used in that block.
 
-    my $cfg = Config::BINDish.new: ...,
-                blocks => (
-                    :server => { :named },
-                    :service => { :named },
-                ),
-                options => (
-                    ip => { :in<server host> },
-                    location => { :in<service> },
-                );
+``` 
+my $cfg = Config::BINDish.new: ...,
+            blocks => (
+                :server => { :named },
+                :service => { :named },
+            ),
+            options => (
+                ip => { :in<server host> },
+                location => { :in<service> },
+            );
+```
 
 With the above declaration:
 
-    server "gw" {
-        ip 192.168.42.1;
-    }
-    service "nagios" {
-        ip 192.168.42.13; # Error, only location can be used here
-        location https://nagios.local;
-    }
+``` 
+server "gw" {
+    ip 192.168.42.1;
+}
+service "nagios" {
+    ip 192.168.42.13; # Error, only location can be used here
+    location https://nagios.local;
+}
+```
 
 Note how we use `host` alongside with `server` to pre-declare `ip`. This is not an error as the grammar will auto-vivify block pre-declaration for us. It will have both ID and keyword set to `host`. We can later re-declare it with non-default properties. If we do so the re-declaration will lost its *auto-vivified* status and any subsequent re-declaration will become an error.
 
 In a little bit more complex case a block can be presented as a pair of two strings where key would still be block's ID and the value would allow to narrow down block classes for which a declaration is allowed. In the most simple case we can limit to a single class by its name:
 
-    :keyword => { :in(:classy<specific>), ... }
+``` 
+:keyword => { :in(:classy<specific>), ... }
+```
 
 `keyword` would only be allowed within a `specific` block `classy`:
 
-    classy "a name" specific {
-        keyword ...;
-    }
+``` 
+classy "a name" specific {
+    keyword ...;
+}
+```
 
 Since the value of block definition pair is used on right hand side of a smartmatch operator the class condition is not only limited to strings. Consider the following examples:
 
-    :in(:classy('specific' | 'special' | 'limited'))
-    :in(:classy(/^ specif .* $/))
-    :in(:classy(*.starts-with: 'specif'))
+``` 
+:in(:classy('specific' | 'special' | 'limited'))
+:in(:classy(/^ specif .* $/))
+:in(:classy(*.starts-with: 'specif'))
+```
 
 #### `type`
 
 This key allows to constrain value type which can be used for values of the statement. This key is used as RHS of [smartmatch](https://docs.raku.org/language/operators#index-entry-smartmatch_operator) operator.
 
-    my $cfg = Config::BINDish.new: ...,
-                options => (
-                    multiplier => { :in<measurements>, :type(Num | Rat) },
-                    ip => { :in<server>, type => IP::Addr },
-                );
+``` 
+my $cfg = Config::BINDish.new: ...,
+            options => (
+                multiplier => { :in<measurements>, :type(Num | Rat) },
+                ip => { :in<server>, type => IP::Addr },
+            );
+```
 
 Because value validation takes place in a context where `$*CFG-VALUE` is available, it is even possible to do things like:
 
-    my $cfg = Config::BINDish.new: ...,
-                blocks => (
-                    :srv-ph<server> => { :in<datacenter>, :named }, # A physical server
-                    :srv-vm<server> => { :in<vm-cluster>, :named }, # A VM server
-                ),
-                options => (
-                    location => { :in<srv-ph>, type => { $_ ~~ Stringy && $*CFG-VALUE.payload.contains('Rack') },
-                    location => { :in<srv-vm>, type => { $_ ~~ Stringy && $*CFG-VALUE.payload.contains('Cluster') },
-                );
+``` 
+my $cfg = Config::BINDish.new: ...,
+            blocks => (
+                :srv-ph<server> => { :in<datacenter>, :named }, # A physical server
+                :srv-vm<server> => { :in<vm-cluster>, :named }, # A VM server
+            ),
+            options => (
+                location => { :in<srv-ph>, type => { $_ ~~ Stringy && $*CFG-VALUE.payload.contains('Rack') },
+                location => { :in<srv-vm>, type => { $_ ~~ Stringy && $*CFG-VALUE.payload.contains('Cluster') },
+            );
+```
 
 #### `type-name`
 
 Value type name elaborates on the exact meaning of a value. For example, a value can have Raku [`Str`](https://docs.raku.org/type/Str) type. But then it can be one of:
 
-  * *sq-string* - single-quoted string
+  - *sq-string* - single-quoted string
 
-  * *dq-string* - double-quoted string
+  - *dq-string* - double-quoted string
 
-  * *file-path*
+  - *file-path*
 
-  * *keyword*
+  - *keyword*
 
 With this key one can be even more explicit as to what values are acceptable:
 
-    my $cfg = Config::BINDish.new: ...,
-                options => (
-                    location => { :in<srv-ph>, type => { $_ ~~ Stringy && $*CFG-VALUE.payload.contains('Rack') },
-                    location => { :in<srv-vm>, type => { $_ ~~ Stringy && $*CFG-VALUE.payload.contains('Cluster') },
-                    location => { :in<pdf-collection image-collection>, :type(Str), :type-name<file-path> }
-                );
+``` 
+my $cfg = Config::BINDish.new: ...,
+            options => (
+                location => { :in<srv-ph>, type => { $_ ~~ Stringy && $*CFG-VALUE.payload.contains('Rack') },
+                location => { :in<srv-vm>, type => { $_ ~~ Stringy && $*CFG-VALUE.payload.contains('Cluster') },
+                location => { :in<pdf-collection image-collection>, :type(Str), :type-name<file-path> }
+            );
+```
 
 With this declaration the following config is incorrect:
 
-    pdf-collection "user uploads" {
-        location "/mnt/cloud-data/uploads/pdf"
-    }
+``` 
+pdf-collection "user uploads" {
+    location "/mnt/cloud-data/uploads/pdf"
+}
+```
 
 Yet, same as with the `type` key, `type-name` is used as smartmatch operator RHS. Therefore if we replace it with: `:type-name(/^ [ "file-path" | .. "-string" ] $/)` or `:type-name(any <file-path sq-string dq-string>)` – then the above snipped will become valid.
 
@@ -724,29 +772,41 @@ Yet, same as with the `type` key, `type-name` is used as smartmatch operator RHS
 
 This key defines an exact list of allowed grammar rules/tokens of `value:sym<...>` candidates to be tried when a value is parsed. The list must contain the words used between `< >` symbols of `:sym` adverb. I.e. for the `multiplier` option from a previous example we can explicitly make the grammar even don't attempt matching on anything but the numeric values:
 
-    multiplier => { :value-sym<num rat int>, ... }
+``` 
+multiplier => { :value-sym<num rat int>, ... }
+```
 
 With this pre-declaration the grammar will attempt only tokens `value:sym<num>`, `value:sym<rat>`, `value:sym<int>`. In this case the following example will throw with `Config::BINDish::X::Parse::General` instead of `Config::BINDish::X::Parse::ValueType`:
 
-    multiplier "3.1415926";
+``` 
+multiplier "3.1415926";
+```
 
 When the grammar iterates over `value-sym` items it sets `$*CFG-SPECIFIC-VALUE-SYM` dynamic to the currently attempted item. This allows the candidate token to know that it is being expected to succeed and some additional measures could be taken to fulfill the expectations.
 
 For example, if we expect an option to be a file system path then the following example is likely not to parse correctly because the value can be considered both a keyword or a single path element:
 
-    pathy etc;
+``` 
+pathy etc;
+```
 
 For this reason `value:sym<file-path>` candidate does not attempt parsing something as a path unless it finds a slash separator. I.e. for the above example to work it must look like:
 
-    pathy /etc;
+``` 
+pathy /etc;
+```
 
 or
 
-    pathy etc/;
+``` 
+pathy etc/;
+```
 
 But if we pre-declare the option like:
 
-    pathy => { :value-sym<file-path>, ... }
+``` 
+pathy => { :value-sym<file-path>, ... }
+```
 
 Then `value:sym<file-path>` would know that `etc` would not be tried as a keyword and it can safely consider it a file/directory name.
 
@@ -762,46 +822,60 @@ Block-only. Similar to `named` but for block class. Only makes sense if `named` 
 
 Block-only. If this key is set to *True* then the block can not contain options, only values are allowed. I.e. with a declaration like:
 
-    foo => { :value-only }
+``` 
+foo => { :value-only }
+```
 
 The following config would be an error:
 
-    foo { option 42 }
+``` 
+foo { option 42 }
+```
 
 But the following example will work:
 
-    foo { 13; 42; 3.1415926 }
+``` 
+foo { 13; 42; 3.1415926 }
+```
 
 Note that within a value-only block keywords are treated as keyword values, not as boolean options:
 
-    foo { value1; value2 } # Two string values with type name 'keyword'
-    bar { value1; value2 } # Two True options because bar is not pre-declared
+``` 
+foo { value1; value2 } # Two string values with type name 'keyword'
+bar { value1; value2 } # Two True options because bar is not pre-declared
+```
 
 Here is an example of how this peculiarity can be used:
 
-    acl office { 192.168.42.0/24; 192.168.13.0/24 }
-    acl data-center { 10.42.0.0/16 }
-    acl customers { 172.10.0.0/16 }
-    acl any { 0.0.0.0/0 }
-    network "internal" {
-        access-rules {
-            allow { office; data-center } # 'allow' is a value-only block
-            disable { any }; # value-only block too
-        }
+``` 
+acl office { 192.168.42.0/24; 192.168.13.0/24 }
+acl data-center { 10.42.0.0/16 }
+acl customers { 172.10.0.0/16 }
+acl any { 0.0.0.0/0 }
+network "internal" {
+    access-rules {
+        allow { office; data-center } # 'allow' is a value-only block
+        disable { any }; # value-only block too
     }
-    network "public" {
-        access-rules { allow { any } }
-    }
+}
+network "public" {
+    access-rules { allow { any } }
+}
+```
 
 #### `no-values`
 
 Block-only. This property is a direct opposite to `value-only` as blocks declared with it can not hold any values. So, a declaration like this:
 
-    foo => { :no-values }
+``` 
+foo => { :no-values }
+```
 
 will cause the following to throw:
 
-    foo { "bar"; }
+``` 
+foo { "bar"; }
+```
 
 Since the property is clearly conflicting with `value-only` use of both within a block declaration will result in an exception thrown.
 
@@ -809,14 +883,16 @@ Since the property is clearly conflicting with `value-only` use of both within a
 
 Specifies the default value of a statement. When used with a block declaration then multiple values can be used.
 
-    blocks => (
-        :server => %( :in<.TOP> ),
-        :services => %( :default<api login files>, :type(Str), :in<server> ),
-    ),
-    options => (
-        :server-iface<interface> => { :type(Str), :default<*>, :in<server> },
-        :server-port<port> => { :type(Int), :default(80), :in<server> },
-    )
+``` 
+blocks => (
+    :server => %( :in<.TOP> ),
+    :services => %( :default<api login files>, :type(Str), :in<server> ),
+),
+options => (
+    :server-iface<interface> => { :type(Str), :default<*>, :in<server> },
+    :server-port<port> => { :type(Int), :default(80), :in<server> },
+)
+```
 
 Default values are not verified against pre-declaration `type` constrain.
 
@@ -824,8 +900,10 @@ Default values are not verified against pre-declaration `type` constrain.
 
 This property meaning is the same, as [`where`](https://docs.raku.org/type/Signature#Type_constraints) clause in Raku: it defines a constraint on the allowed values. The property is used as smartmatch RHS. Consider the examples:
 
-    foo => { :type(Int), :where(* > 10) }
-    bar => { :type(Str), :where(any <debug info error>) }
+``` 
+foo => { :type(Int), :where(* > 10) }
+bar => { :type(Str), :where(any <debug info error>) }
+```
 
 **Note** that similar outcome could be achieved by using a [`subset`](https://docs.raku.org/language/typesystem#index-entry-subset-subset) with `type` property. But `where` is more obvious on many occasions.
 
@@ -833,13 +911,17 @@ This property meaning is the same, as [`where`](https://docs.raku.org/type/Signa
 
 This property must be a short string to be used within error message of the exception thrown when `where` constraint is not met. For example, if there is an option declaration:
 
-    min => { :type(Int), :where(* >= 10), :why('must be 10 or more') }
+``` 
+min => { :type(Int), :where(* >= 10), :why('must be 10 or more') }
+```
 
 Then defining the option as `min 1;` in a configuration file would produce output similar to the following:
 
-    Option 'min' expects a (Int) value (must be 10 or more) but got 1
-      at line 2
-        ⏏min 1;
+``` 
+Option 'min' expects a (Int) value (must be 10 or more) but got 1
+  at line 2
+    ⏏min 1;
+```
 
 ### Reservations
 
@@ -851,60 +933,59 @@ All keywords and IDs starting with a dot are reserved for internal use. Any use 
 
 The grammar reserves the following keywords for internal use:
 
-  * `include`
+  - `include`
 
-  * `use`
+  - `use`
 
 #### Blocks
 
 Two blocks are used internally by the grammar: `.TOP` and `.ANYWHERE`. The first one is a kind of global context, where all top-level blocks and options are installed. The name can also be use in a pre-declaration to specify that a statement can be used at the top-level:
 
-    options => ( foo => { :in<.TOP> } )
+``` 
+options => ( foo => { :in<.TOP> } )
+```
 
 `.ANYWHERE` is used in pre-declaration context to keep track of pre-declared statements which do not have `in` key and therefore can be used literally anywhere in a config file.
 
 Note that no keyword can start with a dot. Therefore there is no way to accidentally declare `.TOP { }` or `.ANYWHERE { }`, even though technically and formally the config file looks like:
 
-    .TOP {
-        include "your-config.cfg"
-    }
+``` 
+.TOP {
+    include "your-config.cfg"
+}
+```
 
 #### IDs
 
 As it was stated in the [Names](#Names) section any ID string starting with a dot is reserved. Use method `autogen-id` if you need a unique one.
 
-EXTENSIONS
-==========
-
-
+# EXTENSIONS
 
 This section provides tips for writing own grammar extensions. See [`Config::BINDish::Actions`](Actions.md) to find more about action extensions.
 
-Context
--------
+## Context
 
 The grammar maintains current parsing context as a way to validate various aspects of config file syntax. In this task it relies upon:
 
-  * `Config::BINDish::Grammar::Context` class
+  - `Config::BINDish::Grammar::Context` class
 
-  * `$*CFG-CTX` and `$*CFG-PARENT-CTX` variables containing instances of the `Context` class
+  - `$*CFG-CTX` and `$*CFG-PARENT-CTX` variables containing instances of the `Context` class
 
-  * roles `Config::BINDish::Grammar::StatementProps`, `Config::BINDish::Grammar::ContainerProps` and classes consuming them: `Config::BINDish::Grammar::OptionProps` and `Config::BINDish::Grammar::BlockProps`
+  - roles `Config::BINDish::Grammar::StatementProps`, `Config::BINDish::Grammar::ContainerProps` and classes consuming them: `Config::BINDish::Grammar::OptionProps` and `Config::BINDish::Grammar::BlockProps`
 
-  * Raku call stack
+  - Raku call stack
 
 Most of the context implementation mechanics are not standardized and subject for change. Yet, a few elements are rather unlikely to change. Among those are:
 
-  * A context has a type, stored in the same-named attribute of the `Context` class. The currently used types are: *"TOP"*, *"BLOCK"*, and *"OPTION"*
+  - A context has a type, stored in the same-named attribute of the `Context` class. The currently used types are: *"TOP"*, *"BLOCK"*, and *"OPTION"*
 
-  * Except for the *"TOP"* context, all other contexts keep track of their enclosing context via `$.parent` attribute of the `Context` class
+  - Except for the *"TOP"* context, all other contexts keep track of their enclosing context via `$.parent` attribute of the `Context` class
 
-  * A context's primary purpose is to provide properties of the currently begin parsed syntax element. Those properties are provided by `props` attribute of the `Context` class and expected to consume `StatementProps` role
+  - A context's primary purpose is to provide properties of the currently begin parsed syntax element. Those properties are provided by `props` attribute of the `Context` class and expected to consume `StatementProps` role
 
 If you plan to implement a grammar extension with a rule or token providing own context then it'd make sense to follow the steps taken by `statement:sym<option>` or `statement:sym<block>` rules.
 
-Extending The Grammar
----------------------
+## Extending The Grammar
 
 [`Config::BINDish`](../BINDish.md) contains general information about writing extensions. Here we provide only grammar-specific details.
 
@@ -912,24 +993,23 @@ Only the rules and tokens documented in corresponding section above are guarante
 
 The most common way to extend the grammar would be to add a new kind of statement or value type. This must be as easy as adding new rules or tokens akin to the following example:
 
-    role MyExtension is BINDish-grammar {
-        ...
-        multi rule statement:sym<your-statement> {
-            # Your statement syntax rules
-        }
-        multi token value:sym<your-type> {
-            # Your value syntax rules
-        }
-        ...
+``` 
+role MyExtension is BINDish-grammar {
+    ...
+    multi rule statement:sym<your-statement> {
+        # Your statement syntax rules
     }
+    multi token value:sym<your-type> {
+        # Your value syntax rules
+    }
+    ...
+}
+```
 
-SEE ALSO
-========
+# SEE ALSO
 
 [`Config::BINDish`](../BINDish.md), [`Config::BINDish::Grammar::Strictness`](Grammar/Strictness.md), [`Config::BINDish::Grammar::StatementProps`](Grammar/StatementProps.md), [`Config::BINDish::Grammar::ContainerProps`](Grammar/ContainerProps.md), [`Config::BINDish::Grammar::OptionProps`](Grammar/OptionProps.md), [`Config::BINDish::Grammar::BlockProps`](Grammar/BlockProps.md)
 
-AUTHOR
-======
+# AUTHOR
 
-Vadim Belman <vrurg@cpan.org>
-
+Vadim

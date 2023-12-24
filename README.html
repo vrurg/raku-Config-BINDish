@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>README</title>
+    <meta charset="UTF-8">
+    <style>hr,
+img {
+    box-sizing: content-box
+}
+body::after,
+body::before,
+hr::after,
+hr::before {
+    display: table;
+    content: ""
+}
+a,
+a:not([href]) {
+    text-decoration: none
+}
+
+hr,
+svg:not(:root) {
+    overflow: hidden
+}
+
+img,
+table tr {
+    background-color: #fff
+}
+
+pre,
+table {
+    overflow: auto
+}
+
+dl,
+dl dt,
+hr,
+pre code,
+pre>code,
+td,
+th {
+    padding: 0
+}
+
+input,
+pre code {
+    overflow: visible
+}
+
+pre,
+pre code {
+    word-wrap: normal
+}
+
+body {
+    -ms-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+    color: #333;
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-size: 16px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    width: 820px;
+    margin: 2em auto;
+}
+
+a {
+    background-color: transparent;
+    -webkit-text-decoration-skip: objects;
+    color: #4078c0
+}
+
+a:active,
+a:hover {
+    outline-width: 0;
+    text-decoration: underline
+}
+
+h1 {
+    margin: .67em 0
+}
+
+img {
+    border-style: none;
+    max-width: 100%
+}
+
+h1,
+h2 {
+    padding-bottom: .3em;
+    border-bottom: 1px solid #eee
+}
+
+input {
+    font: inherit;
+    margin: 0;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit
+}
+
+* {
+    box-sizing: border-box
+}
+
+strong {
+    font-weight: 600
+}
+
+body::after,
+hr::after {
+    clear: both
+}
+
+table {
+    border-spacing: 0;
+    border-collapse: collapse;
+    display: block;
+    width: 100%
+}
+
+blockquote {
+    margin: 0;
+    padding: 0 1em;
+    color: #777;
+    border-left: .25em solid #ddd
+}
+
+ol ol,
+ul ol {
+    list-style-type: lower-roman
+}
+
+ol ol ol,
+ol ul ol,
+ul ol ol,
+ul ul ol {
+    list-style-type: lower-alpha
+}
+
+dd {
+    margin-left: 0
+}
+
+code {
+    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace
+}
+
+pre {
+    font: 12px Consolas, "Liberation Mono", Menlo, Courier, monospace
+}
+
+input {
+    -webkit-font-feature-settings: "liga" 0;
+    font-feature-settings: "liga" 0
+}
+
+body>:first-child {
+    margin-top: 0!important
+}
+
+body>:last-child {
+    margin-bottom: 0!important
+}
+
+a:not([href]) {
+    color: inherit
+}
+
+blockquote,
+dl,
+ol,
+p,
+pre,
+table,
+ul {
+    margin-top: 0;
+    margin-bottom: 16px
+}
+
+hr {
+    background: #e7e7e7;
+    height: .25em;
+    margin: 24px 0;
+    border: 0
+}
+
+blockquote>:first-child {
+    margin-top: 0
+}
+
+blockquote>:last-child {
+    margin-bottom: 0
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin-top: 24px;
+    margin-bottom: 16px;
+    font-weight: 600;
+    line-height: 1.25
+}
+
+dl dt,
+table th {
+    font-weight: 700
+}
+
+h1 code,
+h1 tt,
+h2 code,
+h2 tt,
+h3 code,
+h3 tt,
+h4 code,
+h4 tt,
+h5 code,
+h5 tt,
+h6 code,
+h6 tt {
+    font-size: inherit
+}
+
+h1 {
+    font-size: 2em
+}
+
+h2 {
+    font-size: 1.5em
+}
+
+h3 {
+    font-size: 1.25em
+}
+
+h4 {
+    font-size: 1em
+}
+
+h5 {
+    font-size: .875em
+}
+
+h6 {
+    font-size: .85em;
+    color: #777
+}
+
+ol,
+ul {
+    padding-left: 2em
+}
+
+ol ol,
+ol ul,
+ul ol,
+ul ul {
+    margin-top: 0;
+    margin-bottom: 0
+}
+
+li>p {
+    margin-top: 16px
+}
+
+li+li {
+    margin-top: .25em
+}
+
+dl dt {
+    margin-top: 16px;
+    font-size: 1em;
+    font-style: italic
+}
+
+dl dd {
+    padding: 0 16px;
+    margin-bottom: 16px
+}
+
+table td,
+table th {
+    padding: 6px 13px;
+    border: 1px solid #ddd
+}
+
+table tr {
+    border-top: 1px solid #ccc
+}
+
+table tr:nth-child(2n) {
+    background-color: #f8f8f8
+}
+
+code {
+    padding: .2em 0;
+    margin: 0;
+    font-size: 85%;
+    background-color: rgba(0, 0, 0, .04);
+    border-radius: 3px
+}
+
+code::after,
+code::before {
+    letter-spacing: -.2em;
+    content: "\00a0"
+}
+
+pre>code {
+    margin: 0;
+    font-size: 100%;
+    word-break: normal;
+    white-space: pre;
+    background: 0 0;
+    border: 0
+}
+
+pre {
+    padding: 16px;
+    font-size: 85%;
+    line-height: 1.45;
+    background-color: #f7f7f7;
+    border-radius: 3px
+}
+
+pre code {
+    display: inline;
+    max-width: auto;
+    margin: 0;
+    line-height: inherit;
+    background-color: transparent;
+    border: 0
+}
+
+pre code::after,
+pre code::before {
+    content: normal
+}
+
+kbd {
+    display: inline-block;
+    padding: 3px 5px;
+    font: 11px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    line-height: 10px;
+    color: #555;
+    vertical-align: middle;
+    background-color: #fcfcfc;
+    border: 1px solid #ccc;
+    border-bottom-color: #bbb;
+    border-radius: 3px;
+    box-shadow: inset 0 -1px 0 #bbb
+}
+
+hr {
+    border-bottom-color: #eee
+}
+</style>
+
+    
+<style class="build-tools-gen-doc">.toc-level-1 .toc-text { padding-left: 1.5em; }
+.toc-level-2 .toc-text { padding-left: 2.5em; }
+.toc-level-3 .toc-text { padding-left: 3.5em; }
+.toc-level-4 .toc-text { padding-left: 4.5em; }
+.toc-level-5 .toc-text { padding-left: 5.5em; }
+#TOC * { border-width: 0; }
+li > p { margin: inherit; }
+li > .pod-block-code { margin-top: 16px; }
+</style></head>
+
+<body class="pod">
+    <div id="___top"></div>
+    <nav class="indexgroup">
+<table id="TOC">
+<caption><h2 id="TOC_Title">Table of Contents</h2></caption>
+<tr class="toc-level-1"><td class="toc-number">1</td><td class="toc-text"><a href="#NAME">NAME</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">2</td><td class="toc-text"><a href="#DISCLAIMER">DISCLAIMER</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">3</td><td class="toc-text"><a href="#DESCRIPTION">DESCRIPTION</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">4</td><td class="toc-text"><a href="#EXTENSIONS">EXTENSIONS</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">5</td><td class="toc-text"><a href="#ATTRIBUTES">ATTRIBUTES</a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">5.1</td><td class="toc-text"><a href="#Config::BINDish::Grammar::Strictness_%24.strict"><code class="pod-code-inline">Config::BINDish::Grammar::Strictness</code> <code class="pod-code-inline">$.strict</code></a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">5.2</td><td class="toc-text"><a href="#Pair:D_@.blocks,_Pair:D_@.options"><code class="pod-code-inline">Pair:D</code> <code class="pod-code-inline">@.blocks</code>, <code class="pod-code-inline">Pair:D</code> <code class="pod-code-inline">@.options</code></a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">5.3</td><td class="toc-text"><a href="#%24.grammar,_%24.actions"><code class="pod-code-inline">$.grammar</code>, <code class="pod-code-inline">$.actions</code></a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">5.4</td><td class="toc-text"><a href="#IO::Path_%24.file"><code class="pod-code-inline">IO::Path</code> <code class="pod-code-inline">$.file</code></a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">5.5</td><td class="toc-text"><a href="#Bool_%24.flat_=_False"><code class="pod-code-inline">Bool</code> <code class="pod-code-inline">$.flat = False</code></a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">5.6</td><td class="toc-text"><a href="#%24.top"><code class="pod-code-inline">$.top</code></a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">5.7</td><td class="toc-text"><a href="#%24.match"><code class="pod-code-inline">$.match</code></a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">6</td><td class="toc-text"><a href="#METHODS">METHODS</a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">6.1</td><td class="toc-text"><a href="#extend-grammar(_+@ext_),_extend-actions(_+@ext_)"><code class="pod-code-inline">extend-grammar( +@ext )</code>, <code class="pod-code-inline">extend-actions( +@ext )</code></a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">6.2</td><td class="toc-text"><a href="#build-grammar(),_build-actions()"><code class="pod-code-inline">build-grammar()</code>, <code class="pod-code-inline">build-actions()</code></a></td></tr>
+<tr class="toc-level-2"><td class="toc-number">6.3</td><td class="toc-text"><a href="#multi_method_read(IO:D(Str:D)_:%24file,_%7Cargs),_multi_method_read(Str:D_:%24string,_%7Cargs)"><code class="pod-code-inline">multi method read(IO:D(Str:D) :$file, |args)</code>, <code class="pod-code-inline">multi method read(Str:D :$string, |args)</code></a></td></tr>
+<tr class="toc-level-3"><td class="toc-number">6.3.1</td><td class="toc-text"><a href="#multi_get(...)"><code class="pod-code-inline">multi get(...)</code></a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">7</td><td class="toc-text"><a href="#EXPORTS">EXPORTS</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">8</td><td class="toc-text"><a href="#SEE_ALSO">SEE ALSO</a></td></tr>
+
+</table>
+</nav>
+
+
+    <div class="pod-body">
+    <h1 id="NAME"><a class="u" href="#___top" title="go to top of document">NAME</a></h1>
+<p><code>Config::BINDish</code> - parse BIND9/named kind of config files</p>
+<section><h1>SYNOPSIS</h1>
+<pre class="pod-block-code">my $cfg = Config::BINDish.new;
+$cfg.read: string =&gt; q:to/CFG/;
+server "s1" {
+    name "my.server";
+    paths {
+        base "/opt/myapp";
+        pool "files" static {
+            "pub/img";
+            "static/img";
+            "docs";
+        };
+        pool "files" dynamic {
+            "users/reports";
+            "system/reports"
+        }
+    }
+}
+CFG
+say $cfg.top.get( :server("s1") =&gt; :paths =&gt; :pool("images") =&gt; 'root' ); # ./pub/img</pre>
+</section>
+<p>$cfg.read: file =&gt; $my-config-filename;</p>
+<h1 id="DISCLAIMER"><a class="u" href="#___top" title="go to top of document">DISCLAIMER</a></h1>
+<p>This module is very much experimental in the sense of the API methods it provides. The grammar is expected to be more stable, yet no warranties can be given at the moment.</p>
+<h1 id="DESCRIPTION"><a class="u" href="#___top" title="go to top of document">DESCRIPTION</a></h1>
+<p>In this documentation I'll be referring to the configuration format implemented by the module as <em>BINDish config</em> or simply <em>BINDish</em>.</p>
+<h1 id="EXTENSIONS"><a class="u" href="#___top" title="go to top of document">EXTENSIONS</a></h1>
+<p>BINDish configuration parser can be augmented with 3rd-party extensions. Every extension is implemented as a role which will be used to build the final grammar or actions classes (see <a href="https://docs.raku.org/type/Grammar"><code>Grammar</code></a>). The classes are based upon <a href="docs/html/Config/BINDish/Grammar.html"><code>Config::BINDish::Grammar</code></a> and <a href="docs/html/Config/BINDish/Actions.html"><code>Config::BINDish::Actions</code></a> respectively. Here is the steps <code>Config::BINDish</code> does to build them:</p>
+<ul><li><p>An empty class is created which will serve as the final version</p>
+</li>
+<li><p>Extension roles are punned and added as parents to the class</p>
+</li>
+<li><p>Then the base class is added as the last parent</p>
+</li>
+</ul>
+<p>The order in which the extensions are added is defined by the order and the way they're registered. The later added ones serve as the earlier parents meaning that Raku's method call dispatching will have their methods invoked first.</p>
+<p>There are two and a half ways to extend the parser. First is to use `is BINDish-grammar` or `is BINDish-actions` trait:</p>
+<pre class="pod-block-code">unit module Config::BINDish::Ext1;
+use Config::BINDish;
+role Grammar is BINDish-grammar {
+    token value:sym&lt;mine&gt; {
+        ...
+    }
+}
+role Actions is BINDish-actions {
+    method value:sym&lt;mine&gt;($/) {
+        ...
+    }
+}</pre>
+<p>In this case the role they're applied to will be auto-registered with <code>Config::BINDish</code>. When such extension is contained by a module then it would be added when the module is <code>use</code>d:</p>
+<pre class="pod-block-code">use Config::BINDish::Ext1;
+use Config::BINDish::Ext2;</pre>
+<p><em>Note</em> that considering the order of <code>use</code> statements, <code>Ext2</code> will be able to override methods of <code>Ext1</code>.</p>
+<p>The specificifty of using the traits is that extensions declared this way will become application-wide available. So, even if the extension module is used by a module used by the main code, the extension will be available to any instance of <code>Config::BINDish</code>.</p>
+<p><strong>Note:</strong> We say that extensions registered with the traits are registered <em>statically</em>.</p>
+<p>The other 1.5 ways of adding the extensions are to use <code>extend-grammar</code> and <code>extend-actions</code> constructor arguments or methods with the same names:</p>
+<pre class="pod-block-code">my $cfg = Config::BINDish.new: :extend-grammar(ExtG1, ExtG2), :extend-actions(ExtA1, ExtA2);
+$cfg.extend-grammar(ExtG3)
+    .extend-actions(ExtA3);</pre>
+<p>In this case extension roles don't need the traits applied. This way we call <em>dynamic</em> registration.</p>
+<p>The other specific of dynamic extensions is that they will go after the static ones. I.e. in the above examples <code>ExtG*</code> and <code>ExtA*</code> will be positioned before <code>Ext1</code> and <code>Ext2</code> in the MRO order, prioritizing the former over the latter ones.</p>
+<p>Why is the above called <em>1.5 ways</em>? Because the constructor eventually uses the <code>extend-*</code> methods with corresponding <code>:extend-*</code> named attributes.</p>
+<p>See also <a href="docs/html/Config/BINDish/Grammar.html"><code>Config::BINDish::Grammar</code></a> and <a href="docs/html/Config/BINDish/Actions.html"><code>Config::BINDish::Actions</code></a>.</p>
+<h1 id="ATTRIBUTES"><a class="u" href="#___top" title="go to top of document">ATTRIBUTES</a></h1>
+<h2 id="Config::BINDish::Grammar::Strictness_$.strict"><a href="docs/html/Config/BINDish/Grammar/Strictness.html"><code>Config::BINDish::Grammar::Strictness</code></a> <code>$.strict</code></h2>
+<p>The default grammar strictness mode. See <a href="docs/html/Config/BINDish/Grammar/Strictness.html"><code>Config::BINDish::Grammar::Strictness</code></a> documentation for details.</p>
+<h2 id="Pair:D_@.blocks,_Pair:D_@.options"><a href="https://docs.raku.org/type/Pair"><code>Pair:D</code></a> <code>@.blocks</code>, <a href="https://docs.raku.org/type/Pair"><code>Pair:D</code></a> <code>@.options</code></h2>
+<p>These two attributes contain user-defined (pre-declared) structure of the config file. More information about them can be found in <a href="BINDish/Grammar.md">Config::BINDish::Grammar</a> documentation, in <a href="BINDish/Grammar.md#Pre-declaration">Pre-declaration</a> section.</p>
+<h2 id="$.grammar,_$.actions"><a class="u" href="#___top" title="go to top of document"><code>$.grammar</code>, <code>$.actions</code></a></h2>
+<p>The final grammar and actions class versions with all registered extensions applied. Both attributes are <em>lazy</em> and <code>clearable</code> in terms of <a href="https://modules.raku.org/dist/AttrX::Mooish"><code>AttrX::Mooish</code></a>. It means that the following is possible:</p>
+<pre class="pod-block-code">say $cfg.grammar.^name; # Config::BINDish::Grammar...
+$cfg.extend-grammar(MyApp::GrammarMod);
+$cfg.clear-grammar;     # Actually, extend-grammar already does this. This line is here to demo the concept only.
+say $cfg.grammar.^name; # Config::BINDish::Grammar+{MyApp::GrammarMod}...</pre>
+<h2 id="IO::Path_$.file"><a href="https://docs.raku.org/type/IO::Path"><code>IO::Path</code></a> <code>$.file</code></h2>
+<p>If <code>read</code> method was called with <code>:file&lt;...&gt;</code> argument then this attribute will hold corresponding <code>IO::Path</code> object for the file name.</p>
+<h2 id="Bool_$.flat_=_False"><a href="https://docs.raku.org/type/Bool"><code>Bool</code></a> <code>$.flat = False</code></h2>
+<p>If set to <code>True</code> then <a href="docs/html/Config/BINDish/Actions.html"><code>Config::BINDish::Actions</code></a> will act in flattening mode.</p>
+<h2 id="$.top"><a class="u" href="#___top" title="go to top of document"><code>$.top</code></a></h2>
+<p>The top node produced by the grammar actions. I.e. it is the result of <code>$&lt;TOP&gt;.ast</code> of the <a href="https://docs.raku.org/type/Match"><code>Match</code></a> object produced by grammar's <code>parse</code> method. For <a href="docs/html/Config/BINDish/Actions.html"><code>Config::BINDish::Actions</code></a> it would be an instance of <a href="docs/html/Config/BINDish/AST/TOP.html"><code>Config::BINDish::AST::TOP</code></a>. But an extension can produce something to its taste which wouldn't be an AST whatsoever. The only requirement imposed on the object stored in the attribute is to provide <code>get</code> method.</p>
+<p>This attribute <code>handles</code> method <code>get</code>.</p>
+<h2 id="$.match"><a class="u" href="#___top" title="go to top of document"><code>$.match</code></a></h2>
+<p>This attribute stores the <a href="https://docs.raku.org/type/Match"><code>Match</code></a> object produced by grammar's <code>parse</code> method.</p>
+<h1 id="METHODS"><a class="u" href="#___top" title="go to top of document">METHODS</a></h1>
+<h2 id="extend-grammar(_+@ext_),_extend-actions(_+@ext_)"><a class="u" href="#___top" title="go to top of document"><code>extend-grammar( +@ext )</code>, <code>extend-actions( +@ext )</code></a></h2>
+<p>Interface to dynamically register extensions. Take a list of roles and records them as extensions. Then it clears <code>$.grammar</code> or <code>$.actions</code> attributes, respectively. Both return <code>self</code> to allow method call chaining.</p>
+<h2 id="build-grammar(),_build-actions()"><a class="u" href="#___top" title="go to top of document"><code>build-grammar()</code>, <code>build-actions()</code></a></h2>
+<p>Methods used by <a href="https://modules.raku.org/dist/AttrX::Mooish"><code>AttrX::Mooish</code></a> to lazily initialize <code>$.grammar</code> and <code>$.actions</code> attributes respectively.</p>
+<p><code>multi method read(Config::BINDish:U: |args)</code></p>
+<p>Instantiates <code>Config::BINDish</code> class and re-invokes <code>read</code> method on the instance with <code>args</code> capture.</p>
+<h2 id="multi_method_read(IO:D(Str:D)_:$file,_|args),_multi_method_read(Str:D_:$string,_|args)"><a class="u" href="#___top" title="go to top of document"><code>multi method read(IO:D(Str:D) :$file, |args)</code>, <code>multi method read(Str:D :$string, |args)</code></a></h2>
+<p>Parses a configuration stored either in a <code>$string</code> or in a <code>$file</code> and returns the resulting <a href="https://docs.raku.org/type/Match"><code>Match</code></a> object. The capture <code>args</code> is passed over to the <code>parse</code> method of <code>$.grammar</code> alongside with <code>$.actions</code>, <code>$.strict</code>, <code>$.flat</code>, <code>%.blocks</code>, and <code>%.options</code> attributes.</p>
+<p>The method returns what is returned by grammar's <code>parse</code> method. The same value is then stored in <code>$.match</code> attribute.</p>
+<h3 id="multi_get(...)"><a class="u" href="#___top" title="go to top of document"><code>multi get(...)</code></a></h3>
+<p>Method is handled by <code>$.top</code> attribute. See <a href="docs/html/Config/BINDish/AST/Blockish.html"><code>Config::BINDish::AST::Blockish</code></a> for detailed method description.</p>
+<h1 id="EXPORTS"><a class="u" href="#___top" title="go to top of document">EXPORTS</a></h1>
+<p>By default this module exports only <code>BINDish-grammar</code> and <code>BINDish-actions</code> traits. But if <code>use</code>d with either "op" or "ascii-op" positional arguments it will also export _request operator_ in either unicode or ASCII form:</p>
+<pre class="pod-block-code">use Config::BINDish &lt;op&gt;;
+my $cfg = Config::BINDish.new.read(...);
+say $cfg ∷ :top-block&lt;name&gt; ∷ "option";</pre>
+<p>Or:</p>
+<pre class="pod-block-code">use Config::BINDish &lt;ascii-op&gt;;
+my $cfg = Config::BINDish.new.read(...);
+say $cfg :: :top-block&lt;name&gt; :: "option";</pre>
+<p>*Note* that <code>::</code> (ASCII version) may conflict with Raku's name resolution. Though in my tests this never happened, I would still prefer the unicode version over the ASCII.</p>
+<p>More information about the operator can be found in <a href="docs/html/Config/BINDish/Ops.html"><code>Config::BINDish::Ops</code></a>.</p>
+<h1 id="SEE_ALSO"><a class="u" href="#___top" title="go to top of document">SEE ALSO</a></h1>
+<ul><li><p><a href="docs/html/Config/BINDish/Grammar.html"><code>Config::BINDish::Grammar</code></a></p>
+</li>
+<li><p><a href="docs/html/Config/BINDish/AST.html"><code>Config::BINDish::AST</code></a></p>
+</li>
+<li><p><a href="docs/html/Config/BINDish/Ops.html"><code>Config::BINDish::Ops</code></a></p>
+</li>
+<li><p><a href="docs/html/Config/BINDish/Expandable.html"><code>Config::BINDish::Expandable</code></a></p>
+</li>
+<li><p><a href="docs/html/Config/BINDish/INET.html"><code>Config::BINDish::INET</code></a></p>
+</li>
+<li><p><a href="README.html"><code>..::README</code></a></p>
+</li>
+<li><p><a href="INDEX.html"><code>..::INDEX</code></a></p>
+</li>
+</ul>
+
+    </div>
+
+    
+</body>
+</html>
