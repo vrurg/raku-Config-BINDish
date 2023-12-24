@@ -379,7 +379,7 @@ li > .pod-block-code { margin-top: 16px; }
 <table id="TOC">
 <caption><h2 id="TOC_Title">Table of Contents</h2></caption>
 <tr class="toc-level-1"><td class="toc-number">1</td><td class="toc-text"><a href="#NAME">NAME</a></td></tr>
-<tr class="toc-level-1"><td class="toc-number">2</td><td class="toc-text"><a href="#SYNOPSIS_my_$cfg_=_Config::BINDish.new;_$cfg.read:_string_=&gt;_q:to/CFG/;_server_&quot;s1&quot;_{_name_&quot;my.server&quot;;_paths_{_base_&quot;/opt/myapp&quot;;_pool_&quot;files&quot;_static_{_&quot;pub/img&quot;;_&quot;static/img&quot;;_&quot;docs&quot;;_};_pool_&quot;files&quot;_dynamic_{_&quot;users/reports&quot;;_&quot;system/reports&quot;_}_}_}_CFG_say_$cfg.top.get(_:server(&quot;s1&quot;)_=&gt;_:paths_=&gt;_:pool(&quot;images&quot;)_=&gt;_'root'_);_#_./pub/img">SYNOPSIS my $cfg = Config::BINDish.new; $cfg.read: string =&gt; q:to/CFG/; server "s1" { name "my.server"; paths { base "/opt/myapp"; pool "files" static { "pub/img"; "static/img"; "docs"; }; pool "files" dynamic { "users/reports"; "system/reports" } } } CFG say $cfg.top.get( :server("s1") =&gt; :paths =&gt; :pool("images") =&gt; 'root' ); # ./pub/img</a></td></tr>
+<tr class="toc-level-1"><td class="toc-number">2</td><td class="toc-text"><a href="#SYNOPSIS">SYNOPSIS</a></td></tr>
 <tr class="toc-level-1"><td class="toc-number">3</td><td class="toc-text"><a href="#DISCLAIMER">DISCLAIMER</a></td></tr>
 <tr class="toc-level-1"><td class="toc-number">4</td><td class="toc-text"><a href="#DESCRIPTION">DESCRIPTION</a></td></tr>
 <tr class="toc-level-1"><td class="toc-number">5</td><td class="toc-text"><a href="#EXTENSIONS">EXTENSIONS</a></td></tr>
@@ -408,7 +408,26 @@ li > .pod-block-code { margin-top: 16px; }
     <div class="pod-body">
     <h1 id="NAME"><a class="u" href="#___top" title="go to top of document">NAME</a></h1>
 <p><code>Config::BINDish</code> - parse BIND9/named kind of config files</p>
-<h1 id="SYNOPSIS_my_$cfg_=_Config::BINDish.new;_$cfg.read:_string_=&gt;_q:to/CFG/;_server_&quot;s1&quot;_{_name_&quot;my.server&quot;;_paths_{_base_&quot;/opt/myapp&quot;;_pool_&quot;files&quot;_static_{_&quot;pub/img&quot;;_&quot;static/img&quot;;_&quot;docs&quot;;_};_pool_&quot;files&quot;_dynamic_{_&quot;users/reports&quot;;_&quot;system/reports&quot;_}_}_}_CFG_say_$cfg.top.get(_:server(&quot;s1&quot;)_=&gt;_:paths_=&gt;_:pool(&quot;images&quot;)_=&gt;_'root'_);_#_./pub/img"><a class="u" href="#___top" title="go to top of document">SYNOPSIS my $cfg = Config::BINDish.new; $cfg.read: string =&gt; q:to/CFG/; server "s1" { name "my.server"; paths { base "/opt/myapp"; pool "files" static { "pub/img"; "static/img"; "docs"; }; pool "files" dynamic { "users/reports"; "system/reports" } } } CFG say $cfg.top.get( :server("s1") =&gt; :paths =&gt; :pool("images") =&gt; 'root' ); # ./pub/img</a></h1>
+<h1 id="SYNOPSIS"><a class="u" href="#___top" title="go to top of document">SYNOPSIS</a></h1>
+<pre class="pod-block-code">my $cfg = Config::BINDish.new;
+$cfg.read: string =&gt; q:to/CFG/;
+server "s1" {
+    name "my.server";
+    paths {
+        base "/opt/myapp";
+        pool "files" static {
+            "pub/img";
+            "static/img";
+            "docs";
+        };
+        pool "files" dynamic {
+            "users/reports";
+            "system/reports"
+        }
+    }
+}
+CFG
+say $cfg.top.get( :server("s1") =&gt; :paths =&gt; :pool("images") =&gt; 'root' ); # ./pub/img</pre>
 <p>$cfg.read: file =&gt; $my-config-filename;</p>
 <h1 id="DISCLAIMER"><a class="u" href="#___top" title="go to top of document">DISCLAIMER</a></h1>
 <p>This module is very much experimental in the sense of the API methods it provides. The grammar is expected to be more stable, yet no warranties can be given at the moment.</p>

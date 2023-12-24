@@ -2,7 +2,29 @@
 
 `Config::BINDish` - parse BIND9/named kind of config files
 
-# SYNOPSIS my $cfg = Config::BINDish.new; $cfg.read: string =\> q:to/CFG/; server "s1" { name "my.server"; paths { base "/opt/myapp"; pool "files" static { "pub/img"; "static/img"; "docs"; }; pool "files" dynamic { "users/reports"; "system/reports" } } } CFG say $cfg.top.get( :server("s1") =\> :paths =\> :pool("images") =\> 'root' ); \# ./pub/img
+# SYNOPSIS
+
+``` 
+my $cfg = Config::BINDish.new;
+$cfg.read: string => q:to/CFG/;
+server "s1" {
+    name "my.server";
+    paths {
+        base "/opt/myapp";
+        pool "files" static {
+            "pub/img";
+            "static/img";
+            "docs";
+        };
+        pool "files" dynamic {
+            "users/reports";
+            "system/reports"
+        }
+    }
+}
+CFG
+say $cfg.top.get( :server("s1") => :paths => :pool("images") => 'root' ); # ./pub/img
+```
 
 $cfg.read: file =\> $my-config-filename;
 

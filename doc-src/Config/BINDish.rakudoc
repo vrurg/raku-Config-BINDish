@@ -4,6 +4,7 @@
 C<Config::BINDish> - parse BIND9/named kind of config files
 
 =head1 SYNOPSIS
+
     my $cfg = Config::BINDish.new;
     $cfg.read: string => q:to/CFG/;
     server "s1" {
